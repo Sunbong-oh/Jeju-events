@@ -195,8 +195,9 @@ def fetch_rss(blog_id):
 
 
 def _matches(post, keywords):
-    hay = (post["category"] + post["title"]).replace(" ", "")
-    return not keywords or any(k.replace(" ", "") in hay for k in keywords)
+    # 네이버 RSS 카테고리는 공백이 '+'로 온다 ('오늘+제주소식')
+    hay = re.sub(r"[\s+]", "", post["category"] + post["title"])
+    return not keywords or any(re.sub(r"[\s+]", "", k) in hay for k in keywords)
 
 
 def collect(log=print):

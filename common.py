@@ -24,7 +24,7 @@ for _s in (sys.stdout, sys.stderr):
 DEFAULT_CONFIG = {
     # keywords: 글의 카테고리·제목에 하나라도 들어 있으면 수집 (빈 목록이면 전체 수집)
     "blogs": [
-        {"blog_id": "wowjejusi", "name": "제주시", "keywords": ["오늘의 제주소식"]},
+        {"blog_id": "wowjejusi", "name": "제주시", "keywords": ["오늘 제주소식", "오늘의 제주소식"]},
         {"blog_id": "seogwipo-si", "name": "서귀포시",
          "keywords": ["소식", "행사", "축제", "모집", "신청", "공연", "체험", "교육"]},
         {"blog_id": "jejudo_official", "name": "제주도",
