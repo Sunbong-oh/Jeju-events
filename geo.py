@@ -95,10 +95,14 @@ def where(ev, home):
     return {"area": loc[0], "km": round(km_between(home["lat"], home["lng"], loc[1], loc[2]))}
 
 
+# 제주시내 = 구제주·신제주와 그 사이. 화북·삼양·봉개·회천·외도·이호·도두 같은 외곽 동과 읍면, 서귀포시는 시외
+CITY_CORE = re.compile(r"일도|이도|삼도|용담|건입|도남|연동|노형|오라|아라|원도심|전농로|연삼로")
+
+
 def zone(area):
-    """'city'(제주시 동 지역) / 'out'(제주시 읍면·서귀포시) / None(위치 모름)."""
+    """'city'(구제주·신제주) / 'out'(그 밖) / None(위치 모름)."""
     if not area:
         return None
-    if area.startswith("제주시") and not re.search(r"[읍면](?:\s|$)", area):
+    if area == "제주시" or (area.startswith("제주시") and CITY_CORE.search(area)):
         return "city"
     return "out"
