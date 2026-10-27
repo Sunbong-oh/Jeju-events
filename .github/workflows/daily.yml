@@ -1,0 +1,39 @@
+# 매일 아침 8시(한국 시간)에 행사를 수집하고 텔레그램 알림을 보낸 뒤, 결과를 저장소에 저장한다.
+name: daily
+
+on:
+  schedule:
+    - cron: "0 23 * * *"   # UTC 23:00 = 한국 08:00
+  workflow_dispatch:         # Actions 탭에서 'Run workflow'로 바로 실행
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      TZ: Asia/Seoul
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      HOME_LAT: ${{ secrets.HOME_LAT }}
+      HOME_LNG: ${{ secrets.HOME_LNG }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: 수집·알림·사이트 생성
+        run: python run_daily.py
+      - name: 결과 저장
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/events.json docs
+          git diff --cached --quiet || git commit -m "행사 데이터 갱신 $(date +%F)"
+          git push

@@ -1,0 +1,84 @@
+{
+  "blogs": [
+    {
+      "blog_id": "wowjejusi",
+      "name": "제주시",
+      "keywords": [
+        "오늘의 제주소식"
+      ]
+    },
+    {
+      "blog_id": "seogwipo-si",
+      "name": "서귀포시",
+      "keywords": [
+        "소식",
+        "행사",
+        "축제",
+        "모집",
+        "신청",
+        "공연",
+        "체험",
+        "교육"
+      ]
+    },
+    {
+      "blog_id": "jejudo_official",
+      "name": "제주도",
+      "keywords": [
+        "소식",
+        "행사",
+        "축제",
+        "모집",
+        "신청",
+        "공연",
+        "체험",
+        "교육",
+        "가족",
+        "어린이",
+        "아이"
+      ]
+    }
+  ],
+  "reserve": {
+    "enabled": true,
+    "categories": [
+      "견학/체험",
+      "교육/강좌",
+      "공연/행사"
+    ],
+    "max_pages": 3,
+    "targets_any": []
+  },
+  "visitjeju": {
+    "enabled": true
+  },
+  "child": {
+    "age_min": 4,
+    "age_max": 6,
+    "notify_only_fit": true,
+    "likes": [
+      "음악회",
+      "콘서트",
+      "공연",
+      "버스킹",
+      "뮤지컬",
+      "오케스트라",
+      "합창",
+      "밴드",
+      "가요제",
+      "재즈",
+      "국악",
+      "음악"
+    ]
+  },
+  "home": {
+    "lat": 0.0,
+    "lng": 0.0
+  },
+  "notify_max_km": 25,
+  "telegram_bot_token": "여기에_봇_토큰",
+  "telegram_chat_id": "여기에_채팅_ID",
+  "remind_days_before": 1,
+  "notify_new_events": true,
+  "port": 8765
+}

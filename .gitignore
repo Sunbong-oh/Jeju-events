@@ -1,0 +1,5 @@
+# 비밀값(텔레그램 토큰·집 위치)은 이 PC의 config.json에만 — 절대 올리지 않음
+config.json
+__pycache__/
+data/run.log
+data/*.tmp
