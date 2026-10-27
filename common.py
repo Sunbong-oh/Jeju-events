@@ -3,6 +3,8 @@ import json
 import os
 import sys
 import threading
+import time
+import urllib.error
 import urllib.parse
 import urllib.request
 
@@ -88,9 +90,23 @@ def save_db(db):
 
 
 def http_get(url, timeout=20):
+    return http_get_bytes(url, timeout).decode("utf-8", "replace")
+
+
+def http_get_bytes(url, timeout=20, tries=4):
+    """일시적인 네트워크 오류(DNS 실패·시간 초과 등)는 5·15·30초 간격으로 다시 시도한다."""
     req = urllib.request.Request(url, headers={"User-Agent": UA})
-    with urllib.request.urlopen(req, timeout=timeout) as r:
-        return r.read().decode("utf-8", "replace")
+    for i in range(tries):
+        try:
+            with urllib.request.urlopen(req, timeout=timeout) as r:
+                return r.read()
+        except urllib.error.HTTPError as e:
+            if e.code < 500 or i == tries - 1:  # 403·404 같은 응답은 다시 해도 같다
+                raise
+        except (urllib.error.URLError, TimeoutError, ConnectionError):
+            if i == tries - 1:
+                raise
+        time.sleep((5, 15, 30)[min(i, 2)])
 
 
 def send_telegram(text, cfg=None):

@@ -3,10 +3,9 @@ import datetime as dt
 import html
 import io
 import re
-import urllib.request
 import zipfile
 
-from common import UA, http_get
+from common import http_get, http_get_bytes
 
 SITE = "https://www.visitjeju.or.kr"
 LIST = "/issue/data/event.htm"
@@ -14,9 +13,7 @@ DATE_RE = re.compile(r"(?:(20\d{2})\s*년\s*)?(\d{1,2})\s*[월.]\s*(\d{1,2})\s*�
 
 
 def _download(url):
-    req = urllib.request.Request(url, headers={"User-Agent": UA})
-    with urllib.request.urlopen(req, timeout=30) as r:
-        return r.read()
+    return http_get_bytes(url, timeout=30)
 
 
 def latest_posts():
