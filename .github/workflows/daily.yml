@@ -34,6 +34,6 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/events.json docs
+          git add data/events.json data/run.log docs
           git diff --cached --quiet || git commit -m "행사 데이터 갱신 $(date +%F)"
           git push

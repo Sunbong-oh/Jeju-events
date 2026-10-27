@@ -3,6 +3,7 @@ import datetime as dt
 import html
 import re
 import xml.etree.ElementTree as ET
+from collections import Counter
 from html.parser import HTMLParser
 
 from common import http_get, load_config, load_db, save_db
@@ -68,37 +69,60 @@ def parse_dates(line, base):
     return None
 
 
-def extract_events(text, base, skip_kw="제주소식"):
-    """글 본문을 항목별로 나눠 [{title, apply_start, apply_end, event_start, event_end, snippet}] 반환."""
+# 여러 행사를 모아 소개하는 글 — 이런 글만 항목별로 나눈다 (나머지는 글 하나 = 행사 하나)
+DIGEST_TITLE = re.compile(r"주간\s*소식|오늘의\s*제주\s*소식|알짜\s*소식|소식\s*모음|한눈에|이번\s*주\s*행사")
+BULLET = re.compile(r"^\s*(?:[■□◆◇▶▷●○◎★☆♣♠✔✅📌📍🔹🔸•▪]|\d{1,2}\s*[.)]|[①-⑳])\s*")
+
+
+def _dates(lines, base):
+    ev = {"apply_start": None, "apply_end": None, "event_start": None, "event_end": None}
+    for l in lines:
+        found = parse_dates(l, base)
+        if not found:
+            continue
+        kind = "apply" if any(k in l for k in APPLY_KW) else "event"
+        if ev[f"{kind}_start"] is None:
+            ev[f"{kind}_start"], ev[f"{kind}_end"] = (d.isoformat() for d in found)
+    return ev
+
+
+def _clean_title(line):
+    return BULLET.sub("", line).strip("[]【】<>〈〉 ")[:80]
+
+
+def _good_title(line):
+    """항목 제목으로 쓸 만한 줄인가: '30.(금) 18:50', '안녕하세요', 전화번호 같은 줄은 아니다."""
+    t = _clean_title(line)
+    return (len(re.findall(r"[가-힣]", t)) >= 6 and not re.match(r"^[\d\s.~(),:월일금토일화수목-]", t)
+            and not re.search(r"안녕하세요|입니다[.!]?$|[,，]$|\d{2,4}-\d{3,4}-\d{4}", t))
+
+
+def extract_events(text, base, post_title=""):
+    """글 본문 → [{title, apply_start, apply_end, event_start, event_end, snippet}].
+    보통 글은 행사 하나(제목 = 글 제목), 모음 글('[주간소식]' 등)만 항목별로 나눈다."""
     lines = [l.strip() for l in text.splitlines() if l.strip()]
+    if not DIGEST_TITLE.search(post_title):
+        ev = _dates(lines, base)
+        if not (ev["apply_start"] or ev["event_start"]):
+            return []
+        return [{**ev, "title": post_title[:80], "snippet": "\n".join(lines)[:600]}]
+
+    # 모음 글: 제목다운 항목 줄에서 나누고, 제목답지 않은 조각은 앞 항목에 붙인다
     chunks, cur = [], []
     for l in lines:
-        if ITEM_START.match(l) and not FIELD_LINE.match(l) and cur:
+        if ITEM_START.match(l) and not FIELD_LINE.match(l) and _good_title(l) and cur:
             chunks.append(cur)
             cur = []
         cur.append(l)
     if cur:
         chunks.append(cur)
-
     out = []
     for ch in chunks:
-        ev = {"apply_start": None, "apply_end": None, "event_start": None, "event_end": None}
-        for l in ch:
-            found = parse_dates(l, base)
-            if not found:
-                continue
-            kind = "apply" if any(k in l for k in APPLY_KW) else "event"
-            if ev[f"{kind}_start"] is None:
-                ev[f"{kind}_start"], ev[f"{kind}_end"] = (d.isoformat() for d in found)
-        if not (ev["apply_start"] or ev["event_start"]):
-            continue
-        if skip_kw and skip_kw in ch[0].replace(" ", "") and len(ch) == 1:
-            continue  # '오늘의 제주소식 (10월 27일)' 같은 글 머리줄
-        title = re.sub(r"^\s*(?:[■□◆◇▶▷●○◎★☆♣♠✔✅📌📍🔹🔸•▪]|\d{1,2}\s*[.)]|[①-⑳])\s*", "", ch[0])
-        title = title.strip("[]【】<>〈〉 ")[:80]
-        ev["title"] = title
-        ev["snippet"] = "\n".join(ch)[:600]
-        out.append(ev)
+        if not _good_title(ch[0]) or DIGEST_TITLE.search(ch[0]):
+            continue  # 글 머리말('안녕하세요…', '오늘의 제주소식 (10월 27일)')
+        ev = _dates(ch, base)
+        if ev["apply_start"] or ev["event_start"]:
+            out.append({**ev, "title": _clean_title(ch[0]), "snippet": "\n".join(ch)[:600]})
     return out
 
 
@@ -179,6 +203,13 @@ def collect(log=print):
     """설정된 모든 블로그에서 새 글을 수집해 DB에 추가하고, 새로 추가된 행사 목록을 반환."""
     cfg = load_config()
     db = load_db()
+    if db.get("version", 1) < 2:
+        # v1은 블로그 글을 잘못 쪼갰다 → 블로그 항목을 지우고 다시 수집 (직접 고친 항목은 유지)
+        blog_ids = {b["blog_id"] for b in cfg["blogs"]}
+        db["events"] = [e for e in db["events"] if e.get("source") != "auto" or e.get("edited")]
+        db["seen_posts"] = [k for k in db["seen_posts"] if k.split(":")[0] not in blog_ids]
+        db["version"] = 2
+        log("블로그 항목을 새 방식으로 다시 수집합니다")
     seen = set(db["seen_posts"])
     new_events = []
     for blog in cfg["blogs"]:
@@ -188,6 +219,9 @@ def collect(log=print):
         except Exception as e:
             log(f"[{bid}] RSS 읽기 실패: {e}")
             continue
+        matched = [p for p in posts if _matches(p, blog.get("keywords", []))]
+        cats = Counter(p["category"] or "(없음)" for p in posts).most_common(8)
+        log(f"[{bid}] RSS 글 {len(posts)}개 중 조건 맞는 글 {len(matched)}개 · 카테고리: {cats}")
         for post in posts:
             key = f"{bid}:{post['log_no']}"
             if key in seen or not _matches(post, blog.get("keywords", [])):
@@ -197,7 +231,7 @@ def collect(log=print):
             except Exception as e:  # 본문을 못 읽으면 RSS 요약으로 대체
                 log(f"[{bid}] 본문 읽기 실패({post['log_no']}): {e}")
                 text = post["desc"]
-            found = extract_events(text, post["pub_date"])
+            found = extract_events(text, post["pub_date"], post["title"])
             if not found:  # 날짜를 못 찾아도 아이에게 맞을 만한 글은 남겨서 웹에서 직접 입력할 수 있게 한다
                 stub = {"title": post["title"], "snippet": text[:600], "apply_start": None,
                         "apply_end": None, "event_start": None, "event_end": None}

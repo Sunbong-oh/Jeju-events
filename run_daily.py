@@ -58,6 +58,12 @@ def main():
             log(f"사이트 생성: 행사 {build()}건")
         except Exception:
             log("사이트 생성 오류\n" + traceback.format_exc())
+    # 실행 기록은 GitHub에서도 볼 수 있게 저장소에 함께 저장 — 최근 500줄만 유지
+    path = os.path.join(DATA_DIR, "run.log")
+    with open(path, encoding="utf-8") as f:
+        lines = f.readlines()[-500:]
+    with open(path, "w", encoding="utf-8") as f:
+        f.writelines(lines)
 
 
 if __name__ == "__main__":
