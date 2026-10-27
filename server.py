@@ -6,8 +6,8 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 from collector import collect
 from common import BASE, load_config, load_db, save_db, send_telegram
-from geo import where
-from kidfit import fit_cfg, liked
+from geo import where, zone
+from kidfit import fit_cfg, is_big, liked
 from notifier import _line
 
 EDITABLE = ("title", "apply_start", "apply_end", "event_start", "event_end", "memo", "hidden", "url", "fit_override")
@@ -15,7 +15,9 @@ EDITABLE = ("title", "apply_start", "apply_end", "event_start", "event_end", "me
 
 def _decorate(ev, cfg):
     """화면용: 아이 적합도와 집에서의 거리를 붙인다 (저장하지 않음)."""
-    return {**ev, "fit": fit_cfg(ev, cfg), "liked": liked(ev, cfg), **where(ev, cfg["home"])}
+    loc = where(ev, cfg["home"])
+    return {**ev, "fit": fit_cfg(ev, cfg), "liked": liked(ev, cfg), **loc,
+            "zone": zone(loc.get("area")), "big": is_big(ev, cfg)}
 
 
 class Handler(BaseHTTPRequestHandler):

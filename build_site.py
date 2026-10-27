@@ -5,8 +5,8 @@ import os
 import shutil
 
 from common import BASE, load_config, load_db
-from geo import where
-from kidfit import fit_cfg, liked
+from geo import where, zone
+from kidfit import fit_cfg, is_big, liked
 
 DOCS = os.path.join(BASE, "docs")
 
@@ -17,7 +17,9 @@ def build():
     for e in load_db()["events"]:
         if e.get("hidden"):
             continue
-        out.append({**e, "fit": fit_cfg(e, cfg), "liked": liked(e, cfg), **where(e, None)})
+        loc = where(e, None)
+        out.append({**e, "fit": fit_cfg(e, cfg), "liked": liked(e, cfg), **loc,
+                    "zone": zone(loc.get("area")), "big": is_big(e, cfg)})
     os.makedirs(DOCS, exist_ok=True)
     shutil.copy(os.path.join(BASE, "index.html"), os.path.join(DOCS, "index.html"))
     with open(os.path.join(DOCS, "events.json"), "w", encoding="utf-8") as f:

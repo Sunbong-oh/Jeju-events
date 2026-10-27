@@ -3,8 +3,8 @@ import datetime as dt
 import html
 
 from common import load_config, load_db, save_db, send_telegram
-from geo import where
-from kidfit import fit_cfg, liked
+from geo import where, zone
+from kidfit import fit_cfg, is_big, liked
 
 # (날짜 필드, 라벨, 며칠 전 알림 여부)
 TRIGGERS = [
@@ -76,6 +76,9 @@ def notify(new_events=(), today=None, log=print):
         if e["_fit"] == "no":
             return False
         # '가능' 등급은 너무 먼 곳이면 뺀다 (추천은 멀어도 알림)
+        # 시외(제주시 읍면·서귀포)는 큰 행사만
+        if zone(e["_where"].get("area")) == "out" and not is_big(e, cfg):
+            return False
         return e["_fit"] == "good" or not max_km or e["_where"].get("km", 0) <= max_km
     # 알림을 항목마다 따로 보내지 않고 하루치 묶음으로 보낸다
     blocks = []  # (key 목록, 텍스트)

@@ -100,4 +100,28 @@ def collect_reserve(db, cfg, log=print):
             if all(i["event"] and i["event"][2] < stale for i in items):
                 break
         log(f"[예약] {cat}: 새 항목 {sum(1 for e in new if e['blog'].endswith(cat))}건")
+    _fill_details(db, log)
     return new
+
+
+PLACE_RE = re.compile(r"(?:교육|운영|체험|행사)?장소\s*:?\s*(.{2,80}?)\s*(?:신청방법|문의|$)")
+
+
+def _fill_details(db, log, limit=200):
+    """아직 안 끝난 예약 항목의 상세 페이지에서 포스터(첫 본문 이미지)와 장소를 가져온다. 항목마다 한 번만."""
+    today = dt.date.today().isoformat()
+    todo = [e for e in db["events"] if e.get("source") == "jje" and ("poster" not in e or "place" not in e)
+            and max(e.get("event_end") or "", e.get("apply_end") or "") >= today][:limit]
+    posters = 0
+    for ev in todo:
+        try:
+            page = http_get(ev["url"])
+        except Exception:
+            continue  # 다음 실행 때 다시 시도
+        m = re.search(r'<img[^>]+src="(/upload_data/editor/[^"]+)"', page)
+        ev["poster"] = SITE + m.group(1) if m else None
+        posters += bool(m)
+        m = PLACE_RE.search(_text(page))
+        ev["place"] = m.group(1).strip() if m else None
+    if todo:
+        log(f"[예약] 상세 확인 {len(todo)}건 (포스터 {posters}건)")

@@ -134,6 +134,7 @@ class _BodyText(HTMLParser):
         super().__init__()
         self.depth = 0
         self.parts = []
+        self.images = []  # 본문 이미지 — 첫 장을 포스터로 쓴다
 
     def handle_starttag(self, tag, attrs):
         a = dict(attrs)
@@ -142,6 +143,11 @@ class _BodyText(HTMLParser):
                 self.depth += 1
             if tag in self.BLOCK and tag != "span":
                 self.parts.append("\n")
+            if tag == "img":
+                src = a.get("data-lazy-src") or a.get("src") or ""
+                # 스티커·이모티콘·지도 이미지는 건너뜀
+                if re.search(r"pstatic\.net|blogfiles", src) and not re.search(r"storep|sticker|static\.map|dthumb", src):
+                    self.images.append(re.sub(r"\?type=\w+$", "", src) + "?type=w773")
         elif tag == "div" and ("se-main-container" in (a.get("class") or "")
                                or a.get("id") == "postViewArea"):
             self.depth = 1
@@ -162,11 +168,12 @@ class _BodyText(HTMLParser):
         return re.sub(r"\n\s*\n+", "\n", t)
 
 
-def fetch_post_text(blog_id, log_no):
+def fetch_post(blog_id, log_no):
+    """(본문 텍스트, 포스터 이미지 주소 또는 None)"""
     page = http_get(f"https://blog.naver.com/PostView.naver?blogId={blog_id}&logNo={log_no}")
     p = _BodyText()
     p.feed(page)
-    return p.text()
+    return p.text(), (p.images[0] if p.images else None)
 
 
 def fetch_rss(blog_id):
@@ -204,12 +211,12 @@ def collect(log=print):
     """설정된 모든 블로그에서 새 글을 수집해 DB에 추가하고, 새로 추가된 행사 목록을 반환."""
     cfg = load_config()
     db = load_db()
-    if db.get("version", 1) < 2:
-        # v1은 블로그 글을 잘못 쪼갰다 → 블로그 항목을 지우고 다시 수집 (직접 고친 항목은 유지)
+    if db.get("version", 1) < 3:
+        # v1은 블로그 글을 잘못 쪼갰고 v2는 포스터가 없다 → 블로그 항목을 지우고 다시 수집 (직접 고친 항목은 유지)
         blog_ids = {b["blog_id"] for b in cfg["blogs"]}
         db["events"] = [e for e in db["events"] if e.get("source") != "auto" or e.get("edited")]
         db["seen_posts"] = [k for k in db["seen_posts"] if k.split(":")[0] not in blog_ids]
-        db["version"] = 2
+        db["version"] = 3
         log("블로그 항목을 새 방식으로 다시 수집합니다")
     seen = set(db["seen_posts"])
     new_events = []
@@ -227,8 +234,10 @@ def collect(log=print):
             key = f"{bid}:{post['log_no']}"
             if key in seen or not _matches(post, blog.get("keywords", [])):
                 continue
+            poster = None
             try:
-                text = fetch_post_text(bid, post["log_no"]) or post["desc"]
+                text, poster = fetch_post(bid, post["log_no"])
+                text = text or post["desc"]
             except Exception as e:  # 본문을 못 읽으면 RSS 요약으로 대체
                 log(f"[{bid}] 본문 읽기 실패({post['log_no']}): {e}")
                 text = post["desc"]
@@ -245,6 +254,7 @@ def collect(log=print):
                     "url": post["link"],
                     "posted": post["pub_date"].isoformat(),
                     "source": "auto",
+                    "poster": poster,
                     "hidden": False,
                     "memo": "",
                 })

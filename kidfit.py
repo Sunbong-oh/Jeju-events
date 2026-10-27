@@ -97,3 +97,16 @@ def fit(ev, age_min=4, age_max=6, like_re=None):
     if MAYBE.search(text):
         return "maybe"
     return "no"
+
+
+# 시외라도 가볼 만한 큰 행사 — 20회 이상 이어진 축제·문화제, 이름난 축제
+BIG = re.compile(r"탐라문화제|칠십리|들불|유채꽃|제주마\s*축제|해녀\s*축제|감귤\s*(?:박람회|축제)|야\s*페스타|비엔날레|"
+                 r"국제[^|]{0,10}(?:축제|페스티벌|영화제)|불꽃|드론\s*라이트|엑스포")
+EDITION = re.compile(r"제\s*(\d+)\s*회[^|]{0,20}(?:축제|문화제|페스티벌|페스타|박람회)")
+
+
+def is_big(ev, cfg=None):
+    extra = (cfg or {}).get("big_events", [])
+    title = ev.get("title") or ev.get("post_title") or ""
+    m = EDITION.search(title)
+    return bool(BIG.search(title) or (m and int(m.group(1)) >= 20) or any(k in title for k in extra))

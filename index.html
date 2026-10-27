@@ -36,6 +36,12 @@ a.tlink{display:block;color:var(--ink);text-decoration:none;font-size:16px;line-
 a.tlink:hover{color:var(--accent);text-decoration:underline}
 .top input.title{width:calc(100% - 28px)}
 a.tgo{color:var(--accent);text-decoration:none;font-weight:600}
+.card.hasp{display:grid;grid-template-columns:minmax(0,1fr) 112px;column-gap:14px}
+.card.hasp>*{grid-column:1}
+.card.hasp>.pwrap{grid-column:2;grid-row:1 / span 6;align-self:start}
+img.poster{display:block;width:112px;max-height:170px;object-fit:cover;object-position:top;border-radius:8px;border:1px solid var(--line);background:var(--bg)}
+@media (max-width:520px){.card.hasp{grid-template-columns:minmax(0,1fr) 84px;column-gap:10px}img.poster{width:84px;max-height:126px}}
+.b.out{background:var(--bg);color:var(--sub);border:1px solid var(--line);font-size:11px;padding:1px 6px}
 .eid{display:none;margin-top:6px;font-size:11px}
 /* GitHub Pages 보기 전용 */
 .ro .btns,.ro .row{display:none}
@@ -72,7 +78,9 @@ details pre{white-space:pre-wrap;font:inherit;margin:6px 0 0}
 </header>
 <main>
   <nav class="tabs" id="tabs"></nav>
-  <div class="tools"><select id="fitSel">
+  <div class="tools"><select id="zoneSel">
+    <option value="near">🏙 제주시내 + 시외 큰 행사</option><option value="city">제주시내만</option><option value="out">시외만</option><option value="all">전체 지역</option>
+  </select><select id="fitSel">
     <option value="kid">👧 아이 맞춤</option><option value="good">⭐ 추천만</option><option value="liked">🎵 음악 공연</option><option value="all">전체</option>
   </select><select id="kmSel">
     <option value="">거리 전체</option><option value="10">10km 이내</option><option value="20">20km 이내</option><option value="30">30km 이내</option>
@@ -112,12 +120,17 @@ function card(e){
     + (e.fit==="good"?`<span class="b kid">⭐ 추천</span>`:"")
     + badge("신청마감",e.apply_end||e.apply_start,"apply") + badge("행사",e.event_start,"event");
   const inp=(f)=>`<input type="date" data-f="${f}" value="${e[f]||""}">`;
-  return `<div class="card" data-id="${esc(e.id)}">
+  // 포스터: 누르면 크게 열림. 이미지를 못 불러오면 칸째 숨김
+  const poster = e.poster ? `<a class="pwrap" href="${esc(e.poster)}" target="_blank" rel="noopener noreferrer">
+      <img class="poster" src="${esc(e.poster)}" alt="포스터" loading="lazy" referrerpolicy="no-referrer"
+        onerror="const c=this.closest('.card');c.classList.remove('hasp');this.parentNode.remove()"></a>` : "";
+  return `<div class="card ${e.poster?"hasp":""}" data-id="${esc(e.id)}">
+    ${poster}
     <div class="top"><div style="flex:1;min-width:0">
       ${READONLY&&e.url
         ? `<a class="title tlink" href="${esc(e.url)}" target="_blank" rel="noopener">${esc(e.title||e.post_title)}</a>`
         : `<input class="title" data-f="title" value="${esc(e.title||e.post_title)}">${e.url?` <a class="tgo" href="${esc(e.url)}" target="_blank" rel="noopener" title="원문 열기">↗</a>`:""}`}
-      ${e.area?`<div class="meta place">📍 ${esc(e.area)}${e.km!=null?` · 집에서 약 ${e.km}km`:""}</div>`:""}
+      ${e.area?`<div class="meta place">📍 ${esc(e.area)}${e.km!=null?` · 집에서 약 ${e.km}km`:""}${e.zone==="out"?` <span class="b out">시외${e.big?" · 큰 행사":""}</span>`:""}</div>`:""}
       ${e.info?`<div class="meta">${esc(e.info)}${e.apply_end_time?` · 마감 ${esc(e.apply_end_time)}`:""}</div>`:""}
       <div class="meta">${esc(e.blog||"")} · ${esc(e.posted||"")}${e.url?` · <a href="${esc(e.url)}" target="_blank" rel="noopener">원문</a>`:""}</div>
     </div><div class="badges">${b}</div></div>
@@ -142,7 +155,10 @@ function render(){
   const fm=document.getElementById("fitSel").value;
   const fitOk=e=>fm==="all"||(fm==="good"?e.fit==="good":fm==="liked"?e.liked&&e.fit!=="no":e.fit!=="no");
   const km=+document.getElementById("kmSel").value;
-  const pool=events.filter(e=>(!sel.value||srcOf(e)===sel.value)&&fitOk(e)&&(!km||(e.km??0)<=km));
+  const zm=document.getElementById("zoneSel").value;
+  // 시외 = 제주시 읍면(구좌·조천·한림·애월 등)과 서귀포시. 위치를 모르는 행사는 제주시내 쪽에 둔다
+  const zoneOk=e=>zm==="all"||(zm==="near"?e.zone!=="out"||e.big:zm==="city"?e.zone!=="out":e.zone==="out");
+  const pool=events.filter(e=>(!sel.value||srcOf(e)===sel.value)&&fitOk(e)&&zoneOk(e)&&(!km||(e.km??0)<=km));
   const counts={}; pool.forEach(e=>counts[group(e)]=(counts[group(e)]||0)+1);
   document.getElementById("tabs").innerHTML=Object.entries(TABS).map(([k,v])=>
     `<button class="tab ${k===tab?"on":""}" data-tab="${k}">${v} ${counts[k]||0}</button>`).join("");
@@ -165,6 +181,7 @@ document.getElementById("tabs").onclick=e=>{const t=e.target.dataset.tab;if(t){t
 document.getElementById("q").oninput=render;
 document.getElementById("src").onchange=render;
 document.getElementById("fitSel").onchange=render;
+document.getElementById("zoneSel").onchange=render;
 document.getElementById("kmSel").onchange=render;
 document.getElementById("list").addEventListener("change",async e=>{
   const f=e.target.dataset.f, id=e.target.closest(".card")?.dataset.id; if(!f||!id) return;
