@@ -58,6 +58,9 @@ def due_today(db, today, remind_days):
 
 def notify(new_events=(), today=None, log=print):
     cfg = load_config()
+    if not cfg.get("telegram_bot_token") or not cfg.get("telegram_chat_id"):
+        log("텔레그램 설정 없음 — 알림 건너뜀 (웹페이지만 사용)")
+        return 0
     today = today or dt.date.today()
     db = load_db()
     child = cfg.get("child", {})
