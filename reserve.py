@@ -12,7 +12,7 @@ CATEGORIES = {
     "공연/행사": "/jjeEvent/list.jje?menuCd=DOM_000000503001000000",
     "시설대관": "/jjeFacility/list.jje?menuCd=DOM_000000505001000000",
 }
-DEFAULT = {"categories": ["견학/체험", "교육/강좌", "공연/행사"], "max_pages": 3, "targets_any": []}
+DEFAULT = {"categories": ["견학/체험", "교육/강좌", "공연/행사"], "max_pages": 20, "targets_any": []}
 
 ROW_RE = re.compile(r"<tr>(.*?)</tr>", re.S)
 CELL_RE = re.compile(r"<td[^>]*>(.*?)</td>", re.S)

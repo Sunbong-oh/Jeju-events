@@ -12,6 +12,7 @@ LANG = re.compile(r"외국어|영어|일본어|중국어|스페인어|프랑스�
 KID_WORD = re.compile(r"유아|어린이|키즈|kids|아기|영유아|가족|그림책|동화|놀이", re.I)
 MAYBE = re.compile(r"축제|페스티벌|페스타|공연|음악회|콘서트|장터|마켓|야시장|체험|전시|문화제|버스킹|빛|불꽃|퍼레이드|투어")
 AGE_RANGE = re.compile(r"(\d{1,2})\s*[~\-–]\s*(\d{1,2})\s*세")
+AGE_ONE = re.compile(r"(?<![\d~\-–])(\d{1,2})\s*세\s*(?:반|대상|아동|어린이)")  # '♥4세반♥', '5세 대상'
 AGE_MIN = re.compile(r"(\d{1,2})\s*세\s*이상")
 AGE_MAX = re.compile(r"(\d{1,2})\s*세\s*(?:이하|미만)")
 MONTHS = re.compile(r"(\d{2,3})\s*개월\s*(?:~\s*(\d{2,3})\s*개월)?")
@@ -23,6 +24,9 @@ def _age_ok(text, lo, hi):
     if m:
         a, b = int(m.group(1)), int(m.group(2))
         return a <= hi and b >= lo
+    m = AGE_ONE.search(text)
+    if m:
+        return lo <= int(m.group(1)) <= hi
     m = MONTHS.search(text)
     if m:
         a = int(m.group(1)) / 12

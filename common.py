@@ -42,7 +42,7 @@ DEFAULT_CONFIG = {
     # 제주교육청 통합예약시스템. categories: 견학/체험, 교육/강좌, 공연/행사, 시설대관
     # targets_any: 대상에 이 중 하나라도 있는 것만 (예: ["학부모", "가족", "일반"]), 빈 목록이면 전체
     "reserve": {"enabled": True, "categories": ["견학/체험", "교육/강좌", "공연/행사"],
-                "max_pages": 3, "targets_any": []},
+                "max_pages": 20, "targets_any": []},
     # 제주관광협회 '행사안내' 월별 축제·행사 일정표(첨부 hwpx)
     "visitjeju": {"enabled": True},
     "telegram_bot_token": "",
