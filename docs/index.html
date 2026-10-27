@@ -79,7 +79,7 @@ details pre{white-space:pre-wrap;font:inherit;margin:6px 0 0}
 <main>
   <nav class="tabs" id="tabs"></nav>
   <div class="tools"><select id="zoneSel">
-    <option value="near">🏙 제주시내 + 시외 큰 행사</option><option value="city">제주시내만</option><option value="out">시외만</option><option value="all">전체 지역</option>
+    <option value="near">🏙 구제주·신제주 + 시외 큰 행사</option><option value="city">구제주·신제주만</option><option value="out">시외만</option><option value="all">전체 지역</option>
   </select><select id="fitSel">
     <option value="kid">👧 아이 맞춤</option><option value="good">⭐ 추천만</option><option value="liked">🎵 음악 공연</option><option value="all">전체</option>
   </select><select id="kmSel">
@@ -156,7 +156,7 @@ function render(){
   const fitOk=e=>fm==="all"||(fm==="good"?e.fit==="good":fm==="liked"?e.liked&&e.fit!=="no":e.fit!=="no");
   const km=+document.getElementById("kmSel").value;
   const zm=document.getElementById("zoneSel").value;
-  // 시외 = 제주시 읍면(구좌·조천·한림·애월 등)과 서귀포시. 위치를 모르는 행사는 제주시내 쪽에 둔다
+  // 시외 = 구제주·신제주 밖(화북·외도 등 외곽 동, 조천·애월·한림·구좌 등 읍면, 서귀포시). 위치를 모르는 행사는 시내 쪽에 둔다
   const zoneOk=e=>zm==="all"||(zm==="near"?e.zone!=="out"||e.big:zm==="city"?e.zone!=="out":e.zone==="out");
   const pool=events.filter(e=>(!sel.value||srcOf(e)===sel.value)&&fitOk(e)&&zoneOk(e)&&(!km||(e.km??0)<=km));
   const counts={}; pool.forEach(e=>counts[group(e)]=(counts[group(e)]||0)+1);
