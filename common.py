@@ -47,6 +47,8 @@ DEFAULT_CONFIG = {
                 "max_pages": 20, "targets_any": []},
     # 제주관광협회 '행사안내' 월별 축제·행사 일정표(첨부 hwpx)
     "visitjeju": {"enabled": True},
+    # 네이버 블로그 검색: '10월 제주행사'처럼 검색한 글 중 새 글을 수집 (months_ahead: 이번 달 + N개월 뒤)
+    "naver_search": {"enabled": True, "queries": ["{m}월 제주행사"], "months_ahead": 1, "pages": 2},
     "telegram_bot_token": "",
     "telegram_chat_id": "",
     "remind_days_before": 1,

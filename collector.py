@@ -10,6 +10,7 @@ from common import http_get, load_config, load_db, save_db
 from reserve import collect_reserve
 from visitjeju import collect_visitjeju
 from kidfit import fit_cfg
+from naver_search import DEFAULT as SEARCH_DEFAULT, search_posts
 
 APPLY_KW = ("신청", "접수", "모집", "응모", "예약", "등록")
 EVENT_KW = ("일시", "기간", "행사", "축제", "개최", "일정", "운영", "공연", "교육", "날짜", "때")
@@ -220,6 +221,8 @@ def collect(log=print):
         log("블로그 항목을 새 방식으로 다시 수집합니다")
     seen = set(db["seen_posts"])
     new_events = []
+    # (출처 이름, 글, 조건 키워드) — 블로그 RSS 글과 네이버 블로그 검색 결과 글을 같은 방식으로 처리한다
+    jobs = []
     for blog in cfg["blogs"]:
         bid = blog["blog_id"]
         try:
@@ -230,38 +233,46 @@ def collect(log=print):
         matched = [p for p in posts if _matches(p, blog.get("keywords", []))]
         cats = Counter(p["category"] or "(없음)" for p in posts).most_common(8)
         log(f"[{bid}] RSS 글 {len(posts)}개 중 조건 맞는 글 {len(matched)}개 · 카테고리: {cats}")
-        for post in posts:
-            key = f"{bid}:{post['log_no']}"
-            if key in seen or not _matches(post, blog.get("keywords", [])):
-                continue
-            poster = None
-            try:
-                text, poster = fetch_post(bid, post["log_no"])
-                text = text or post["desc"]
-            except Exception as e:  # 본문을 못 읽으면 RSS 요약으로 대체
-                log(f"[{bid}] 본문 읽기 실패({post['log_no']}): {e}")
-                text = post["desc"]
-            found = extract_events(text, post["pub_date"], post["title"])
-            if not found:  # 날짜를 못 찾아도 아이에게 맞을 만한 글은 남겨서 웹에서 직접 입력할 수 있게 한다
-                stub = {"title": post["title"], "snippet": text[:600], "apply_start": None,
-                        "apply_end": None, "event_start": None, "event_end": None}
-                found = [stub] if fit_cfg(stub, cfg) != "no" else []
-            for i, ev in enumerate(found):
-                ev.update({
-                    "id": f"{bid}-{post['log_no']}-{i}",
-                    "blog": blog.get("name", bid),
-                    "post_title": post["title"],
-                    "url": post["link"],
-                    "posted": post["pub_date"].isoformat(),
-                    "source": "auto",
-                    "poster": poster,
-                    "hidden": False,
-                    "memo": "",
-                })
-                db["events"].append(ev)
-                new_events.append(ev)
-            seen.add(key)
-            log(f"[{bid}] 수집: {post['title']} → {len(found)}건")
+        jobs += [(blog.get("name", bid), dict(p, blog_id=bid), blog.get("keywords", [])) for p in posts]
+    ns = {**SEARCH_DEFAULT, **cfg.get("naver_search", {})}
+    if ns.get("enabled", True):
+        try:
+            jobs += [("네이버 검색", p, []) for p in search_posts(ns, log)]
+        except Exception as e:
+            log(f"[네이버 검색] 실패: {e}")
+    for name, post, keywords in jobs:
+        bid = post["blog_id"]
+        key = f"{bid}:{post['log_no']}"
+        if key in seen or not _matches(post, keywords):
+            continue
+        poster = None
+        try:
+            text, poster = fetch_post(bid, post["log_no"])
+            text = text or post["desc"]
+        except Exception as e:  # 본문을 못 읽으면 RSS 요약으로 대체
+            log(f"[{bid}] 본문 읽기 실패({post['log_no']}): {e}")
+            text = post["desc"]
+        found = extract_events(text, post["pub_date"], post["title"])
+        if not found:  # 날짜를 못 찾아도 아이에게 맞을 만한 글은 남겨서 웹에서 직접 입력할 수 있게 한다
+            stub = {"title": post["title"], "snippet": text[:600], "apply_start": None,
+                    "apply_end": None, "event_start": None, "event_end": None}
+            found = [stub] if fit_cfg(stub, cfg) != "no" else []
+        for i, ev in enumerate(found):
+            ev.update({
+                "id": f"{bid}-{post['log_no']}-{i}",
+                "blog": name,
+                "post_title": post["title"],
+                "url": post["link"],
+                "posted": post["pub_date"].isoformat(),
+                "source": "auto",
+                "poster": poster,
+                "hidden": False,
+                "memo": "",
+            })
+            db["events"].append(ev)
+            new_events.append(ev)
+        seen.add(key)
+        log(f"[{name}] 수집: {post['title']} → {len(found)}건")
     db["seen_posts"] = sorted(seen)
     for extra in (collect_reserve, collect_visitjeju):
         try:
