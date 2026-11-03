@@ -5,6 +5,8 @@ on:
   schedule:
     - cron: "0 23 * * *"   # UTC 23:00 = 한국 08:00
   workflow_dispatch:         # Actions 탭에서 'Run workflow'로 바로 실행
+  push:
+    paths: [overrides.json]  # 갤럭시탭 등에서 수정하면 사이트를 바로 다시 만든다
 
 permissions:
   contents: write

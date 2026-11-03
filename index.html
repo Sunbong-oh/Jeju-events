@@ -45,6 +45,8 @@ img.poster{display:block;width:112px;max-height:170px;object-fit:cover;object-po
 .eid{display:none;margin-top:6px;font-size:11px}
 /* GitHub Pages 보기 전용 */
 .ro .btns,.ro .row{display:none}
+/* 갤럭시탭 등 공개 페이지에서 수정 모드일 때: 서버가 필요한 버튼은 숨김 */
+.static #collect,.static #add,.static #test,.static button[data-act=send]{display:none}
 .ro .eid{display:block}
 .ro .dates input,.ro input.title{pointer-events:none;border-color:transparent;background:none}
 .badges{display:flex;gap:4px;flex-shrink:0}
@@ -74,6 +76,7 @@ details pre{white-space:pre-wrap;font:inherit;margin:6px 0 0}
     <button id="collect" class="primary">지금 수집</button>
     <button id="add">행사 직접 추가</button>
     <button id="test">텔레그램 테스트</button>
+    <button id="editMode" hidden>✏️ 수정</button>
   </div>
 </header>
 <main>
@@ -96,7 +99,34 @@ const dday = s => s ? Math.round((new Date(s) - today) / 864e5) : null;
 const esc = s => (s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
 function toast(msg){const t=document.getElementById("toast");t.textContent=msg;t.style.display="block";clearTimeout(t._h);t._h=setTimeout(()=>t.style.display="none",3000)}
+// 공개 페이지(GitHub Pages)에서의 수정: 이 기기에만 저장한 토큰으로 overrides.json을 고쳐 GitHub에 커밋한다
+const REPO = "Sunbong-oh/Jeju-events", OVR = "overrides.json";
+let STATIC = false, TOKEN = null;
+try { TOKEN = localStorage.getItem("jejuEditToken"); } catch {}
+const b64 = s => btoa(Array.from(new TextEncoder().encode(s), c => String.fromCharCode(c)).join(""));
+const unb64 = s => new TextDecoder().decode(Uint8Array.from(atob(s.replace(/\s/g, "")), c => c.charCodeAt(0)));
+let saveChain = Promise.resolve();
+// 여러 번 눌러도 한 번에 하나씩 저장한다 (GitHub 파일 버전 충돌 방지)
+const saveOverride = (id, patch) => (saveChain = saveChain.then(() => doSave(id, patch)));
+async function doSave(id, patch){
+  const url = `https://api.github.com/repos/${REPO}/contents/${OVR}`;
+  const h = {Authorization: `Bearer ${TOKEN}`, Accept: "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28"};
+  const r = await fetch(url, {headers: h, cache: "no-store"});
+  if(!r.ok) throw new Error(r.status === 401 || r.status === 403 || r.status === 404 ? "토큰을 확인해 주세요" : `GitHub ${r.status}`);
+  const f = await r.json();
+  const all = JSON.parse(unb64(f.content) || "{}");
+  all[id] = {...(all[id] || {}), ...patch};
+  const put = await fetch(url, {method: "PUT", headers: {...h, "Content-Type": "application/json"},
+    body: JSON.stringify({message: `수정: ${id}`, content: b64(JSON.stringify(all, null, 2) + "\n"), sha: f.sha})});
+  if(!put.ok) throw new Error(put.status === 409 ? "다른 저장과 겹쳤어요. 다시 눌러 주세요" : `GitHub ${put.status}`);
+  return patch;
+}
 async function api(method, path, body){
+  if(STATIC){
+    const m = path.match(/^\/api\/events\/(.+)$/);
+    if(method === "PUT" && m) return saveOverride(decodeURIComponent(m[1]), body);
+    throw new Error("이 기능은 PC에서만 쓸 수 있어요");
+  }
   const r = await fetch(path,{method,headers:{"Content-Type":"application/json"},body:body&&JSON.stringify(body)});
   const j = await r.json(); if(!r.ok) throw new Error(j.error||r.status); return j;
 }
@@ -170,8 +200,16 @@ async function load(){
   try{ events = await api("GET","/api/events"); }
   catch{ // GitHub Pages: 서버 없이 미리 만들어 둔 events.json을 보기 전용으로 띄운다
     events = await fetch("events.json",{cache:"no-store"}).then(r=>r.json());
-    document.body.classList.add("ro");
-    READONLY = true;
+    const edit = document.getElementById("editMode");
+    edit.hidden = false;
+    edit.textContent = TOKEN ? "수정 끄기" : "✏️ 수정";
+    if(TOKEN){ // 토큰이 있으면 수정 모드 (저장하면 GitHub에 기록)
+      STATIC = true;
+      document.body.classList.add("static");
+    } else {
+      document.body.classList.add("ro");
+      READONLY = true;
+    }
   }
   document.getElementById("kmSel").hidden = !events.some(e=>e.km!=null);
   render();
@@ -205,6 +243,17 @@ document.getElementById("collect").onclick=async e=>{
 };
 document.getElementById("test").onclick=async()=>{
   try{await api("POST","/api/test-telegram");toast("테스트 메시지를 보냈습니다")}catch(err){toast("오류: "+err.message)}
+};
+document.getElementById("editMode").onclick=()=>{
+  if(TOKEN){
+    if(!confirm("이 기기의 수정 모드를 끌까요? 저장된 토큰이 지워집니다.")) return;
+    try{localStorage.removeItem("jejuEditToken")}catch{}
+  } else {
+    const t = prompt("GitHub 토큰을 붙여넣으세요. 이 기기 브라우저에만 저장됩니다.");
+    if(!t) return;
+    try{localStorage.setItem("jejuEditToken", t.trim())}catch{toast("이 브라우저는 저장을 막아 두었어요");return}
+  }
+  location.reload();
 };
 document.getElementById("add").onclick=async()=>{
   const title=prompt("행사 이름"); if(!title) return;
