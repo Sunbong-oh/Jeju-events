@@ -5,7 +5,7 @@ import os
 import shutil
 
 from common import BASE, load_config, load_db
-from geo import where, zone
+from geo import is_jeju, where, zone
 from kidfit import fit_cfg, is_big, liked
 
 DOCS = os.path.join(BASE, "docs")
@@ -15,7 +15,7 @@ def build():
     cfg = load_config()
     out = []
     for e in load_db()["events"]:
-        if e.get("hidden"):
+        if e.get("hidden") or not is_jeju(e):  # 제주 이외의 행사는 보여주지 않는다
             continue
         loc = where(e, None)
         out.append({**e, "fit": fit_cfg(e, cfg), "liked": liked(e, cfg), **loc,

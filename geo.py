@@ -106,3 +106,21 @@ def zone(area):
     if area == "제주시" or (area.startswith("제주시") and CITY_CORE.search(area)):
         return "city"
     return "out"
+
+
+# 제주가 아닌 지역 이름 — 이것만 있고 제주 지명이 없으면 제주 행사가 아니다
+OTHER_REGION = re.compile(r"서울|부산|대구|인천|광주|대전|울산|세종|경기|강원|충북|충남|전북|전남|경북|경남|"
+                          r"수원|성남|고양|용인|창원|청주|전주|춘천|강릉|여수|순천|포항|경주|안산|안양|부천|"
+                          r"화성|파주|김포|남양주|진주|원주|아산|천안|속초|양양|통영|거제|남해|담양|보성|안동|"
+                          r"제천|단양|부안|군산|목포|익산|구미")
+JEJU_NAME = re.compile(r"제주|서귀포|한라|성산|애월|조천|구좌|표선|대정|한림|우도|추자|중문|남원|안덕")
+
+
+def is_jeju(ev):
+    """제주 행사인지. 교육청·관광협회 목록은 제주 행사이고, 그 밖에는 제주 지명이 있어야 한다."""
+    if ev.get("source") in ("jje", "visitjeju"):
+        return True
+    text = " ".join(str(ev.get(k) or "") for k in ("title", "post_title", "info", "snippet", "place", "area"))
+    if JEJU_NAME.search(text):
+        return True
+    return not OTHER_REGION.search(text) and ev.get("blog") != "네이버 검색"

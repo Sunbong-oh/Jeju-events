@@ -3,7 +3,7 @@ import datetime as dt
 import html
 
 from common import load_config, load_db, save_db, send_telegram
-from geo import where, zone
+from geo import is_jeju, where, zone
 from kidfit import fit_cfg, is_big, liked
 
 # (날짜 필드, 라벨, 며칠 전 알림 여부)
@@ -73,7 +73,7 @@ def notify(new_events=(), today=None, log=print):
     def wanted(e):
         if not child.get("notify_only_fit", True):
             return True
-        if e["_fit"] == "no":
+        if e["_fit"] == "no" or not is_jeju(e):
             return False
         # '가능' 등급은 너무 먼 곳이면 뺀다 (추천은 멀어도 알림)
         # 시외(제주시 읍면·서귀포)는 큰 행사만
