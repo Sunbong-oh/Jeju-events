@@ -120,6 +120,10 @@ def is_jeju(ev):
     """제주 행사인지. 교육청·관광협회 목록은 제주 행사이고, 그 밖에는 제주 지명이 있어야 한다."""
     if ev.get("source") in ("jje", "visitjeju"):
         return True
+    # 전국 단위 모음 글('전국 가볼 만한 축제')은 제목에 제주가 없으면 제주 행사가 아니다
+    title = f"{ev.get('title') or ''} {ev.get('post_title') or ''}"
+    if "전국" in title and not JEJU_NAME.search(title):
+        return False
     text = " ".join(str(ev.get(k) or "") for k in ("title", "post_title", "info", "snippet", "place", "area"))
     if JEJU_NAME.search(text):
         return True
