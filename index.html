@@ -170,6 +170,7 @@ function card(e){
       <label><span>신청</span>${inp("apply_start")}~${inp("apply_end")}</label>
       <label><span>행사</span>${inp("event_start")}~${inp("event_end")}</label>
     </div>
+    ${e.related?.length?`<details><summary>관련 글 ${e.related.length}건</summary><ul>${e.related.map(r=>`<li>${r.url?`<a href="${esc(r.url)}" target="_blank" rel="noopener">${esc(r.title||"")}</a>`:esc(r.title||"")}${r.blog?` <small>(${esc(r.blog)})</small>`:""}</li>`).join("")}</ul></details>`:""}
     ${e.snippet?`<details><summary>본문 발췌</summary><pre>${esc(e.snippet)}</pre></details>`:""}
     <div class="meta eid">ID: ${esc(e.id)} (overrides.json에서 고칠 때 사용)</div>
     <div class="row">

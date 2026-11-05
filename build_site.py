@@ -42,6 +42,38 @@ def dedupe(items):
     return kept
 
 
+# 블로그 글이 여러 개인 같은 행사를 한 카드로 묶는 이름 목록. 이름 + 같은 기간인 글만 묶는다.
+ROUNDUP = re.compile(r"총정리|모음|정리|추천|BEST|TOP|목록|가볼|미리보기|축제 일정|행사 일정|첫째 주")
+GROUP_NAMES = ["올레걷기축제", "제주감귤박람회", "칠십리축제", "정원문화박람회", "야페스타"]
+
+
+def group_festivals(items):
+    """GROUP_NAMES 중 하나가 제목에 있고 기간이 같은 글을 한 카드로 묶는다. 나머지는 related에 링크로 남긴다."""
+    out = list(items)
+    for name in GROUP_NAMES:
+        key = _norm(name)
+        members = [e for e in out if e.get("event_start") and key in _norm(e.get("title") or e.get("post_title"))]
+        if len(members) < 2:
+            continue
+        # 가장 많이 나온 기간을 행사 기간으로 본다
+        counts = {}
+        for e in members:
+            k = (e["event_start"], e.get("event_end"))
+            counts[k] = counts.get(k, 0) + 1
+        period = max(counts, key=counts.get)
+        # 시작일이 행사 기간 안에 있는 글을 같은 행사로 본다 (하루짜리로 잘못 읽힌 글 포함)
+        same = sorted([e for e in members if period[0] <= e["event_start"] <= (period[1] or period[0])],
+                      key=lambda e: (PRIORITY.get(e.get("source"), 1), bool(ROUNDUP.search(e.get("title") or ""))))
+        if len(same) < 2:
+            continue
+        main, rest = same[0], same[1:]
+        main["related"] = [{"title": e.get("title") or e.get("post_title"), "url": e.get("url"), "blog": e.get("blog")}
+                           for e in rest]
+        ids = {id(e) for e in rest}
+        out = [e for e in out if id(e) not in ids]
+    return out
+
+
 def build():
     cfg = load_config()
     out = []
@@ -51,7 +83,7 @@ def build():
         loc = where(e, None)
         out.append({**e, "fit": fit_cfg(e, cfg), "liked": liked(e, cfg), **loc,
                     "zone": zone(loc.get("area")), "big": is_big(e, cfg)})
-    out = dedupe(out)
+    out = group_festivals(dedupe(out))
     os.makedirs(DOCS, exist_ok=True)
     shutil.copy(os.path.join(BASE, "index.html"), os.path.join(DOCS, "index.html"))
     with open(os.path.join(DOCS, "events.json"), "w", encoding="utf-8") as f:
