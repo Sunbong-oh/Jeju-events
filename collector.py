@@ -6,7 +6,7 @@ import xml.etree.ElementTree as ET
 from collections import Counter
 from html.parser import HTMLParser
 
-from common import http_get, load_config, load_db, save_db
+from common import http_get, is_past, load_config, load_db, save_db
 from reserve import collect_reserve
 from visitjeju import collect_visitjeju, collect_visitjeju_notices
 from kidfit import fit_cfg
@@ -269,6 +269,8 @@ def collect(log=print):
                 "hidden": False,
                 "memo": "",
             })
+            if is_past(ev):  # 이미 지난 행사는 새로 넣지 않는다
+                continue
             db["events"].append(ev)
             new_events.append(ev)
         seen.add(key)
@@ -276,7 +278,7 @@ def collect(log=print):
     db["seen_posts"] = sorted(seen)
     for extra in (collect_reserve, collect_visitjeju, collect_visitjeju_notices):
         try:
-            new_events += extra(db, cfg, log)
+            new_events += [e for e in extra(db, cfg, log) if not is_past(e)]
         except Exception as e:  # 한 출처가 실패해도 나머지는 저장
             log(f"{extra.__name__} 실패: {e}")
     save_db(db)

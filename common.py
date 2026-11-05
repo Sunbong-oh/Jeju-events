@@ -1,4 +1,5 @@
 """공통: 설정, 저장소, 텔레그램 전송."""
+import datetime as dt
 import json
 import os
 import sys
@@ -72,6 +73,17 @@ def load_config():
     if env.get("HOME_LAT") and env.get("HOME_LNG"):
         cfg["home"] = {"lat": float(env["HOME_LAT"]), "lng": float(env["HOME_LNG"])}
     return cfg
+
+
+KST = dt.timezone(dt.timedelta(hours=9))
+
+
+def is_past(ev):
+    """행사가 이미 끝났는지. 행사 날짜가 없으면 지난 것으로 보지 않는다(직접 날짜를 넣을 수 있게 남겨 둠)."""
+    last = ev.get("event_end") or ev.get("event_start")
+    if not last:
+        return False
+    return last < dt.datetime.now(KST).date().isoformat()
 
 
 def load_db():
