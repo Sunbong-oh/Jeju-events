@@ -8,7 +8,7 @@ from html.parser import HTMLParser
 
 from common import http_get, load_config, load_db, save_db
 from reserve import collect_reserve
-from visitjeju import collect_visitjeju
+from visitjeju import collect_visitjeju, collect_visitjeju_notices
 from kidfit import fit_cfg
 from naver_search import DEFAULT as SEARCH_DEFAULT, search_posts
 
@@ -274,7 +274,7 @@ def collect(log=print):
         seen.add(key)
         log(f"[{name}] 수집: {post['title']} → {len(found)}건")
     db["seen_posts"] = sorted(seen)
-    for extra in (collect_reserve, collect_visitjeju):
+    for extra in (collect_reserve, collect_visitjeju, collect_visitjeju_notices):
         try:
             new_events += extra(db, cfg, log)
         except Exception as e:  # 한 출처가 실패해도 나머지는 저장
