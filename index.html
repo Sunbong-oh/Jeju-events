@@ -26,6 +26,8 @@ main{max-width:960px;margin:0 auto;padding:8px 16px 48px}
 .tools select{font:inherit;padding:8px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);max-width:40%}
 .tools input{flex-basis:100%}
 .tools input{flex:1;min-width:0;font:inherit;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink)}
+#onDate{flex:0 1 auto;flex-basis:auto;width:auto;max-width:48%}
+#onDateClr{font:inherit;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink)}
 .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:10px}
 .top{display:flex;gap:8px;align-items:flex-start;justify-content:space-between}
 .title{font-weight:600;font-size:16px;border:0;background:none;color:var(--ink);font:inherit;font-weight:600;width:100%;padding:0}
@@ -87,7 +89,7 @@ details pre{white-space:pre-wrap;font:inherit;margin:6px 0 0}
     <option value="kid">👧 아이 맞춤</option><option value="good">⭐ 추천만</option><option value="liked">🎵 음악 공연</option><option value="all">전체</option>
   </select><select id="kmSel">
     <option value="">거리 전체</option><option value="10">10km 이내</option><option value="20">20km 이내</option><option value="30">30km 이내</option>
-  </select><select id="src"></select><input id="q" placeholder="제목·내용 검색"></div>
+  </select><input type="date" id="onDate" title="이 날짜에 열리는 행사"><button id="onDateClr" hidden>날짜 해제</button><select id="src"></select><input id="q" placeholder="제목·내용 검색"></div>
   <div id="list"></div>
 </main>
 <div id="toast"></div>
@@ -188,13 +190,17 @@ function render(){
   const zm=document.getElementById("zoneSel").value;
   // 시외 = 구제주·신제주 밖(화북·외도 등 외곽 동, 조천·애월·한림·구좌 등 읍면, 서귀포시). 위치를 모르는 행사는 시내 쪽에 둔다
   const zoneOk=e=>zm==="all"||(zm==="near"?e.zone!=="out"||e.big:zm==="city"?e.zone!=="out":e.zone==="out");
-  const pool=events.filter(e=>(!sel.value||srcOf(e)===sel.value)&&fitOk(e)&&zoneOk(e)&&(!km||(e.km??0)<=km));
+  // 날짜 찾기: 그 날짜에 행사가 열리는 항목(행사 시작~끝 사이). 날짜를 고르면 탭과 상관없이 보여준다
+  const dd=document.getElementById("onDate").value;
+  document.getElementById("onDateClr").hidden=!dd;
+  const onDay=e=>!e.hidden&&!!e.event_start&&e.event_start<=dd&&(e.event_end||e.event_start)>=dd;
+  const pool=events.filter(e=>(!sel.value||srcOf(e)===sel.value)&&fitOk(e)&&zoneOk(e)&&(!km||(e.km??0)<=km)&&(!dd||onDay(e)));
   const counts={}; pool.forEach(e=>counts[group(e)]=(counts[group(e)]||0)+1);
   document.getElementById("tabs").innerHTML=Object.entries(TABS).map(([k,v])=>
     `<button class="tab ${k===tab?"on":""}" data-tab="${k}">${v} ${counts[k]||0}</button>`).join("");
-  let xs=pool.filter(e=>group(e)===tab && (!q || (e.title+e.post_title+e.snippet+(e.info||"")).includes(q)));
-  xs.sort(tab==="upcoming"?(a,b)=>nextDate(a).localeCompare(nextDate(b)):(a,b)=>(b.posted||"").localeCompare(a.posted||""));
-  document.getElementById("list").innerHTML = xs.map(card).join("") || `<div class="empty">표시할 행사가 없습니다.</div>`;
+  let xs=pool.filter(e=>(dd||group(e)===tab) && (!q || (e.title+e.post_title+e.snippet+(e.info||"")).includes(q)));
+  xs.sort(dd?(a,b)=>a.event_start.localeCompare(b.event_start):tab==="upcoming"?(a,b)=>nextDate(a).localeCompare(nextDate(b)):(a,b)=>(b.posted||"").localeCompare(a.posted||""));
+  document.getElementById("list").innerHTML = xs.map(card).join("") || `<div class="empty">${dd?"이 날짜에 열리는 행사가 없습니다. (지역·아이 맞춤 필터도 적용됩니다)":"표시할 행사가 없습니다."}</div>`;
 }
 async function load(){
   try{ events = await api("GET","/api/events"); }
@@ -221,6 +227,8 @@ document.getElementById("src").onchange=render;
 document.getElementById("fitSel").onchange=render;
 document.getElementById("zoneSel").onchange=render;
 document.getElementById("kmSel").onchange=render;
+document.getElementById("onDate").onchange=render;
+document.getElementById("onDateClr").onclick=()=>{document.getElementById("onDate").value="";render()};
 document.getElementById("list").addEventListener("change",async e=>{
   const f=e.target.dataset.f, id=e.target.closest(".card")?.dataset.id; if(!f||!id) return;
   const ev=await api("PUT","/api/events/"+encodeURIComponent(id),{[f]:e.target.value||null});
