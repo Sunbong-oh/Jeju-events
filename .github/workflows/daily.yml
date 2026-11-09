@@ -30,6 +30,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: 필요한 패키지 설치 (협회 hwp 일정표 읽기)
+        run: pip install olefile
       - name: 수집·알림·사이트 생성
         run: python run_daily.py
       - name: 결과 저장

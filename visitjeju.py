@@ -6,6 +6,7 @@ import re
 import zipfile
 
 from common import http_get, http_get_bytes
+from hwp_table import hwp_rows
 
 SITE = "https://www.visitjeju.or.kr"
 LIST = "/issue/data/event.htm"
@@ -81,13 +82,17 @@ def collect_visitjeju(db, cfg, log=print):
         if key in seen:
             continue
         view = html.unescape(http_get(f"{SITE}{LIST}?act=view&seq={post['seq']}"))
-        files = re.findall(r'act=download&seq=\d+&no=(\d+)"[^>]*>\s*([^<]+?\.hwpx)\s*<', view)
+        files = re.findall(r'act=download&seq=\d+&no=(\d+)"[^>]*>\s*([^<]+?\.(?:hwpx|hwp))\s*<', view)
         if not files:
-            log(f"[비짓제주] {post['title']}: hwpx 첨부 없음, 건너뜀")
+            log(f"[비짓제주] {post['title']}: 일정표(hwp·hwpx) 첨부 없음, 건너뜀")
             continue
-        url = f"{SITE}{LIST}?act=download&seq={post['seq']}&no={files[0][0]}"
+        # 축제 일정표를 고른다 (주요행사 현황표는 열 구성이 달라서 건너뜀). 없으면 첫 첨부
+        no, name = next((f for f in files if "축제" in f[1]), files[0])
+        url = f"{SITE}{LIST}?act=download&seq={post['seq']}&no={no}"
+        raw = _download(url)
+        rows = hwp_rows(raw) if name.lower().endswith(".hwp") else hwpx_rows(raw)
         count = 0
-        for cells in hwpx_rows(_download(url)):
+        for cells in rows:
             if len(cells) < 3 or "축제명" in cells or "행사명" in cells:
                 continue
             name, sched, place = cells[-3:]
