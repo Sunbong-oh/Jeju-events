@@ -1,0 +1,667 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);box-sizing:border-box}*,*::before,*::after{box-sizing:inherit}body{margin:0}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>Princess Talk Time</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Jua&display=swap">
+<style>
+:root{
+  /* Layout: one-screen storybook stage. Princess and speech bubble on top, big picture cards and a mic button below. Single bright look by choice. */
+  --ink:#3B2A5C; --ink-soft:#6A5890; --paper:#FFF9FE; --lilac:#EDE3FF; --line:#E5D6F5;
+  --rose:#FF5E9C; --rose-deep:#D9407A; --gold:#FFC530; --mint:#2FBF94; --mint-soft:#E3FFF4;
+  --font-en:'Baloo 2','Jua',ui-rounded,system-ui,sans-serif;
+  --font-ko:'Jua','Baloo 2',system-ui,sans-serif;
+  color-scheme:light;
+}
+html,body{height:100%}
+body{background:var(--lilac);color:var(--ink);font-family:var(--font-en);overflow:hidden;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible{outline:4px solid var(--gold);outline-offset:3px}
+#app{height:100%;display:flex;flex-direction:column}
+.screen{flex:1;min-height:0;display:flex;flex-direction:column}
+.gutter{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+/* Home */
+.home{overflow-y:auto;padding-block:22px 32px;background:radial-gradient(circle at 20% 0%,#FFE1EF 0,transparent 45%),radial-gradient(circle at 90% 10%,#DDF1FF 0,transparent 40%),var(--lilac)}
+.home-inner{max-width:980px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+.home h1{margin:0;text-align:center;font-size:clamp(40px,8vw,74px);line-height:1;font-weight:800;color:var(--rose);text-shadow:0 4px 0 #fff,0 7px 0 rgba(59,42,92,.12);text-wrap:balance}
+.home .sub{margin:0;text-align:center;font-family:var(--font-ko);font-size:clamp(18px,3vw,24px);color:var(--ink-soft)}
+.stories{display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:14px}
+.story{border:4px solid #fff;border-radius:28px;padding:8px 8px 14px;display:grid;justify-items:center;gap:2px;box-shadow:0 7px 0 rgba(59,42,92,.13);transition:transform .15s}
+.story:active{transform:translateY(4px);box-shadow:0 3px 0 rgba(59,42,92,.13)}
+.story svg{height:150px;width:auto;max-width:100%}
+.story .label{display:grid;justify-items:center;gap:2px;background:rgba(255,255,255,.88);border-radius:18px;padding:6px 12px}
+.story .en{font-size:22px;font-weight:800;line-height:1.1}
+.story .ko{font-family:var(--font-ko);font-size:16px;color:var(--ink-soft)}
+.story .got{font-size:20px;letter-spacing:2px;color:var(--gold);min-height:24px;text-shadow:0 1px 0 rgba(59,42,92,.25)}
+.tips{background:#fff;border-radius:22px;padding:14px 18px;font-family:var(--font-ko);font-size:16px;line-height:1.6;color:var(--ink)}
+.tips ol{margin:6px 0 0;padding-left:22px}
+.tips .engine{margin-top:8px;padding:8px 12px;border-radius:14px;background:var(--lilac)}
+
+/* Play */
+.topbar{display:flex;align-items:center;gap:12px;padding-block:10px;background:var(--paper)}
+.round{width:48px;height:48px;border-radius:50%;border:3px solid var(--line);background:#fff;display:grid;place-items:center;flex:none}
+.round svg{width:24px;height:24px}
+.topbar .name{flex:1;min-width:0;font-weight:800;font-size:22px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dots{display:flex;gap:6px;font-size:26px;line-height:1}
+.dots span{color:var(--line)}
+.dots span.on{color:var(--gold);text-shadow:0 2px 0 rgba(59,42,92,.2)}
+
+.stage{flex:1;min-height:0;position:relative;overflow:hidden;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);grid-template-areas:"bubble bubble" "princess prop";gap:6px;padding-block:12px 0}
+.stage::after{content:"";position:absolute;left:-10%;right:-10%;bottom:-40px;height:90px;border-radius:50%;background:rgba(255,255,255,.55);z-index:0}
+.bubble{grid-area:bubble;justify-self:center;position:relative;z-index:2;background:#fff;border:none;border-radius:26px;padding:10px 18px 10px 20px;font-size:clamp(20px,3.6vh,30px);font-weight:700;line-height:1.2;max-width:680px;text-align:center;box-shadow:0 6px 0 rgba(59,42,92,.12);display:flex;align-items:center;gap:10px;text-wrap:balance}
+.bubble::after{content:"";position:absolute;left:24%;bottom:-16px;border:10px solid transparent;border-top:12px solid #fff;border-bottom:0}
+.bubble .ear{flex:none;width:34px;height:34px;border-radius:50%;background:var(--lilac);display:grid;place-items:center}
+.bubble .ear svg{width:20px;height:20px}
+.princess-wrap{grid-area:princess;min-height:0;position:relative;z-index:1;display:flex;align-items:flex-end;justify-content:center}
+.princess-wrap .princess{height:100%;max-height:360px;width:auto;max-width:100%;animation:bob 3.2s ease-in-out infinite;transform-origin:50% 100%}
+.princess-wrap.talking .princess{animation:bob 0.9s ease-in-out infinite}
+.friend{position:absolute;right:2%;bottom:4px;font-size:clamp(40px,8vh,76px);line-height:1;animation:bob 2.6s ease-in-out infinite reverse}
+.prop{grid-area:prop;min-height:0;position:relative;z-index:1;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;align-content:center;gap:4px;font-size:clamp(56px,13vh,128px);line-height:1}
+.prop.count{font-size:clamp(46px,9vh,88px)}
+.prop span{animation:bob 2.8s ease-in-out infinite}
+.prop span:nth-child(2){animation-delay:-.6s}.prop span:nth-child(3){animation-delay:-1.2s}
+
+.m-open{display:none;transform-box:fill-box;transform-origin:center}
+.talking .m-closed{display:none}
+.talking .m-open{display:inline;animation:talk .22s ease-in-out infinite alternate}
+
+.choices{display:flex;justify-content:center;gap:14px;padding-block:14px 6px;background:var(--paper)}
+.choice{flex:1 1 0;min-width:0;max-width:230px;background:#fff;border:4px solid var(--line);border-radius:26px;padding:8px 6px 6px;display:grid;justify-items:center;gap:0;box-shadow:0 6px 0 var(--line);transition:transform .18s,border-color .18s,background .18s}
+.choice:active{transform:translateY(4px);box-shadow:0 2px 0 var(--line)}
+.choice .pic{font-size:clamp(44px,8vh,74px);line-height:1.15;display:grid;place-items:center;min-height:1.15em}
+.choice .word{font-size:clamp(22px,3.4vh,30px);font-weight:800;line-height:1.1}
+.choice.reading{border-color:var(--gold);transform:translateY(-6px) scale(1.04);box-shadow:0 10px 0 #F5DFA0}
+.choice.hint{border-color:var(--rose);animation:glow 1s ease-in-out infinite alternate}
+.choice.correct{border-color:var(--mint);background:var(--mint-soft);box-shadow:0 6px 0 #B9EBD8}
+.swatch{width:.9em;height:.9em;border-radius:50%;border:4px solid rgba(59,42,92,.18);display:block}
+.num{font-weight:800;color:var(--rose)}
+
+.dock{display:flex;align-items:center;justify-content:center;gap:12px 18px;flex-wrap:wrap;padding-block:6px 14px;background:var(--paper)}
+.mic{width:92px;height:92px;border-radius:50%;border:none;background:var(--rose);box-shadow:0 7px 0 var(--rose-deep);display:grid;place-items:center;position:relative;flex:none}
+.mic svg{width:44px;height:44px}
+.mic:disabled{background:#D9CBE8;box-shadow:0 7px 0 #BBA9D0;cursor:default}
+.mic.ready::before,.mic.listening::before{content:"";position:absolute;inset:-8px;border-radius:50%;border:5px solid var(--rose);opacity:.6;animation:ring 1.4s ease-out infinite}
+.mic.listening{background:#FF3D73}
+.mic.listening::before{animation-duration:.8s}
+.mic-side{display:flex;flex-direction:column;gap:4px;min-width:0;max-width:340px}
+.mic-label{font-size:26px;font-weight:800;line-height:1.1}
+.status{font-family:var(--font-ko);font-size:16px;color:var(--ink-soft);min-height:1.4em;overflow-wrap:anywhere}
+.pass{font-family:var(--font-ko);font-size:16px;background:#fff;border:3px dashed var(--line);border-radius:999px;padding:8px 16px}
+
+.spark{position:fixed;z-index:30;font-size:34px;color:var(--gold);pointer-events:none;text-shadow:0 2px 0 rgba(59,42,92,.2);animation:spark .9s ease-out forwards}
+
+.overlay{position:fixed;inset:0;z-index:40;background:rgba(59,42,92,.55);display:grid;place-items:center;padding:20px max(16px,env(safe-area-inset-right,0px)) 20px max(16px,env(safe-area-inset-left,0px))}
+.done{background:#fff;border-radius:34px;padding:20px 24px 24px;text-align:center;display:grid;justify-items:center;gap:6px;max-width:420px;width:100%;animation:pop .5s cubic-bezier(.3,1.6,.5,1)}
+.done svg{height:200px;width:auto}
+.done h2{margin:0;font-size:44px;font-weight:800;color:var(--rose);line-height:1}
+.done .big-stars{font-size:40px;color:var(--gold);letter-spacing:4px}
+.done .ko{font-family:var(--font-ko);font-size:18px;color:var(--ink-soft)}
+.btns{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:8px}
+.btn{border:none;border-radius:999px;padding:12px 24px;font-size:22px;font-weight:800;background:var(--rose);color:#fff;box-shadow:0 5px 0 var(--rose-deep)}
+.btn.alt{background:var(--lilac);color:var(--ink);box-shadow:0 5px 0 var(--line)}
+
+.particle{position:absolute;z-index:0;pointer-events:none;color:rgba(255,255,255,.95);line-height:1}
+.particle.fall{top:-8%;animation:fall linear infinite}
+.particle.rise{bottom:-8%;animation:rise linear infinite}
+
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes talk{from{transform:scaleY(.4)}to{transform:scaleY(1.15)}}
+@keyframes ring{from{transform:scale(.9);opacity:.7}to{transform:scale(1.3);opacity:0}}
+@keyframes glow{from{box-shadow:0 6px 0 #FFC2DA}to{box-shadow:0 6px 0 #FFC2DA,0 0 0 8px rgba(255,94,156,.25)}}
+@keyframes spark{from{transform:translate(0,0) scale(.6);opacity:1}to{transform:translate(var(--dx),var(--dy)) scale(1.3);opacity:0}}
+@keyframes pop{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes fall{from{transform:translateY(0) rotate(0)}to{transform:translateY(120vh) rotate(200deg)}}
+@keyframes rise{from{transform:translateY(0)}to{transform:translateY(-120vh)}}
+
+@media (max-width:560px){
+  .stage{grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr)}
+  .mic{width:80px;height:80px}
+  .mic-label{font-size:22px}
+}
+@media (max-height:620px){
+  .princess-wrap .princess{max-height:240px}
+  .choices{padding-block:8px 4px}
+  .mic{width:72px;height:72px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:0s!important;animation-iteration-count:1!important;transition:none!important}
+  .particle{display:none}
+}
+</style>
+
+<div id="app"></div>
+
+<script>
+/* ---------------- Stories (original characters) ---------------- */
+const STORIES = [
+  { id:'snow', en:'Snow Castle', ko:'크리스탈 공주의 눈의 성', friend:'⛄', fx:{ch:'❄',mode:'fall'},
+    bg:'linear-gradient(180deg,#A9D8FF 0%,#DDF0FF 65%,#F4FBFF 100%)',
+    p:{name:'Princess Crystal', skin:'#FCE4D4', hair:'#F6E7B0', hairDark:'#E2CB82', dress:'#86D4F2', accent:'#D6F4FF', eye:'#3E8FD6', crown:'#FFD95A'},
+    hi:"Hello! I'm Princess Crystal. Welcome to my snow castle!",
+    bye:"Thank you, my friend! Bye-bye!",
+    qs:[
+      {q:"Look! What is falling from the sky?", prop:'❄️', a:0, c:[
+        {w:'Snow', e:'❄️', k:['snow','snowy','sno','slow','no']},
+        {w:'Rain', e:'🌧️', k:['rain','rainy','ran','rein']}]},
+      {q:"What color is the snow?", prop:{n:3,e:'❄️'}, a:0, c:[
+        {w:'White', col:'#FFFFFF', k:['white','wide','wite','whyte','why','wait','quite']},
+        {w:'Red', col:'#EF4B5B', k:['red','read','bread','rad','wed']}]},
+      {q:"Let's make a snowman! What is his nose?", prop:'⛄', a:0, c:[
+        {w:'Carrot', e:'🥕', k:['carrot','carrots','karat','carat','parrot','carol','caret','care']},
+        {w:'Banana', e:'🍌', k:['banana','bananas','nana']}]},
+      {q:"Brrr! It's cold! What do I wear on my hands?", prop:'🥶', a:0, c:[
+        {w:'Gloves', e:'🧤', k:['gloves','glove','love','loves','globe','globes','clove','mittens','mitten']},
+        {w:'Socks', e:'🧦', k:['socks','sock','sox','sucks','sack']}]},
+    ]},
+  { id:'sea', en:'Under the Sea', ko:'코랄 공주의 바닷속 생일', friend:'🐢', fx:{ch:'○',mode:'rise'},
+    bg:'linear-gradient(180deg,#5FD0EE 0%,#2C9BD1 60%,#1F7DB5 100%)',
+    p:{name:'Princess Coral', skin:'#FBDCC8', hair:'#E8673C', hairDark:'#C24E28', dress:'#2FC7A0', accent:'#B9A3FF', eye:'#5A3E2B', crown:'#FFD95A', tail:true},
+    hi:"Hi! I'm Princess Coral. I live in the sea. Today is my birthday!",
+    bye:"What a happy birthday! Thank you, friend! Bye-bye!",
+    qs:[
+      {q:"Who swims with me in the sea?", prop:'🌊', a:0, c:[
+        {w:'Fish', e:'🐠', k:['fish','fishy','fishes','fis','fist','fist']},
+        {w:'Dog', e:'🐶', k:['dog','dogs','doggy','dock','duck']}]},
+      {q:"It's my birthday! What do we eat?", prop:'🎉', a:0, c:[
+        {w:'Cake', e:'🎂', k:['cake','cakes','kick','take','kate','cape','k']},
+        {w:'Shoe', e:'👟', k:['shoe','shoes','show','sue']}]},
+      {q:"How many shells? Let's count!", prop:{n:3,e:'🐚'}, a:1, c:[
+        {w:'One', num:'1', k:['one','1','won','want','wan']},
+        {w:'Three', num:'3', k:['three','3','tree','trees','free','sree','through','thee']}]},
+      {q:"What color is my tail?", prop:'🧜‍♀️', a:0, c:[
+        {w:'Green', col:'#2FC7A0', k:['green','grin','grain','greene','greens','grim']},
+        {w:'Pink', col:'#FF7EB6', k:['pink','ping','pinky','think','pin']}]},
+    ]},
+  { id:'unicorn', en:'Rainbow Meadow', ko:'로지 공주와 유니콘', friend:'🦄', fx:{ch:'✦',mode:'fall'},
+    bg:'linear-gradient(180deg,#FFC7E4 0%,#FFE7F2 55%,#FFF6DA 100%)',
+    p:{name:'Princess Rosie', skin:'#F6D2B8', hair:'#8A5534', hairDark:'#6A3D22', dress:'#FF8FC4', accent:'#FFE1F0', eye:'#4E7A3A', crown:'#FFD95A'},
+    hi:"Hello! I'm Princess Rosie. This is my unicorn, Sunny!",
+    bye:"Sunny is so happy! Thank you, friend! Bye-bye!",
+    qs:[
+      {q:"Look at the sky! What do you see?", prop:'🌈', a:0, c:[
+        {w:'Rainbow', e:'🌈', k:['rainbow','rainbows','rain','bow','raymbo','reinbow']},
+        {w:'Moon', e:'🌙', k:['moon','moo','noon','mood']}]},
+      {q:"Sunny is hungry. What does she eat?", prop:'🦄', a:0, c:[
+        {w:'Apple', e:'🍎', k:['apple','apples','happle','appo','apo','appa']},
+        {w:'Pencil', e:'✏️', k:['pencil','pencils','pensil']}]},
+      {q:"What color is my dress?", prop:'👗', a:0, c:[
+        {w:'Pink', col:'#FF8FC4', k:['pink','ping','pinky','think','pin']},
+        {w:'Blue', col:'#4D8DF0', k:['blue','blew','boo','bloo','glue']}]},
+      {q:"Let's dance together! Are you happy?", prop:'💃', a:0, c:[
+        {w:'Yes!', e:'😊', k:['yes','yeah','yep','yay','ya','yess','yea','yup','yes yes']},
+        {w:'No', e:'😢', k:['no','nope','nah']}]},
+    ]},
+  { id:'dino', en:'Dino Egg', ko:'릴리 공주와 아기 공룡', friend:'🌴', fx:{ch:'❀',mode:'fall'},
+    bg:'linear-gradient(180deg,#BFEFB4 0%,#E6F9D6 60%,#FFF4C9 100%)',
+    p:{name:'Princess Lily', skin:'#EBC3A2', hair:'#2E2433', hairDark:'#1B1520', dress:'#FFCF3F', accent:'#FFF0B8', eye:'#3B2A1E', crown:'#FFD95A'},
+    hi:"Hi! I'm Princess Lily. I found a big egg in my garden!",
+    bye:"Good night, little dino! Thank you, friend! Bye-bye!",
+    qs:[
+      {q:"Crack, crack! What is inside the egg?", prop:'🥚', a:0, c:[
+        {w:'Dinosaur', e:'🦕', k:['dinosaur','dinosaurs','dino','dyno','diner','die no','dinah','dina','dino saur']},
+        {w:'Car', e:'🚗', k:['car','cars','ca','call','cart']}]},
+      {q:"Baby dino says roar! Can you say roar?", prop:'🦖', a:0, c:[
+        {w:'Roar!', e:'🦖', k:['roar','rawr','raw','roll','row','war','wore','ror','rar','road','raah','rah','ra']},
+        {w:'Moo', e:'🐮', k:['moo','mu','move','mooo']}]},
+      {q:"Baby dino is little. Is he big or small?", prop:'🐣', a:1, c:[
+        {w:'Big', e:'🐘', k:['big','pig','bick','bigg']},
+        {w:'Small', e:'🐭', k:['small','smaller','smol','smoll','mall','small small','smile']}]},
+      {q:"Dino is sleepy. Let's say good... ?", prop:'😴', a:0, c:[
+        {w:'Night', e:'🌙', k:['night','nite','knight','nights','nigh','good night','goodnight']},
+        {w:'Morning', e:'☀️', k:['morning','mourning','morn']}]},
+    ]},
+  { id:'kitten', en:'Kitten Garden', ko:'벨라 공주와 아기 고양이', friend:'🐈', fx:{ch:'✿',mode:'fall'},
+    bg:'linear-gradient(180deg,#E3D2FF 0%,#F4E9FF 55%,#FFE6F1 100%)',
+    p:{name:'Princess Bella', skin:'#FCE0CF', hair:'#F2A53A', hairDark:'#D6861E', dress:'#B595F0', accent:'#EFE4FF', eye:'#3F7E9C', crown:'#FFD95A'},
+    hi:"Hello! I'm Princess Bella. Come and see my kittens!",
+    bye:"The kittens love you! Thank you, friend! Bye-bye!",
+    qs:[
+      {q:"What does a kitten say?", prop:'🐱', a:0, c:[
+        {w:'Meow', e:'🐱', k:['meow','mew','miaow','meo','mio','mao','miao','me ow','meow meow','mow','now']},
+        {w:'Woof', e:'🐶', k:['woof','wolf','woo','roof','wuf']}]},
+      {q:"How many kittens? Let's count!", prop:{n:3,e:'🐱'}, a:1, c:[
+        {w:'Two', num:'2', k:['two','2','to','too','tu']},
+        {w:'Three', num:'3', k:['three','3','tree','trees','free','sree','through','thee']}]},
+      {q:"The kittens are thirsty. What do they drink?", prop:'🐾', a:0, c:[
+        {w:'Milk', e:'🥛', k:['milk','milky','melk','mil','milks','mick']},
+        {w:'Pizza', e:'🍕', k:['pizza','pizzas','peter']}]},
+      {q:"Let's pick a flower! What color is it?", prop:'🌼', a:0, c:[
+        {w:'Yellow', col:'#FFD23F', k:['yellow','yello','yell','jello','mellow','hello','yeah low']},
+        {w:'Purple', col:'#9B6BE8', k:['purple','people','purpl','popple']}]},
+    ]},
+];
+const PRAISE = ["Great job!","Wonderful!","You did it!","Super!","Yay! Well done!","Amazing!"];
+
+/* ---------------- Princess drawing (original, parametric) ---------------- */
+function princessSVG(p){
+  const body = p.tail
+    ? `<path d="M80 150 Q70 196 90 226 Q95 238 80 258 Q96 254 100 244 Q104 254 120 258 Q105 238 110 226 Q130 196 120 150 Z" fill="${p.dress}"/>
+       <path d="M86 186 Q100 192 114 186 M88 204 Q100 210 112 204" stroke="rgba(255,255,255,.55)" stroke-width="3" fill="none" stroke-linecap="round"/>
+       <circle cx="90" cy="150" r="9" fill="${p.accent}"/><circle cx="110" cy="150" r="9" fill="${p.accent}"/>`
+    : `<path d="M82 150 L118 150 L152 250 Q100 264 48 250 Z" fill="${p.dress}"/>
+       <path d="M60 238 Q100 250 140 238" stroke="${p.accent}" stroke-width="6" fill="none" stroke-linecap="round"/>
+       <path d="M82 140 Q100 135 118 140 L119 168 Q100 174 81 168 Z" fill="${p.accent}"/>
+       <circle cx="100" cy="156" r="5" fill="${p.crown}"/>`;
+  return `<svg class="princess" viewBox="0 0 200 270" role="img" aria-label="${p.name}">
+    <path d="M42 96 Q30 196 58 222 L142 222 Q170 196 158 96 Z" fill="${p.hairDark}"/>
+    ${body}
+    <ellipse cx="70" cy="170" rx="8" ry="22" fill="${p.skin}" transform="rotate(18 70 170)"/>
+    <ellipse cx="133" cy="146" rx="8" ry="22" fill="${p.skin}" transform="rotate(-40 133 146)"/>
+    <circle cx="146" cy="130" r="8" fill="${p.skin}"/>
+    <rect x="93" y="126" width="14" height="18" rx="6" fill="${p.skin}"/>
+    <circle cx="100" cy="88" r="50" fill="${p.skin}"/>
+    <path d="M52 90 Q42 150 60 200 L72 200 Q60 150 66 100 Z" fill="${p.hair}"/>
+    <path d="M148 90 Q158 150 140 200 L128 200 Q140 150 134 100 Z" fill="${p.hair}"/>
+    <path d="M48 92 Q48 32 100 32 Q152 32 152 92 Q140 62 114 56 Q106 72 86 68 Q64 72 48 92 Z" fill="${p.hair}"/>
+    <g>
+      <ellipse cx="80" cy="96" rx="10" ry="12" fill="#2B2340"/>
+      <ellipse cx="80" cy="99" rx="7" ry="8" fill="${p.eye}"/>
+      <circle cx="76.5" cy="92" r="4" fill="#fff"/><circle cx="83" cy="102" r="1.8" fill="#fff"/>
+      <ellipse cx="120" cy="96" rx="10" ry="12" fill="#2B2340"/>
+      <ellipse cx="120" cy="99" rx="7" ry="8" fill="${p.eye}"/>
+      <circle cx="116.5" cy="92" r="4" fill="#fff"/><circle cx="123" cy="102" r="1.8" fill="#fff"/>
+      <path d="M68 88 L64 84 M72 85 L70 80" stroke="#2B2340" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M132 88 L136 84 M128 85 L130 80" stroke="#2B2340" stroke-width="2.5" stroke-linecap="round"/>
+    </g>
+    <ellipse cx="66" cy="112" rx="8" ry="5" fill="#FF8FB0" opacity=".55"/>
+    <ellipse cx="134" cy="112" rx="8" ry="5" fill="#FF8FB0" opacity=".55"/>
+    <path class="m-closed" d="M91 115 Q100 123 109 115" stroke="#B5476B" stroke-width="3.2" fill="none" stroke-linecap="round"/>
+    <ellipse class="m-open" cx="100" cy="118" rx="6.5" ry="6" fill="#B5476B"/>
+    <path d="M74 46 L80 20 L91 36 L100 12 L109 36 L120 20 L126 46 Q100 40 74 46 Z" fill="${p.crown}" stroke="#E3A600" stroke-width="2" stroke-linejoin="round"/>
+    <circle cx="100" cy="34" r="4.5" fill="${p.dress}"/><circle cx="82" cy="38" r="2.5" fill="#fff"/><circle cx="118" cy="38" r="2.5" fill="#fff"/>
+  </svg>`;
+}
+
+/* ---------------- Helpers ---------------- */
+const $ = (s, r=document) => r.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const wait = ms => new Promise(r => setTimeout(r, ms));
+const shuffle = a => { a = a.slice(); for (let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; };
+const ICON = {
+  home:'<svg viewBox="0 0 24 24" fill="none" stroke="#3B2A5C" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg>',
+  ear:'<svg viewBox="0 0 24 24" fill="none" stroke="#3B2A5C" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg>',
+  mic:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3" fill="#fff"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>',
+  stop:'<svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="3" fill="#fff"/></svg>',
+};
+function loadDone(){ try { return JSON.parse(localStorage.getItem('ptt-stars')||'{}'); } catch { return {}; } }
+function saveDone(o){ try { localStorage.setItem('ptt-stars', JSON.stringify(o)); } catch {} }
+
+/* ---------------- Voice out ---------------- */
+let tts = null, synthVoice = null, runId = 0;
+const synth = window.speechSynthesis || null;
+function pickVoice(){
+  if (!synth) return;
+  const vs = synth.getVoices().filter(v => /^en(-|_)/i.test(v.lang));
+  const pref = ['Samantha','Google US English','Microsoft Aria','Microsoft Jenny','Karen','Moira','Tessa','Zira','Female'];
+  synthVoice = pref.map(n => vs.find(v => v.name.includes(n))).find(Boolean) || vs.find(v => /en-US/i.test(v.lang)) || vs[0] || null;
+}
+if (synth){ pickVoice(); synth.onvoiceschanged = pickVoice; }
+function stopSpeech(){
+  try { synth && synth.cancel(); } catch {}
+  try { tts && tts.stop(); } catch {}
+  setTalking(false);
+}
+function speakSynth(text, who){
+  return new Promise(res => {
+    if (!synth) return res();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'en-US'; if (synthVoice) u.voice = synthVoice;
+    u.rate = who === 'word' ? 0.75 : 0.85;
+    u.pitch = who === 'princess' ? 1.3 : 1.1;
+    let done = false; const fin = () => { if(!done){ done = true; clearTimeout(t); res(); } };
+    const t = setTimeout(fin, 1800 + text.length * 110);
+    u.onend = fin; u.onerror = fin;
+    synth.speak(u);
+  });
+}
+async function say(text, who='princess'){
+  const my = runId;
+  if (who === 'princess') setTalking(true);
+  try {
+    if (tts) {
+      try { await tts.speak(text, {voice: who==='princess' ? 'airy' : 'buttery', language:'en', rate: who==='word' ? 0.8 : 0.9}); }
+      catch (e) { if (my === runId && e && e.code !== 'viewer_stopped') await speakSynth(text, who); }
+    } else {
+      await speakSynth(text, who);
+    }
+  } finally { if (my === runId) setTalking(false); }
+}
+function setTalking(on){ const w = $('.princess-wrap'); if (w) w.classList.toggle('talking', on); }
+
+/* ---------------- Voice in ---------------- */
+let dict = null, dictLang = true, dictRoute = null;
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition || null;
+let engine = SR ? 'native' : 'none';
+let engineChecked = !window.claude;
+
+function attachClaude(){
+  if (!window.claude || !window.claude.use) return;
+  claude.use('tts').then(t => { if (t) tts = t; }).catch(() => {});
+  claude.use('dictation').then(d => {
+    if (d) {
+      dict = d; engine = 'dict';
+      d.onPartial(e => dictRoute && dictRoute.partial(e.text));
+      d.onFinal(e => dictRoute && dictRoute.final(e.text));
+      d.onState(e => dictRoute && dictRoute.state(e.state, e.reason));
+    } else if (inFrame()) {
+      engine = 'none';
+    }
+  }).catch(() => { if (inFrame()) engine = 'none'; })
+    .finally(() => { engineChecked = true; renderEngineNote(); updatePass(); });
+}
+function inFrame(){ try { return window.self !== window.top; } catch { return true; } }
+
+function listen(onHeard){
+  if (engine === 'dict') return listenDict(onHeard);
+  if (engine === 'native') return listenNative(onHeard);
+  return Promise.resolve({texts:[], err:'none'});
+}
+function listenDict(onHeard){
+  return new Promise(resolve => {
+    let finals = [], partial = '', done = false, limit = null;
+    const finish = err => { if (done) return; done = true; clearTimeout(limit); dictRoute = null;
+      resolve({texts:[finals.join(' '), partial].filter(Boolean), err}); };
+    dictRoute = {
+      partial: x => { partial = x; onHeard((finals.join(' ') + ' ' + x).trim()); if (x && heardCorrect([x])) dict.stop().catch(()=>{}); },
+      final: x => { finals.push(x.trim()); partial = ''; onHeard(finals.join(' ')); dict.stop().catch(()=>{}); },
+      state: (s, reason) => {
+        if (s === 'listening' && !limit) limit = setTimeout(() => dict.stop().catch(()=>{}), 7000);
+        if (s === 'idle') finish(['not_granted','unavailable','upstream_error','rate_limited','dismissed'].includes(reason) ? reason : null);
+      },
+    };
+    dict.start(dictLang ? {language:'en'} : undefined).catch(e => {
+      const code = (e && e.code) || 'upstream_error';
+      if (code === 'unavailable' && dictLang) { dictLang = false; finish('retry'); return; }
+      finish(code);
+    });
+  });
+}
+function listenNative(onHeard){
+  return new Promise(resolve => {
+    let r; try { r = new SR(); } catch { engine = 'none'; return resolve({texts:[], err:'none'}); }
+    r.lang = 'en-US'; r.interimResults = true; r.maxAlternatives = 5; r.continuous = false;
+    const alts = new Set(); let err = null, done = false;
+    const finish = () => { if (done) return; done = true; clearTimeout(t); resolve({texts:[...alts], err}); };
+    r.onresult = e => {
+      for (const res of e.results) for (let i=0;i<res.length;i++) alts.add(res[i].transcript);
+      onHeard(e.results[e.results.length-1][0].transcript);
+      if (heardCorrect([...alts])) { try { r.stop(); } catch {} }
+    };
+    r.onerror = e => { err = e.error; };
+    r.onend = finish;
+    const t = setTimeout(() => { try { r.stop(); } catch {} setTimeout(finish, 1500); }, 7000);
+    try { r.start(); } catch { err = 'start'; finish(); }
+  });
+}
+let stopListening = () => {
+  try { dict && dict.active() && dict.stop(); } catch {}
+};
+
+/* ---------------- Matching ---------------- */
+const norm = s => ' ' + String(s).toLowerCase().replace(/[^a-z0-9 ]+/g, ' ').replace(/\s+/g, ' ').trim() + ' ';
+const hasKey = (text, k) => norm(text).includes(' ' + k + ' ');
+function heardCorrect(texts){
+  if (!G.q) return false;
+  const right = G.q.c[G.q.a];
+  return texts.some(t => right.k.some(k => hasKey(t, k)));
+}
+function heardWrong(texts){
+  if (!G.q) return null;
+  for (let i=0;i<G.q.c.length;i++){ if (i === G.q.a) continue;
+    if (texts.some(t => G.q.c[i].k.some(k => hasKey(t, k)))) return G.q.c[i]; }
+  return null;
+}
+
+/* ---------------- Game state + screens ---------------- */
+const G = { story:null, qi:0, q:null, order:[], tries:0, stars:0, busy:false, listening:false };
+const app = $('#app');
+
+function renderHome(){
+  runId++; stopSpeech(); stopListening(); G.story = null; G.q = null;
+  const done = loadDone();
+  app.innerHTML = `<div class="screen home gutter"><div class="home-inner">
+    <h1>Princess Talk Time</h1>
+    <p class="sub">공주님이 물어보면, 영어로 대답해요!</p>
+    <div class="stories">${STORIES.map((s,i) => `
+      <button class="story" data-i="${i}" style="background:${s.bg}" aria-label="${esc(s.en)}">
+        ${princessSVG(s.p)}
+        <span class="label"><span class="en">${esc(s.en)}</span>
+        <span class="ko">${esc(s.ko)}</span></span>
+        <span class="got">${'★'.repeat(done[s.id]||0)}</span>
+      </button>`).join('')}</div>
+    <div class="tips">
+      <b>엄마 아빠께</b>
+      <ol>
+        <li>공주님이 질문하고, 보기 카드를 하나씩 읽어줘요. 카드를 누르면 다시 들을 수 있어요.</li>
+        <li>분홍색 마이크를 누르고 아이가 영어로 대답하면 다음으로 넘어가요.</li>
+        <li>틀리거나 잘 안 들리면 공주님이 정답을 들려주고 다시 말해보게 해요.</li>
+        <li>아이 발음을 기계가 못 알아들을 때는 <b>“잘 말했어요 ✓”</b>를 눌러 넘어가 주세요.</li>
+      </ol>
+      <div class="engine" id="engineNote"></div>
+    </div>
+  </div></div>`;
+  app.querySelectorAll('.story').forEach(b => b.onclick = () => startStory(+b.dataset.i));
+  renderEngineNote();
+}
+function renderEngineNote(){
+  const el = $('#engineNote'); if (!el) return;
+  if (!engineChecked) { el.textContent = '마이크 확인 중…'; return; }
+  el.textContent = engine === 'none'
+    ? '이 화면에서는 음성 인식을 쓸 수 없어요. 아이가 대답하면 “잘 말했어요 ✓”를 눌러 주세요. (크롬 브라우저나 아이패드 사파리에서 게임 파일을 직접 열면 마이크를 쓸 수 있어요.)'
+    : '마이크 사용 가능 ✓  처음 한 번 마이크 허용을 물어보면 “허용”을 눌러 주세요.';
+}
+
+function startStory(i){
+  runId++;
+  const s = STORIES[i]; G.story = s; G.qi = 0; G.stars = 0;
+  app.innerHTML = `<div class="screen">
+    <div class="topbar gutter">
+      <button class="round" id="homeBtn" aria-label="처음으로">${ICON.home}</button>
+      <div class="name">${esc(s.p.name)}</div>
+      <div class="dots" id="dots">${s.qs.map(() => '<span>★</span>').join('')}</div>
+    </div>
+    <div class="stage gutter" id="stage" style="background:${s.bg}">
+      <button class="bubble" id="bubble"><span class="ear">${ICON.ear}</span><span id="bubbleText"></span></button>
+      <div class="princess-wrap">${princessSVG(s.p)}<div class="friend">${s.friend}</div></div>
+      <div class="prop" id="prop"></div>
+    </div>
+    <div class="choices gutter" id="choices"></div>
+    <div class="dock gutter">
+      <button class="mic" id="mic" aria-label="말하기" disabled>${ICON.mic}</button>
+      <div class="mic-side">
+        <div class="mic-label" id="micLabel">Listen…</div>
+        <div class="status" id="status"></div>
+        <button class="pass" id="pass" hidden>잘 말했어요 ✓</button>
+      </div>
+    </div>
+  </div>`;
+  addParticles($('#stage'), s.fx);
+  $('#homeBtn').onclick = renderHome;
+  $('#bubble').onclick = () => { if (!G.listening) readQuestion(false); };
+  $('#mic').onclick = onMic;
+  $('#pass').onclick = () => { if (!G.busy) success(true); };
+  askQuestion(true);
+}
+
+function addParticles(stage, fx){
+  for (let i=0;i<14;i++){
+    const p = document.createElement('span');
+    p.className = 'particle ' + fx.mode; p.textContent = fx.ch;
+    p.style.left = (Math.random()*100) + '%';
+    p.style.fontSize = (12 + Math.random()*20) + 'px';
+    p.style.animationDuration = (7 + Math.random()*8) + 's';
+    p.style.animationDelay = (-Math.random()*14) + 's';
+    p.style.opacity = (.5 + Math.random()*.5).toFixed(2);
+    stage.appendChild(p);
+  }
+}
+
+function choiceHTML(c){
+  const pic = c.col ? `<span class="swatch" style="background:${c.col}"></span>`
+    : c.num ? `<span class="num">${esc(c.num)}</span>` : esc(c.e);
+  return `<span class="pic">${pic}</span><span class="word">${esc(c.w)}</span>`;
+}
+
+async function askQuestion(first){
+  const s = G.story; const q = s.qs[G.qi]; G.q = q; G.tries = 0; G.busy = false;
+  G.order = shuffle(q.c.map((_,i) => i));
+  $('#bubbleText').textContent = q.q;
+  const prop = $('#prop');
+  if (typeof q.prop === 'object'){ prop.className = 'prop count'; prop.innerHTML = Array.from({length:q.prop.n}, () => `<span>${q.prop.e}</span>`).join(''); }
+  else { prop.className = 'prop'; prop.innerHTML = `<span>${q.prop}</span>`; }
+  $('#choices').innerHTML = G.order.map(i => `<button class="choice" data-i="${i}" aria-label="${esc(q.c[i].w)}">${choiceHTML(q.c[i])}</button>`).join('');
+  $('#choices').querySelectorAll('.choice').forEach(b => b.onclick = () => tapChoice(+b.dataset.i, b));
+  setStatus(''); updatePass();
+  if (first) {
+    const my = ++runId;
+    $('#bubbleText').textContent = s.hi;
+    setMic('wait');
+    await say(s.hi);
+    if (my !== runId) return;
+    $('#bubbleText').textContent = q.q;
+  }
+  readQuestion(true);
+}
+
+async function readQuestion(withChoices){
+  const my = ++runId; stopSpeech();
+  setMic('wait');
+  await say(G.q.q);
+  if (my !== runId) return;
+  {
+    for (let n=0;n<G.order.length;n++){
+      const i = G.order[n];
+      const card = $(`.choice[data-i="${i}"]`);
+      if (!card || my !== runId) return;
+      card.classList.add('reading');
+      await say(n === G.order.length-1 && G.order.length > 1 ? 'or… ' + G.q.c[i].w : G.q.c[i].w, 'word');
+      card.classList.remove('reading');
+      if (my !== runId) return;
+      await wait(250);
+    }
+  }
+  if (my !== runId) return;
+  setMic('ready');
+}
+
+async function tapChoice(i, card){
+  if (G.listening || G.busy) return;
+  const my = ++runId; stopSpeech();
+  document.querySelectorAll('.choice.reading').forEach(c => c.classList.remove('reading'));
+  card.classList.add('reading');
+  await say(G.q.c[i].w, 'word');
+  card.classList.remove('reading');
+  if (my === runId) setMic('ready');
+}
+
+function setMic(mode){
+  const mic = $('#mic'), label = $('#micLabel'); if (!mic) return;
+  mic.className = 'mic'; mic.disabled = false; mic.innerHTML = ICON.mic;
+  if (mode === 'wait'){ label.textContent = 'Listen…'; }
+  if (mode === 'ready'){ mic.classList.add('ready'); label.textContent = engine === 'none' ? 'Say it!' : 'Your turn!'; }
+  if (mode === 'listening'){ mic.classList.add('listening'); mic.innerHTML = ICON.stop; label.textContent = "I'm listening…"; }
+  if (mode === 'busy'){ mic.disabled = true; label.textContent = ''; }
+}
+function setStatus(t){ const el = $('#status'); if (el) el.textContent = t; }
+function updatePass(){ const b = $('#pass'); if (b) b.hidden = !(G.q && (engine === 'none' || G.tries >= 1)); }
+
+function onMic(){
+  if (G.busy) return;
+  if (G.listening){ stopListening(); return; }
+  runId++; stopSpeech();
+  document.querySelectorAll('.choice.reading').forEach(c => c.classList.remove('reading'));
+  if (engine === 'none'){
+    setStatus('아이가 말한 뒤 “잘 말했어요 ✓”를 눌러 주세요.');
+    updatePass(); return;
+  }
+  G.listening = true; setMic('listening'); setStatus('듣고 있어요…');
+  const myQ = G.q;
+  const p = listen(t => setStatus('들린 말: ' + t));
+  stopListening = () => { try { dict && dict.active() && dict.stop(); } catch {} };
+  p.then(r => { G.listening = false; if (G.q === myQ) handleHeard(r); });
+}
+
+async function handleHeard({texts, err}){
+  if (err === 'retry'){ setMic('ready'); setStatus('한 번 더 눌러 주세요.'); return; }
+  if (['not-allowed','service-not-allowed','not_granted','unavailable','audio-capture','none'].includes(err)){
+    engine = 'none'; setMic('ready');
+    setStatus('마이크를 쓸 수 없어요. 아이가 말한 뒤 “잘 말했어요 ✓”를 눌러 주세요.');
+    updatePass(); return;
+  }
+  if (heardCorrect(texts)) return success(false);
+  G.tries++; updatePass();
+  const right = G.q.c[G.q.a];
+  const wrong = heardWrong(texts);
+  const heard = texts.filter(Boolean)[0];
+  setStatus(heard ? '들린 말: ' + heard : '잘 안 들렸어요.');
+  const card = $(`.choice[data-i="${G.q.a}"]`); card && card.classList.add('hint');
+  const my = ++runId; setMic('wait');
+  if (wrong) await say(`${wrong.w}? Hmm, look again! Say: ${right.w}!`);
+  else if (!heard) await say(`I can't hear you. Say it loud! ${right.w}!`);
+  else await say(`Almost! Listen. ${right.w}! Now you say it!`);
+  if (my === runId) setMic('ready');
+}
+
+async function success(byParent){
+  if (G.busy) return; G.busy = true;
+  const my = ++runId; stopSpeech(); stopListening();
+  const right = G.q.c[G.q.a];
+  const card = $(`.choice[data-i="${G.q.a}"]`);
+  if (card){ card.classList.remove('hint'); card.classList.add('correct'); burst(card); }
+  G.stars++;
+  const dot = $('#dots').children[G.qi]; dot && dot.classList.add('on');
+  setMic('busy'); $('#pass').hidden = true;
+  setStatus(byParent ? '' : '정답이에요!');
+  const line = `${right.w.replace('!','')}! ${PRAISE[Math.floor(Math.random()*PRAISE.length)]}`;
+  $('#bubbleText').textContent = line;
+  await say(line);
+  if (my !== runId) return;
+  await wait(500);
+  if (my !== runId) return;
+  G.qi++;
+  if (G.qi < G.story.qs.length) askQuestion(false);
+  else finishStory();
+}
+
+function burst(el){
+  const r = el.getBoundingClientRect();
+  for (let i=0;i<10;i++){
+    const s = document.createElement('span'); s.className = 'spark'; s.textContent = '★';
+    const a = (i/10)*Math.PI*2;
+    s.style.left = (r.left + r.width/2 - 15) + 'px'; s.style.top = (r.top + r.height/2 - 20) + 'px';
+    s.style.setProperty('--dx', Math.cos(a)*110 + 'px'); s.style.setProperty('--dy', Math.sin(a)*110 + 'px');
+    document.body.appendChild(s); setTimeout(() => s.remove(), 1000);
+  }
+}
+
+async function finishStory(){
+  const s = G.story; const my = ++runId;
+  const done = loadDone(); done[s.id] = Math.max(done[s.id]||0, G.stars); saveDone(done);
+  const ov = document.createElement('div'); ov.className = 'overlay';
+  ov.innerHTML = `<div class="done">
+    <div class="princess-wrap">${princessSVG(s.p)}</div>
+    <h2>You did it!</h2>
+    <div class="big-stars">${'★'.repeat(G.stars)}</div>
+    <div class="ko">${esc(s.ko)} 이야기를 끝냈어요!</div>
+    <div class="btns"><button class="btn" id="again">Again</button><button class="btn alt" id="toHome">Home</button></div>
+  </div>`;
+  app.appendChild(ov);
+  const idx = STORIES.indexOf(s);
+  $('#again').onclick = () => startStory(idx);
+  $('#toHome').onclick = renderHome;
+  await say(s.bye);
+}
+
+renderHome();
+attachClaude();
+</script>
+
+</body>
+</html>
