@@ -32,6 +32,8 @@ button:focus-visible{outline:4px solid var(--gold);outline-offset:3px}
 .home-inner{max-width:980px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
 .home h1{margin:0;text-align:center;font-size:clamp(40px,8vw,74px);line-height:1;font-weight:800;color:var(--rose);text-shadow:0 4px 0 #fff,0 7px 0 rgba(59,42,92,.12);text-wrap:balance}
 .home .sub{margin:0;text-align:center;font-family:var(--font-ko);font-size:clamp(18px,3vw,24px);color:var(--ink-soft)}
+.sec{margin:8px 0 0;display:flex;align-items:baseline;gap:10px;font-size:28px;font-weight:800;color:var(--ink)}
+.sec small{font-family:var(--font-ko);font-size:18px;font-weight:400;color:var(--ink-soft)}
 .stories{display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:14px}
 .story{border:4px solid #fff;border-radius:28px;padding:8px 8px 14px;display:grid;justify-items:center;gap:2px;box-shadow:0 7px 0 rgba(59,42,92,.13);transition:transform .15s}
 .story:active{transform:translateY(4px);box-shadow:0 3px 0 rgba(59,42,92,.13)}
@@ -57,6 +59,8 @@ button:focus-visible{outline:4px solid var(--gold);outline-offset:3px}
 .stage::after{content:"";position:absolute;left:-10%;right:-10%;bottom:-40px;height:90px;border-radius:50%;background:rgba(255,255,255,.55);z-index:0}
 .bubble{grid-area:bubble;justify-self:center;position:relative;z-index:2;background:#fff;border:none;border-radius:26px;padding:10px 18px 10px 20px;font-size:clamp(20px,3.6vh,30px);font-weight:700;line-height:1.2;max-width:680px;text-align:center;box-shadow:0 6px 0 rgba(59,42,92,.12);display:flex;align-items:center;gap:10px;text-wrap:balance}
 .bubble::after{content:"";position:absolute;left:24%;bottom:-16px;border:10px solid transparent;border-top:12px solid #fff;border-bottom:0}
+.btxt{display:grid;gap:2px}
+#koText{font-family:var(--font-ko);font-size:clamp(14px,2.2vh,17px);font-weight:400;color:var(--ink-soft);line-height:1.35;word-break:keep-all}
 .bubble .ear{flex:none;width:34px;height:34px;border-radius:50%;background:var(--lilac);display:grid;place-items:center}
 .bubble .ear svg{width:20px;height:20px}
 .princess-wrap{grid-area:princess;min-height:0;position:relative;z-index:1;display:flex;align-items:flex-end;justify-content:center}
@@ -145,6 +149,146 @@ button:focus-visible{outline:4px solid var(--gold);outline-offset:3px}
 
 <script>
 /* ---------------- Stories (original characters) ---------------- */
+const CLASSICS = [
+  { id:'snowwhite', group:'classic', en:'Snow White', ko:'백설공주 (그림 형제)', friend:'🍎', fx:{ch:'✿',mode:'fall'},
+    bg:'linear-gradient(180deg,#CDEBC0 0%,#F1F9E6 60%,#FFF6F0 100%)',
+    p:{name:'Snow White', skin:'#FFF1EA', hair:'#231C2A', hairDark:'#120E16', dress:'#D64550', accent:'#FFFFFF', eye:'#3A2A44', crown:'#FFD95A'},
+    hi:"Hello! I'm Snow White. My skin is white as snow. Let me tell you my story!",
+    bye:"And we lived happily ever after! Thank you, friend! Bye-bye!",
+    qs:[
+      {n:"A queen has a magic mirror.", ko:"왕비에게는 말하는 마법 거울이 있었어요.",
+       q:"Mirror, mirror! Who is the prettiest?", prop:'🪞', a:0, c:[
+        {w:'Snow White', e:'👸', k:['snow white','snow','white','snowwhite','snow wide','no white']},
+        {w:'Frog', e:'🐸', k:['frog','frogs','fog','frock']}]},
+      {n:"Snow White runs into the forest. She finds a little house.", ko:"백설공주는 숲으로 도망쳐서 작은 집을 찾았어요.",
+       q:"How many little men live in the house?", prop:'🏠', a:0, c:[
+        {w:'Seven', num:'7', k:['seven','7','heaven','sevens','kevin']},
+        {w:'Two', num:'2', k:['two','2','to','too','tu']}]},
+      {n:"The bad queen brings an apple.", ko:"나쁜 왕비가 사과를 가지고 왔어요.",
+       q:"What color is the apple?", prop:'🍎', a:0, c:[
+        {w:'Red', col:'#E23B4A', k:['red','read','bread','rad','wed']},
+        {w:'Blue', col:'#4D8DF0', k:['blue','blew','boo','bloo','glue']}]},
+      {n:"Snow White eats the apple and falls asleep. A prince comes.", ko:"사과를 먹은 백설공주는 잠들었어요. 왕자님이 왔어요.",
+       q:"Let's help! Say: Wake up!", prop:'😴', a:0, c:[
+        {w:'Wake up!', e:'☀️', k:['wake up','wake','wakeup','weak','wait up','make up','wakey','wake wake']},
+        {w:'Go to bed', e:'🛏️', k:['bed','go to bed','bad']}]},
+    ]},
+  { id:'sleeping', group:'classic', en:'Sleeping Beauty', ko:'잠자는 숲속의 공주 (페로·그림 형제)', friend:'🌹', fx:{ch:'❀',mode:'fall'},
+    bg:'linear-gradient(180deg,#D9CCF5 0%,#F3EAFF 60%,#FFF2F6 100%)',
+    p:{name:'Sleeping Beauty', skin:'#F8DCC8', hair:'#9A6A3E', hairDark:'#7A4F2A', dress:'#5FAF7A', accent:'#E6F7E9', eye:'#3F6E4E', crown:'#FFD95A'},
+    hi:"Hello! I am the Sleeping Beauty. Let me tell you my story!",
+    bye:"I slept for so long! Thank you, friend! Bye-bye!",
+    qs:[
+      {n:"A baby princess is born. Fairies bring her gifts.", ko:"아기 공주가 태어나자 요정들이 선물을 가져왔어요.",
+       q:"Who brings the gifts?", prop:'👶', a:0, c:[
+        {w:'Fairies', e:'🧚', k:['fairies','fairy','ferry','very','fair','berries','fairys']},
+        {w:'Dogs', e:'🐶', k:['dog','dogs','doggy','dock','duck']}]},
+      {n:"One bad fairy is angry. She says: You will sleep!", ko:"화가 난 나쁜 요정이 '공주는 잠들 거야!' 하고 말했어요.",
+       q:"What does the princess do?", prop:'💤', a:0, c:[
+        {w:'Sleep', e:'😴', k:['sleep','sleepy','slip','sleeping','seep','sleeps']},
+        {w:'Run', e:'🏃', k:['run','ran','round','fun']}]},
+      {n:"She sleeps for one hundred years. Roses grow all around the castle.", ko:"공주는 백 년 동안 잠들고, 성 둘레에 장미 덩굴이 자랐어요.",
+       q:"What grows around the castle?", prop:'🏰', a:0, c:[
+        {w:'Roses', e:'🌹', k:['rose','roses','rosie','rosy','flower','flowers','road','rows']},
+        {w:'Cars', e:'🚗', k:['car','cars','ca','call','cart']}]},
+      {n:"A prince comes. The princess wakes up!", ko:"왕자님이 오자 공주가 잠에서 깼어요!",
+       q:"Let's say hi! Good... ?", prop:'☀️', a:0, c:[
+        {w:'Good morning', e:'☀️', k:['morning','good morning','mourning','morn']},
+        {w:'Good night', e:'🌙', k:['night','good night','nite','knight','goodnight']}]},
+    ]},
+  { id:'cinderella', group:'classic', en:'Cinderella', ko:'신데렐라 (페로)', friend:'🎃', fx:{ch:'✦',mode:'fall'},
+    bg:'linear-gradient(180deg,#2E3A78 0%,#5867B0 55%,#B9C2EE 100%)',
+    p:{name:'Cinderella', skin:'#F6D7C2', hair:'#4A3226', hairDark:'#33211A', dress:'#F2C14E', accent:'#FFF3C4', eye:'#4E6B8C', crown:'#E8EEF8'},
+    hi:"Hello! I'm Cinderella. Let me tell you my story!",
+    bye:"The shoe fits! Thank you, friend! Bye-bye!",
+    qs:[
+      {n:"Cinderella works all day. She cleans the floor.", ko:"신데렐라는 하루 종일 바닥을 쓸고 일했어요.",
+       q:"What does she use?", prop:'🧽', a:0, c:[
+        {w:'Broom', e:'🧹', k:['broom','brooms','room','bloom','vroom','groom','brom']},
+        {w:'Spoon', e:'🥄', k:['spoon','spoons','soon','spoom']}]},
+      {n:"A fairy godmother comes. She makes magic!", ko:"요정 할머니가 와서 마법을 부렸어요!",
+       q:"What is this? It turns into a golden coach!", prop:'🪄', a:0, c:[
+        {w:'Pumpkin', e:'🎃', k:['pumpkin','pumpkins','bumpkin','pumkin','punkin','pump']},
+        {w:'Apple', e:'🍎', k:['apple','apples','happle','appo','apo','appa']}]},
+      {n:"Cinderella dances with the prince. At midnight, she must run home!", ko:"왕자님과 춤을 추다가, 밤 12시가 되자 서둘러 집으로 달려갔어요!",
+       q:"Oh no! What does she lose?", prop:'🕛', a:0, c:[
+        {w:'Shoe', e:'👠', k:['shoe','shoes','show','sue','slipper','chew']},
+        {w:'Hat', e:'🎩', k:['hat','hats','hot','cat','had']}]},
+      {n:"The prince looks for her. The shoe fits!", ko:"왕자님이 신데렐라를 찾았어요. 구두가 꼭 맞았어요!",
+       q:"Are they happy?", prop:'💖', a:0, c:[
+        {w:'Yes!', e:'😊', k:['yes','yeah','yep','yay','ya','yess','yea','yup']},
+        {w:'No', e:'😢', k:['no','nope','nah']}]},
+    ]},
+  { id:'mermaid', group:'classic', en:'The Little Mermaid', ko:'인어공주 (안데르센)', friend:'🐚', fx:{ch:'○',mode:'rise'},
+    bg:'linear-gradient(180deg,#4FC3E0 0%,#2A8FC4 60%,#1D6FA8 100%)',
+    p:{name:'The Little Mermaid', skin:'#FBE2D2', hair:'#8FB2F0', hairDark:'#6A8ED6', dress:'#F0889B', accent:'#FFF0B3', eye:'#2F6FA8', crown:'#FFD95A', tail:true},
+    hi:"Hello! I am the little mermaid. I am the youngest daughter of the sea king.",
+    bye:"Now I can walk on land! Thank you, friend! Bye-bye!",
+    qs:[
+      {n:"The little mermaid lives deep under the sea.", ko:"인어공주는 깊은 바닷속에 살았어요.",
+       q:"She has no legs. What does she have?", prop:'🌊', a:0, c:[
+        {w:'Tail', e:'🐟', k:['tail','tails','tale','tell','till','tel','tile']},
+        {w:'Feet', e:'🦶', k:['feet','foot','feat','fit']}]},
+      {n:"A big storm comes! A prince falls into the sea.", ko:"큰 폭풍이 와서 왕자님이 바다에 빠졌어요!",
+       q:"What falls from the sky?", prop:'⛈️', a:0, c:[
+        {w:'Rain', e:'🌧️', k:['rain','rainy','ran','rein','lane']},
+        {w:'Candy', e:'🍬', k:['candy','candi','can','candies','andy']}]},
+      {n:"She saves the prince. Now she wants to walk on land.", ko:"인어공주는 왕자님을 구해 주고, 땅 위를 걷고 싶어졌어요.",
+       q:"What does she want?", prop:'🏝️', a:0, c:[
+        {w:'Legs', e:'🦵', k:['leg','legs','lake','lex','eggs','lags','lacks']},
+        {w:'Hat', e:'🎩', k:['hat','hats','hot','cat','had']}]},
+      {n:"The sea witch gives her legs. But she takes her voice!", ko:"바다 마녀가 다리를 주었지만, 목소리를 가져갔어요!",
+       q:"She can not talk. Say it for her: Hello, prince!", prop:'🤐', a:0, c:[
+        {w:'Hello', e:'👋', k:['hello','hi','hallo','hullo','hey','halo','yellow','hello prince']},
+        {w:'Bye', e:'💤', k:['bye','by','buy','bye bye','bay']}]},
+    ]},
+  { id:'rapunzel', group:'classic', en:'Rapunzel', ko:'라푼젤 (그림 형제)', friend:'🐦', fx:{ch:'✦',mode:'fall'},
+    bg:'linear-gradient(180deg,#FFE3B8 0%,#FFF2D9 55%,#E6F4D8 100%)',
+    p:{name:'Rapunzel', skin:'#F8DFCC', hair:'#F5C542', hairDark:'#D9A521', dress:'#7CB66A', accent:'#EAF6E2', eye:'#5A7A3A', crown:'#FF9FB8', longHair:true},
+    hi:"Hello! I'm Rapunzel. My hair is very, very long!",
+    bye:"Now I am free! Thank you, friend! Bye-bye!",
+    qs:[
+      {n:"A witch puts Rapunzel in a tall tower. There is no door!", ko:"마녀가 라푼젤을 문이 없는 높은 탑에 가두었어요.",
+       q:"Where is Rapunzel?", prop:'🏰', a:0, c:[
+        {w:'Tower', e:'🏰', k:['tower','towers','power','tour','tauer','tao','tall']},
+        {w:'Boat', e:'⛵', k:['boat','boats','both','goat','vote']}]},
+      {n:"Her hair grows long and golden.", ko:"라푼젤의 머리카락은 길고 금빛으로 자랐어요.",
+       q:"What color is her hair?", prop:'💇‍♀️', a:0, c:[
+        {w:'Yellow', col:'#F5C542', k:['yellow','yello','yell','jello','mellow','hello','golden','gold']},
+        {w:'Green', col:'#3FAF6A', k:['green','grin','grain','greene','greens']}]},
+      {n:"Rapunzel, Rapunzel, let down your hair!", ko:"“라푼젤, 라푼젤, 머리카락을 내려 주렴!”",
+       q:"Who climbs up her hair?", prop:'🧗', a:0, c:[
+        {w:'Prince', e:'🤴', k:['prince','prints','princes','pins','print','fins','prance']},
+        {w:'Fish', e:'🐟', k:['fish','fishy','fishes','fis','fist']}]},
+      {n:"The prince and Rapunzel find each other. They are happy!", ko:"왕자님과 라푼젤은 다시 만나 행복하게 살았어요!",
+       q:"Let's brush her long hair! What do we use?", prop:'👸', a:0, c:[
+        {w:'Brush', e:'💇‍♀️', k:['brush','brushing','brash','bush','rush','comb']},
+        {w:'Fork', e:'🍴', k:['fork','forks','folk','for','pork']}]},
+    ]},
+  { id:'snowqueen', group:'classic', en:'The Snow Queen', ko:'눈의 여왕 (안데르센, 겨울왕국의 원작 동화)', friend:'🦌', fx:{ch:'❄',mode:'fall'},
+    bg:'linear-gradient(180deg,#B7DBFF 0%,#E3F1FF 60%,#F8FCFF 100%)',
+    p:{name:'Gerda', skin:'#FBE0CF', hair:'#B5652E', hairDark:'#8E4C1F', dress:'#E2575F', accent:'#FFE9EA', eye:'#3E7AB0', crown:'#FF8FA8', noCrown:true},
+    hi:"Hello! I'm Gerda. This is the story of the Snow Queen!",
+    bye:"Kai is home again! Thank you, friend! Bye-bye!",
+    qs:[
+      {n:"Gerda and Kai are best friends. They play with the roses.", ko:"게르다와 카이는 단짝 친구예요. 함께 장미꽃 옆에서 놀았어요.",
+       q:"What color are the roses?", prop:'🌹', a:0, c:[
+        {w:'Red', col:'#E23B4A', k:['red','read','bread','rad','wed']},
+        {w:'Blue', col:'#4D8DF0', k:['blue','blew','boo','bloo','glue']}]},
+      {n:"Snow falls. The Snow Queen comes and takes Kai away!", ko:"눈이 오던 날, 눈의 여왕이 와서 카이를 데려갔어요!",
+       q:"What does the Snow Queen ride?", prop:'❄️', a:0, c:[
+        {w:'Sled', e:'🛷', k:['sled','sleds','slid','slide','sleigh','slay','fled','said']},
+        {w:'Bike', e:'🚲', k:['bike','bikes','back','bite']}]},
+      {n:"Gerda goes far, far away to find Kai. Someone helps her!", ko:"게르다는 카이를 찾아 멀리 떠났어요. 누군가 도와주었어요!",
+       q:"Who helps Gerda?", prop:'🧭', a:0, c:[
+        {w:'Reindeer', e:'🦌', k:['reindeer','rain deer','deer','dear','rain','raindeer','reindeers']},
+        {w:'Pig', e:'🐷', k:['pig','pigs','big','peg']}]},
+      {n:"Gerda finds Kai in the ice palace. She hugs him. The ice melts!", ko:"게르다가 얼음 궁전에서 카이를 꼭 안아 주자 얼음이 녹았어요!",
+       q:"Let's give a big hug! Say: Hug!", prop:'🤗', a:0, c:[
+        {w:'Hug', e:'🤗', k:['hug','hugs','hag','hog','hook','huck','hugging','hut']},
+        {w:'Run', e:'🏃', k:['run','ran','round','fun']}]},
+    ]},
+];
 const QUEEN = {name:'The Ice Queen', skin:'#FCE6DA', hair:'#EDEBFA', hairDark:'#C9C3EA', dress:'#4C6FD9', accent:'#BFE6FF', eye:'#2F7FD0', crown:'#9FE3FF', queen:true, cape:'#8AB8F5'};
 const STORIES = [
   { id:'battle', en:'Ice Queen Power', ko:'얼음 여왕: 오늘은 누굴 해치울까?', friend:'🤴', fx:{ch:'❄',mode:'fall'},
@@ -226,7 +370,7 @@ const STORIES = [
     ]},
   { id:'sea', en:'Under the Sea', ko:'코랄 공주의 바닷속 생일', friend:'🐢', fx:{ch:'○',mode:'rise'},
     bg:'linear-gradient(180deg,#5FD0EE 0%,#2C9BD1 60%,#1F7DB5 100%)',
-    p:{name:'Princess Coral', skin:'#FBDCC8', hair:'#E8673C', hairDark:'#C24E28', dress:'#2FC7A0', accent:'#B9A3FF', eye:'#5A3E2B', crown:'#FFD95A', tail:true},
+    p:{name:'Princess Coral', skin:'#FBDCC8', hair:'#F28DB2', hairDark:'#D96C96', dress:'#8F7CF0', accent:'#FFD95A', eye:'#5A3E2B', crown:'#FFD95A', tail:true},
     hi:"Hi! I'm Princess Coral. I live in the sea. Today is my birthday!",
     bye:"What a happy birthday! Thank you, friend! Bye-bye!",
     qs:[
@@ -240,8 +384,8 @@ const STORIES = [
         {w:'One', num:'1', k:['one','1','won','want','wan']},
         {w:'Three', num:'3', k:['three','3','tree','trees','free','sree','through','thee']}]},
       {q:"What color is my tail?", prop:'🧜‍♀️', a:0, c:[
-        {w:'Green', col:'#2FC7A0', k:['green','grin','grain','greene','greens','grim']},
-        {w:'Pink', col:'#FF7EB6', k:['pink','ping','pinky','think','pin']}]},
+        {w:'Purple', col:'#8F7CF0', k:['purple','people','purpl','popple','purple purple']},
+        {w:'Green', col:'#2FC7A0', k:['green','grin','grain','greene','greens','grim']}]},
     ]},
   { id:'unicorn', en:'Rainbow Meadow', ko:'로지 공주와 유니콘', friend:'🦄', fx:{ch:'✦',mode:'fall'},
     bg:'linear-gradient(180deg,#FFC7E4 0%,#FFE7F2 55%,#FFF6DA 100%)',
@@ -301,6 +445,7 @@ const STORIES = [
         {w:'Purple', col:'#9B6BE8', k:['purple','people','purpl','popple']}]},
     ]},
 ];
+STORIES.unshift(...CLASSICS);
 const PRAISE = ["Great job!","Wonderful!","You did it!","Super!","Yay! Well done!","Amazing!"];
 
 /* ---------------- Princess drawing (original, parametric) ---------------- */
@@ -316,13 +461,18 @@ function princessSVG(p){
   const back = (p.cape ? `<path d="M74 140 Q30 200 26 262 L174 262 Q170 200 126 140 Z" fill="${p.cape}" opacity=".9"/>
        <path d="M60 200 l4 -6 l4 6 l-4 6z M140 214 l4 -6 l4 6 l-4 6z M96 240 l4 -6 l4 6 l-4 6z" fill="#fff" opacity=".8"/>` : '')
     + (p.veil ? `<path d="M56 60 Q20 160 30 262 L170 262 Q180 160 144 60 Z" fill="#FFFFFF" opacity=".75" stroke="#F3D6E8" stroke-width="2"/>` : '');
-  const crown = p.queen
+  const crown = p.noCrown
+    ? `<path d="M62 56 Q100 30 138 56" stroke="${p.dress}" stroke-width="6" fill="none" stroke-linecap="round"/>
+       <circle cx="72" cy="48" r="7" fill="${p.crown}"/><circle cx="72" cy="48" r="3" fill="#FFD95A"/>`
+    : p.queen
     ? `<path d="M70 48 L74 10 L86 30 L93 2 L100 24 L107 2 L114 30 L126 10 L130 48 Q100 40 70 48 Z" fill="${p.crown}" stroke="#5FA8D8" stroke-width="2" stroke-linejoin="round"/>
        <path d="M100 14 l5 9 l-5 9 l-5 -9z" fill="#fff"/><circle cx="82" cy="38" r="3" fill="#fff"/><circle cx="118" cy="38" r="3" fill="#fff"/>`
     : `<path d="M74 46 L80 20 L91 36 L100 12 L109 36 L120 20 L126 46 Q100 40 74 46 Z" fill="${p.crown}" stroke="#E3A600" stroke-width="2" stroke-linejoin="round"/>
        <circle cx="100" cy="34" r="4.5" fill="${p.dress}"/><circle cx="82" cy="38" r="2.5" fill="#fff"/><circle cx="118" cy="38" r="2.5" fill="#fff"/>`;
+  const longHair = p.longHair ? `<path d="M146 110 Q190 160 160 205 Q136 240 186 266" stroke="${p.hairDark}" stroke-width="24" fill="none" stroke-linecap="round"/>
+       <path d="M146 110 Q190 160 160 205 Q136 240 186 266" stroke="${p.hair}" stroke-width="16" fill="none" stroke-linecap="round" stroke-dasharray="14 6"/>` : '';
   return `<svg class="princess" viewBox="0 0 200 270" role="img" aria-label="${p.name}">
-    ${back}
+    ${back}${longHair}
     <path d="M42 96 Q30 196 58 222 L142 222 Q170 196 158 96 Z" fill="${p.hairDark}"/>
     ${body}
     <ellipse cx="70" cy="170" rx="8" ry="22" fill="${p.skin}" transform="rotate(18 70 170)"/>
@@ -408,7 +558,7 @@ function speakSynth(text, who){
     const u = new SpeechSynthesisUtterance(text);
     u.lang = 'en-US'; if (synthVoice) u.voice = synthVoice;
     u.rate = who === 'word' ? 0.75 : 0.85;
-    u.pitch = who === 'princess' ? 1.3 : 1.1;
+    u.pitch = who === 'princess' ? 1.3 : who === 'narrator' ? 1.05 : 1.1;
     let done = false; const fin = () => { if(!done){ done = true; clearTimeout(t); res(); } };
     const t = setTimeout(fin, 1800 + text.length * 110);
     u.onend = fin; u.onerror = fin;
@@ -417,10 +567,10 @@ function speakSynth(text, who){
 }
 async function say(text, who='princess'){
   const my = runId;
-  if (who === 'princess') setTalking(true);
+  if (who === 'princess' || who === 'narrator') setTalking(true);
   try {
     if (tts) {
-      try { await tts.speak(text, {voice: who==='princess' ? 'airy' : 'buttery', language:'en', rate: who==='word' ? 0.8 : 0.9}); }
+      try { await tts.speak(text, {voice: who==='princess' || who==='narrator' ? 'airy' : 'buttery', language:'en', rate: who==='word' ? 0.8 : 0.9}); }
       catch (e) { if (my === runId && e && e.code !== 'viewer_stopped') await speakSynth(text, who); }
     } else {
       await speakSynth(text, who);
@@ -528,13 +678,15 @@ function renderHome(){
   app.innerHTML = `<div class="screen home gutter"><div class="home-inner">
     <h1>Princess Talk Time</h1>
     <p class="sub">공주님이 물어보면, 영어로 대답해요!</p>
-    <div class="stories">${STORIES.map((s,i) => `
+    ${[['classic','명작 동화','Classic Stories'],['play','놀이 이야기','Play Stories']].map(([g,ko,en]) => `
+    <h2 class="sec"><span>${en}</span><small>${ko}</small></h2>
+    <div class="stories">${STORIES.map((s,i) => (s.group||'play') !== g ? '' : `
       <button class="story" data-i="${i}" style="background:${s.bg}" aria-label="${esc(s.en)}">
         ${princessSVG(s.p)}
         <span class="label"><span class="en">${esc(s.en)}</span>
         <span class="ko">${esc(s.ko)}</span></span>
         <span class="got">${'★'.repeat(done[s.id]||0)}</span>
-      </button>`).join('')}</div>
+      </button>`).join('')}</div>`).join('')}
     <div class="tips">
       <b>엄마 아빠께</b>
       <ol>
@@ -567,7 +719,7 @@ function startStory(i){
       <div class="dots" id="dots">${s.qs.map(() => '<span>★</span>').join('')}</div>
     </div>
     <div class="stage gutter" id="stage" style="background:${s.bg}">
-      <button class="bubble" id="bubble"><span class="ear">${ICON.ear}</span><span id="bubbleText"></span></button>
+      <button class="bubble" id="bubble"><span class="ear">${ICON.ear}</span><span class="btxt"><span id="bubbleText"></span><small id="koText" hidden></small></span></button>
       <div class="princess-wrap">${princessSVG(s.p)}<div class="friend">${s.friend}</div></div>
       <div class="prop" id="prop"></div>
     </div>
@@ -611,7 +763,7 @@ function choiceHTML(c){
 async function askQuestion(first){
   const s = G.story; const raw = s.qs[G.qi]; const q = raw.by ? raw.by[G.branch] : raw; G.q = q; G.tries = 0; G.busy = false; G.pick = -1;
   G.order = shuffle(q.c.map((_,i) => i));
-  $('#bubbleText').textContent = q.q;
+  $('#bubbleText').textContent = q.q; $('#koText').hidden = true;
   const prop = $('#prop');
   if (q.prop && q.prop.mon){ prop.className = 'prop'; prop.innerHTML = `<span>${monsterSVG(G.branch)}</span>`; }
   else if (typeof q.prop === 'object'){ prop.className = 'prop count'; prop.innerHTML = Array.from({length:q.prop.n}, () => `<span>${q.prop.e}</span>`).join(''); }
@@ -625,8 +777,17 @@ async function askQuestion(first){
     setMic('wait');
     await say(s.hi);
     if (my !== runId) return;
-    $('#bubbleText').textContent = q.q;
   }
+  if (q.n){
+    const my = ++runId;
+    $('#bubbleText').textContent = q.n; const ko = $('#koText'); ko.textContent = q.ko || ''; ko.hidden = !q.ko;
+    setMic('wait');
+    await say(q.n, 'narrator');
+    if (my !== runId) return;
+    await wait(300);
+    if (my !== runId) return;
+  }
+  $('#bubbleText').textContent = q.q; $('#koText').hidden = true;
   readQuestion(true);
 }
 
