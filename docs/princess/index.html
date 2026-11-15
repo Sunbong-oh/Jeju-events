@@ -201,6 +201,18 @@ body{background:var(--navy)}
 .done h2{font-family:var(--font-title);font-weight:900;font-size:38px;color:var(--gold-deep)}
 .btn{background:linear-gradient(180deg,#EC5A80,var(--rose-deep));box-shadow:0 5px 0 #7A1230}
 .btn.alt{background:#F6EBD0;box-shadow:0 5px 0 var(--line)}
+
+/* ===== painted portraits from the family picture ===== */
+.hero{aspect-ratio:auto;min-height:0;height:clamp(180px,38vw,360px)}
+.home-inner,.stories,.story{min-width:0}
+.story .today{max-width:100%;text-align:center}
+.princess.portrait{display:block;aspect-ratio:3/4;border-radius:999px 999px 22px 22px;overflow:hidden;border:4px solid var(--gold);box-shadow:0 0 0 2px var(--gold-deep),0 8px 14px rgba(31,27,77,.35);background:#8FB6F2;flex:none}
+.princess.portrait img{width:100%;height:100%;object-fit:cover;display:block;max-width:none}
+.princess-wrap .princess.portrait{height:90%;max-height:330px;width:auto;margin-bottom:10px;filter:none}
+.story .arch .princess.portrait{left:0;bottom:0;transform:none;width:100%;height:100%;border:none;border-radius:0;box-shadow:none;filter:none}
+.done .princess.portrait{height:200px;width:auto;margin-bottom:0}
+.friend img{display:block;width:clamp(60px,12vh,104px);aspect-ratio:1;border-radius:50%;object-fit:cover;object-position:50% 20%;border:3px solid var(--gold);box-shadow:0 0 0 2px var(--gold-deep)}
+.prop-img{display:block;height:1.7em;max-height:100%;aspect-ratio:3/4;object-fit:cover;border-radius:22px;border:4px solid var(--gold);box-shadow:0 0 0 2px var(--gold-deep)}
 </style>
 
 <div id="app"></div>
@@ -531,22 +543,22 @@ function buildBattle(rng){
   const place = pick(BATTLE.places), st = pick(BATTLE.strong), mg = pick(BATTLE.magic);
   const by = f => Object.fromEntries(ids.map(id => [id, f(VILLAINS[id])]));
   return E(place[2], place[3], [
-    {n:place[0], ko:place[1], q:"The dark witch sent three monsters! Who should we beat today?", open:true, prop:'⚔️', a:0,
+    {n:place[0], ko:place[1], q:"The dark witch sent three monsters! Who should we beat today?", open:true, prop:'img:witch.jpg', a:0,
      c:ids.map(id => ({w:VILLAINS[id].label, m:id, branch:id, k:VILLAINS[id].k}))},
     {by:by(v => Q(v.n, v.ko, v.q, 'mon', v.s[0], v.s[1]))},
     Q(null, null, st[0], '💪', st[1], st[2]),
     Q(null, null, mg[0], 'mon', mg[1], mg[2], {freeze:true}),
-    {by:by(v => Q("We won!", "우리가 이겼어요!", v.hq, '🏆', v.h[0], v.h[1]))},
+    {by:by(v => Q("We won!", "우리가 이겼어요!", v.hq, 'img:girl.jpg', v.h[0], v.h[1]))},
   ], {hi:pick(BATTLE.hi), bye:pick(BATTLE.bye)});
 }
 
 /* ---------------- Play stories ---------------- */
 const QUEEN = {name:'The Ice Queen', skin:'#FCE6DA', hair:'#EDEBFA', hairDark:'#C9C3EA', dress:'#4C6FD9', accent:'#BFE6FF', eye:'#2F7FD0', crown:'#9FE3FF', queen:true, cape:'#8AB8F5'};
 const PLAY = [
-  { id:'battle', group:'play', en:'Ice Queen Power', ko:'얼음 여왕: 오늘은 누굴 해치울까?', friend:'🤴', fx:{ch:'❄',mode:'fall'},
+  { id:'battle', group:'play', en:'Ice Queen Power', ko:'얼음 여왕: 오늘은 누굴 해치울까?', friend:'img:king.jpg', fx:{ch:'❄',mode:'fall'},
     bg:'linear-gradient(180deg,#5B6FD6 0%,#8FB6F2 55%,#DDEEFF 100%)', p:QUEEN, gen:buildBattle,
     hi:"I am the Ice Queen!", bye:"Bye-bye!" },
-  { id:'wedding', group:'play', en:'Royal Wedding', ko:'얼음 여왕과 왕의 이야기', friend:'🤴', fx:{ch:'♥',mode:'fall'},
+  { id:'wedding', group:'play', en:'Royal Wedding', ko:'얼음 여왕과 왕의 이야기', friend:'img:king.jpg', fx:{ch:'♥',mode:'fall'},
     bg:'linear-gradient(180deg,#FFD3E6 0%,#FBEAFF 55%,#FFFFFF 100%)',
     p:{...QUEEN, dress:'#FFFFFF', accent:'#FFD3E6', cape:null, veil:true},
     hi:"Hello! I am the Ice Queen, and this is my King!", bye:"What a happy day! Thank you, friend! Bye-bye!",
@@ -745,73 +757,140 @@ const PDEFS = `<defs>
   <linearGradient id="pgHair" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".32"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".16"/></linearGradient>
   <radialGradient id="pgSkin" cx=".38" cy=".32" r=".8"><stop offset="0" stop-color="#fff" stop-opacity=".4"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
 </defs>`;
+/* Each character's own look: hairstyle, fringe, eyes, mouth, dress cut, sleeves, headpiece, pose. */
+const LOOKS = {
+  snowwhite:{hs:'long', bg:'center', ey:'big', ds:'ball', sl:'puff', hd:'tiara', gem:'#E0355A', pose:'wave', lips:'#D62F4A'},
+  sleeping:{hs:'bun', bg:'swoop', ey:'almond', ds:'tier', sl:'long', hd:'flowers', fl:['#FF8FB0','#FFFFFF'], pose:'down', hair:'#B5552E', hairDark:'#8E3D1C', dress:'#3FA8A0', accent:'#D8F3F0'},
+  cinderella:{hs:'sidebraid', bg:'swoop', ey:'round', ds:'ball', sl:'none', hd:'tiara', gem:'#4D8DF0', pose:'wave'},
+  mermaid:{hs:'wavy', bg:'center', ey:'big', hd:'shell'},
+  rapunzel:{hs:'long', bg:'straight', ey:'round', freckles:true, ds:'aline', sl:'puff', hd:'flowers', fl:['#C9A6FF','#FF8FB0'], pose:'down'},
+  snowqueen:{hs:'braids', bg:'straight', ey:'round', freckles:true, mo:'grin', ds:'aline', apron:true, sl:'long', hd:'band', pose:'wave'},
+  battle:{img:'queen.jpg'}, wedding:{img:'queen.jpg'},
+  snow:{hs:'bob', bg:'straight', ey:'big', ds:'fur', sl:'long', hd:'crown', pose:'wand'},
+  sea:{hs:'buns2', bg:'swoop', ey:'almond', mo:'grin', hd:'shell', skin:'#F3C9A8'},
+  unicorn:{hs:'curly', bg:'curly', ey:'big', mo:'grin', ds:'tier', sl:'puff', hd:'flowers', fl:['#FFD23F','#FFFFFF'], pose:'wave', skin:'#B9794E', hair:'#3A2418', hairDark:'#26160E', blush:'#E0606E'},
+  dino:{hs:'buns2', bg:'straight', ey:'almond', ds:'aline', sl:'puff', hd:'tiara', gem:'#2FBF94', pose:'down'},
+  kitten:{hs:'ponytail', bg:'center', ey:'big', mo:'grin', freckles:true, ds:'ball', sl:'puff', hd:'catears', pose:'wave'},
+};
+STORIES.forEach(st => { st.p = Object.assign({}, st.p, LOOKS[st.id] || {}); });
+
 function princessSVG(p){
-  const SK = 'M84 160 Q40 200 34 252 Q100 268 166 252 Q160 200 116 160 Z';
-  const TL = 'M80 150 Q70 196 90 226 Q95 238 80 258 Q96 254 100 244 Q104 254 120 258 Q105 238 110 226 Q130 196 120 150 Z';
+  if (p.img) return `<span class="princess portrait"><img src="${p.img}" alt="${p.name}"></span>`;
+  const H = p.hair, HD = p.hairDark, G = 'url(#pgGold)';
   const spark = (x,y,r) => `<path d="M${x} ${y-r} L${x+r*.3} ${y-r*.3} L${x+r} ${y} L${x+r*.3} ${y+r*.3} L${x} ${y+r} L${x-r*.3} ${y+r*.3} L${x-r} ${y} L${x-r*.3} ${y-r*.3} Z" fill="#fff" opacity=".9"/>`;
+  const gem = (x,y,r,c) => `<circle cx="${x}" cy="${y}" r="${r}" fill="${c}" stroke="#B77A0A" stroke-width="1"/><circle cx="${x-r*.3}" cy="${y-r*.3}" r="${r*.3}" fill="#fff"/>`;
+  const vol = d => `<path d="${d}" fill="url(#pgVol)"/>`;
+
+  /* --- hair behind the body --- */
+  const hs = p.hs || 'long';
+  const backD = {long:'M40 96 Q22 172 44 228 Q60 238 72 224 L128 224 Q140 238 156 228 Q178 172 160 96 Z',
+    wavy:'M40 96 Q14 140 34 176 Q16 206 42 234 Q58 246 70 226 L130 226 Q142 246 158 234 Q184 206 166 176 Q186 140 160 96 Z',
+    bob:'M42 92 Q28 138 50 158 Q100 172 150 158 Q172 138 158 92 Z'}[hs] || 'M46 92 Q42 128 58 140 L142 140 Q158 128 154 92 Z';
+  let back = hs === 'curly'
+    ? [[44,80],[38,108],[46,136],[64,152],[156,80],[162,108],[154,136],[136,152],[54,54],[146,54],[76,36],[124,36],[100,30]].map(([x,y]) => `<circle cx="${x}" cy="${y}" r="23" fill="${HD}"/>`).join('')
+    : `<path d="${backD}" fill="${HD}"/>`;
+  if (hs === 'ponytail') back += `<path d="M140 50 Q200 66 190 140 Q186 192 160 218 Q174 160 160 118 Q154 84 132 70 Z" fill="${HD}"/><path d="M150 62 Q188 80 180 140 Q178 170 168 190 Q172 150 162 116 Q158 90 144 76 Z" fill="${H}"/><circle cx="143" cy="58" r="8" fill="${p.accent}" stroke="${p.dress}" stroke-width="2"/>`;
+  if (p.longHair) back += `<path d="M146 110 Q190 160 160 205 Q136 240 186 266" stroke="${HD}" stroke-width="24" fill="none" stroke-linecap="round"/><path d="M146 110 Q190 160 160 205 Q136 240 186 266" stroke="${H}" stroke-width="16" fill="none" stroke-linecap="round" stroke-dasharray="14 6"/>`;
+  const cape = (p.cape ? `<path d="M74 140 Q26 200 20 262 L180 262 Q174 200 126 140 Z" fill="${p.cape}" opacity=".92"/>${vol('M74 140 Q26 200 20 262 L180 262 Q174 200 126 140 Z')}${spark(44,222,5)}${spark(158,214,4.5)}` : '')
+    + (p.veil ? `<path d="M56 60 Q16 160 24 262 L176 262 Q184 160 144 60 Z" fill="#FFFFFF" opacity=".78" stroke="#F3D6E8" stroke-width="2"/>` : '');
+
+  /* --- body --- */
+  const ds = p.ds || 'ball', sl = p.sl || 'puff';
+  const SK = ds === 'aline' ? 'M86 160 Q62 206 56 254 Q100 266 144 254 Q138 206 114 160 Z' : 'M84 160 Q40 200 34 252 Q100 268 166 252 Q160 200 116 160 Z';
+  const hemD = ds === 'aline' ? 'M56 254 Q100 266 144 254' : 'M34 252 Q100 268 166 252';
+  const ruffle = (y, x0, x1) => { let d = `M${x0} ${y}`; for (let x = x0; x < x1; x += 14) d += ` q7 9 14 0`; return `<path d="${d}" stroke="${p.accent}" stroke-width="3.5" fill="none" stroke-linecap="round"/>`; };
+  const TL = 'M80 150 Q70 196 90 226 Q95 238 80 258 Q96 254 100 244 Q104 254 120 258 Q105 238 110 226 Q130 196 120 150 Z';
+  const BOD = 'M82 138 Q100 132 118 138 L116 164 Q100 170 84 164 Z';
   const body = p.tail
-    ? `<path d="${TL}" fill="${p.dress}"/><path d="${TL}" fill="url(#pgVol)"/>
+    ? `<path d="${TL}" fill="${p.dress}"/>${vol(TL)}
        <path d="M84 176 q5 6 10 0 q5 6 10 0 q5 6 10 0 M86 194 q5 6 9 0 q5 6 9 0 q5 6 9 0 M90 212 q5 5 10 0 q5 5 10 0" stroke="rgba(255,255,255,.6)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-       <path d="M82 152 Q100 160 118 152" stroke="url(#pgGold)" stroke-width="4" fill="none" stroke-linecap="round"/>
+       <path d="M82 152 Q100 160 118 152" stroke="${G}" stroke-width="4" fill="none" stroke-linecap="round"/>
        <circle cx="90" cy="148" r="9" fill="${p.accent}"/><circle cx="110" cy="148" r="9" fill="${p.accent}"/>
        <path d="M84 148 h12 M104 148 h12 M90 142 v12 M110 142 v12" stroke="rgba(0,0,0,.14)" stroke-width="1.5"/>`
     : `<path d="${SK}" fill="${p.dress}" stroke="rgba(42,35,80,.16)" stroke-width="2"/>
-       <path d="M94 162 Q84 212 80 259 Q100 263 120 259 Q116 212 106 162 Z" fill="${p.accent}" opacity=".92"/>
-       <path d="${SK}" fill="url(#pgVol)"/>
-       <path d="M34 252 Q100 268 166 252" stroke="url(#pgGold)" stroke-width="5" fill="none" stroke-linecap="round"/>
-       <path d="M44 236 Q60 246 78 238 M122 238 Q140 246 156 236" stroke="${p.accent}" stroke-width="3" fill="none" stroke-linecap="round" opacity=".9"/>
-       ${spark(58,214,4)}${spark(142,206,3.5)}${spark(70,240,3)}${spark(132,236,3)}
-       <circle cx="79" cy="146" r="11" fill="${p.dress}"/><circle cx="121" cy="146" r="11" fill="${p.dress}"/>
-       <circle cx="79" cy="146" r="11" fill="url(#pgVol)"/><circle cx="121" cy="146" r="11" fill="url(#pgVol)"/>
-       <path d="M82 138 Q100 132 118 138 L116 164 Q100 170 84 164 Z" fill="${p.dress}"/>
-       <path d="M82 138 Q100 132 118 138 L116 164 Q100 170 84 164 Z" fill="url(#pgVol)"/>
-       <path d="M83 139 Q100 149 117 139" stroke="url(#pgGold)" stroke-width="3" fill="none" stroke-linecap="round"/>
-       <path d="M84 162 Q100 169 116 162" stroke="url(#pgGold)" stroke-width="4.5" fill="none" stroke-linecap="round"/>
-       <circle cx="100" cy="166" r="4.5" fill="#E0355A" stroke="#B77A0A" stroke-width="1.5"/><circle cx="98.6" cy="164.6" r="1.3" fill="#fff"/>`;
-  const back = (p.cape ? `<path d="M74 140 Q26 200 20 262 L180 262 Q174 200 126 140 Z" fill="${p.cape}" opacity=".92"/>
-       <path d="M74 140 Q26 200 20 262 L180 262 Q174 200 126 140 Z" fill="url(#pgVol)"/>
-       ${spark(44,222,5)}${spark(158,214,4.5)}${spark(36,250,3.5)}${spark(166,246,3.5)}` : '')
-    + (p.veil ? `<path d="M56 60 Q16 160 24 262 L176 262 Q184 160 144 60 Z" fill="#FFFFFF" opacity=".78" stroke="#F3D6E8" stroke-width="2"/>` : '');
-  const gem = (x,y,r,c) => `<circle cx="${x}" cy="${y}" r="${r}" fill="${c}" stroke="#B77A0A" stroke-width="1"/><circle cx="${x-r*.3}" cy="${y-r*.3}" r="${r*.3}" fill="#fff"/>`;
-  const crown = p.noCrown
-    ? `<path d="M62 56 Q100 30 138 56" stroke="${p.dress}" stroke-width="6" fill="none" stroke-linecap="round"/>
-       <circle cx="72" cy="48" r="7" fill="${p.crown}"/><circle cx="72" cy="48" r="3" fill="#FFD95A"/>`
-    : p.queen
-    ? `<path d="M70 48 L74 10 L86 30 L93 2 L100 24 L107 2 L114 30 L126 10 L130 48 Q100 40 70 48 Z" fill="url(#pgIce)" stroke="#5FA8D8" stroke-width="2" stroke-linejoin="round"/>
-       <path d="M100 14 l5 9 l-5 9 l-5 -9z" fill="#fff"/>${spark(82,38,3.5)}${spark(118,38,3.5)}`
-    : `<path d="M74 46 L78 18 L90 34 L100 8 L110 34 L122 18 L126 46 Q100 39 74 46 Z" fill="url(#pgGold)" stroke="#B77A0A" stroke-width="2" stroke-linejoin="round"/>
-       <circle cx="78" cy="17" r="3" fill="#FFF4B8" stroke="#B77A0A"/><circle cx="100" cy="7" r="3.5" fill="#FFF4B8" stroke="#B77A0A"/><circle cx="122" cy="17" r="3" fill="#FFF4B8" stroke="#B77A0A"/>
-       ${gem(100,32,5,'#E0355A')}${gem(84,38,3,'#4D8DF0')}${gem(116,38,3,'#4D8DF0')}`;
-  const longHair = p.longHair ? `<path d="M146 110 Q190 160 160 205 Q136 240 186 266" stroke="${p.hairDark}" stroke-width="24" fill="none" stroke-linecap="round"/>
-       <path d="M146 110 Q190 160 160 205 Q136 240 186 266" stroke="${p.hair}" stroke-width="16" fill="none" stroke-linecap="round" stroke-dasharray="14 6"/>` : '';
-  const BANG = 'M48 92 Q48 32 100 32 Q152 32 152 92 Q140 62 114 56 Q106 72 86 68 Q64 72 48 92 Z';
-  const eye = x => `<ellipse cx="${x}" cy="96" rx="10" ry="12" fill="#2B2340"/><ellipse cx="${x}" cy="99" rx="7.5" ry="8.5" fill="${p.eye}"/>
-      <ellipse cx="${x}" cy="102" rx="5" ry="4" fill="#fff" opacity=".28"/><circle cx="${x-3.5}" cy="92" r="4" fill="#fff"/><circle cx="${x+3}" cy="102" r="1.8" fill="#fff"/>
-      <path d="M${x-11} 91 Q${x} 81 ${x+11} 91" stroke="#2B2340" stroke-width="3" fill="none" stroke-linecap="round"/>`;
+       ${p.apron ? `<path d="M90 164 Q82 212 80 256 Q100 260 120 256 Q118 212 110 164 Z" fill="#fff"/><path d="M82 250 q6 7 12 0 q6 7 12 0 q6 7 12 0" stroke="#E6DCEA" stroke-width="2" fill="none"/>`
+         : ds === 'tier' ? '' : `<path d="M94 162 Q84 212 80 259 Q100 263 120 259 Q116 212 106 162 Z" fill="${p.accent}" opacity=".92"/>`}
+       ${vol(SK)}
+       ${ds === 'tier' ? ruffle(196, 62, 132) + ruffle(222, 48, 146) + ruffle(246, 40, 154) : ''}
+       ${ds === 'fur' ? `<path d="${hemD}" stroke="#fff" stroke-width="13" fill="none" stroke-linecap="round"/><path d="M50 252 v3 M74 257 v3 M100 259 v3 M126 257 v3 M150 252 v3" stroke="#3B2A5C" stroke-width="2.5" stroke-linecap="round"/>`
+         : `<path d="${hemD}" stroke="${G}" stroke-width="5" fill="none" stroke-linecap="round"/>`}
+       ${ds === 'ball' ? spark(58,214,4) + spark(142,206,3.5) + spark(70,240,3) + spark(132,236,3) : ''}
+       ${sl === 'puff' ? `<circle cx="79" cy="146" r="11" fill="${p.dress}"/><circle cx="121" cy="146" r="11" fill="${p.dress}"/><circle cx="79" cy="146" r="11" fill="url(#pgVol)"/><circle cx="121" cy="146" r="11" fill="url(#pgVol)"/>` : ''}
+       <path d="${BOD}" fill="${p.dress}"/>${vol(BOD)}
+       <path d="M83 139 Q100 149 117 139" stroke="${G}" stroke-width="3" fill="none" stroke-linecap="round"/>
+       <path d="M84 162 Q100 169 116 162" stroke="${G}" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+       ${gem(100,166,4.5,p.gem || '#E0355A')}`;
+
+  /* --- arms --- */
+  const armC = sl === 'long' ? p.dress : p.skin, pose = p.pose || 'wave';
+  const cuff = (x,y) => sl === 'long' ? `<circle cx="${x}" cy="${y}" r="8" fill="${p.skin}"/>` : '';
+  const arms = `<ellipse cx="70" cy="172" rx="8" ry="22" fill="${armC}" transform="rotate(18 70 172)"/>${cuff(64,191)}`
+    + (pose === 'down' ? `<ellipse cx="130" cy="172" rx="8" ry="22" fill="${armC}" transform="rotate(-18 130 172)"/>${cuff(136,191)}`
+       : `<ellipse cx="134" cy="146" rx="8" ry="22" fill="${armC}" transform="rotate(-40 134 146)"/><circle cx="147" cy="130" r="8" fill="${p.skin}"/>`)
+    + (pose === 'wand' ? `<line x1="146" y1="134" x2="170" y2="92" stroke="#B77A0A" stroke-width="4" stroke-linecap="round"/><path d="M170 76 l4 10 l11 1 l-8 7 l3 11 l-10 -6 l-10 6 l3 -11 l-8 -7 l11 -1z" fill="${G}" stroke="#B77A0A" stroke-width="1.5" stroke-linejoin="round"/>` : '');
+
+  /* --- hair in front --- */
+  const lock = (d) => `<path d="${d}" fill="${H}"/>`;
+  const braid = (x, y0, n, r) => Array.from({length:n}, (_,k) => `<ellipse cx="${x + (k%2 ? 2 : -2)}" cy="${y0 + k*17}" rx="${r}" ry="${r+1}" fill="${k%2 ? HD : H}" stroke="${HD}" stroke-width="1"/>`).join('')
+    + `<circle cx="${x}" cy="${y0 + n*17 - 4}" r="6" fill="${p.accent}" stroke="${p.dress}" stroke-width="2"/><path d="M${x-6} ${y0 + n*17} q6 14 12 0 z" fill="${H}"/>`;
+  let front = '';
+  if (hs === 'long' || hs === 'wavy') front = lock('M52 90 Q40 150 58 204 Q66 210 72 200 Q60 150 66 100 Z') + lock('M148 90 Q160 150 142 204 Q134 210 128 200 Q140 150 134 100 Z');
+  else if (hs === 'bob') front = lock('M52 90 Q40 128 52 156 Q66 162 70 146 Q62 118 66 100 Z') + lock('M148 90 Q160 128 148 156 Q134 162 130 146 Q138 118 134 100 Z');
+  else if (hs === 'braids') front = braid(58, 124, 5, 10) + braid(142, 124, 5, 10);
+  else if (hs === 'sidebraid') front = braid(62, 122, 6, 12) + lock('M148 90 Q154 112 146 128 Q138 126 136 104 Z');
+  else if (hs !== 'curly') front = lock('M52 90 Q46 112 54 128 Q62 126 64 104 Z') + lock('M148 90 Q154 112 146 128 Q138 126 136 104 Z');
+  const bangD = {swoop:'M48 92 Q48 32 100 32 Q152 32 152 92 Q140 62 114 56 Q106 72 86 68 Q64 72 48 92 Z',
+    straight:'M48 96 Q44 32 100 32 Q156 32 152 96 Q152 78 142 74 Q100 66 58 74 Q48 78 48 96 Z',
+    center:'M48 96 Q44 32 100 32 Q156 32 152 96 Q146 66 104 48 L100 44 L96 48 Q54 66 48 96 Z'}[p.bg || 'swoop'];
+  const bangs = p.bg === 'curly'
+    ? `<path d="M50 80 Q50 32 100 32 Q150 32 150 80 Q100 50 50 80 Z" fill="${H}"/>` + [[58,62],[76,50],[100,46],[124,50],[142,62]].map(([x,y]) => `<circle cx="${x}" cy="${y}" r="14" fill="${H}"/>`).join('') + [[66,54],[112,44],[134,56]].map(([x,y]) => `<circle cx="${x}" cy="${y}" r="5" fill="#fff" opacity=".12"/>`).join('')
+    : `<path d="${bangD}" fill="${H}"/><path d="${bangD}" fill="url(#pgHair)"/><path d="M66 54 Q98 40 132 52" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round" opacity=".38"/>`;
+  const topHair = hs === 'bun' ? `<circle cx="100" cy="30" r="25" fill="${HD}"/><circle cx="100" cy="30" r="20" fill="${H}"/><path d="M86 24 Q100 14 114 24" stroke="#fff" stroke-width="3" fill="none" opacity=".35" stroke-linecap="round"/>`
+    : hs === 'buns2' ? [50,150].map(x => `<circle cx="${x}" cy="46" r="22" fill="${HD}"/><circle cx="${x}" cy="46" r="17" fill="${H}"/><circle cx="${x-5}" cy="40" r="5" fill="#fff" opacity=".3"/>`).join('') : '';
+
+  /* --- face --- */
+  const ey = p.ey || 'round', ry = ey === 'almond' ? 9.5 : ey === 'big' ? 13.5 : 12, rx = ey === 'big' ? 11.5 : 10.5;
+  const eye = (x, d) => `<ellipse cx="${x}" cy="96" rx="${rx}" ry="${ry}" fill="#2B2340"/><ellipse cx="${x}" cy="${98.5}" rx="${rx-3}" ry="${ry-3.5}" fill="${p.eye}"/>
+      <ellipse cx="${x}" cy="${96+ry*.45}" rx="${rx*.5}" ry="${ry*.3}" fill="#fff" opacity=".3"/><circle cx="${x-3.5}" cy="${96-ry*.35}" r="${ey === 'big' ? 4.8 : 4}" fill="#fff"/><circle cx="${x+3.5}" cy="${96+ry*.45}" r="1.9" fill="#fff"/>
+      <path d="M${x-rx-1} ${ey === 'almond' ? 94 : 91} Q${x} ${96-ry-3} ${x+rx+1} ${ey === 'almond' ? 94 : 91}" stroke="#2B2340" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <path d="M${x+d*(rx+1)} ${ey === 'almond' ? 94 : 91} l${d*5} ${-5} M${x+d*(rx-3)} ${96-ry} l${d*3} ${-5}" stroke="#2B2340" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M${x-9} ${96-ry-9} Q${x} ${96-ry-13} ${x+9} ${96-ry-9}" stroke="${HD}" stroke-width="2.5" fill="none" stroke-linecap="round" opacity=".7"/>`;
+  const lips = p.lips || '#C4456E';
+  const mouth = p.mo === 'grin'
+    ? `<g class="m-closed"><path d="M89 113 Q100 128 111 113 Z" fill="#A83A5C"/><path d="M92 114.5 h16 q-2 3 -8 3 q-6 0 -8 -3z" fill="#fff"/></g>`
+    : `<path class="m-closed" d="M91 115 Q100 123 109 115" stroke="${lips}" stroke-width="3.2" fill="none" stroke-linecap="round"/>`;
+  const freck = p.freckles ? [[62,106],[68,104],[65,110],[132,104],[138,106],[135,110]].map(([x,y]) => `<circle cx="${x}" cy="${y}" r="1.4" fill="#B86A4A" opacity=".7"/>`).join('') : '';
+
+  /* --- headpiece --- */
+  const hd = p.noCrown ? 'band' : p.queen ? 'queen' : (p.hd || 'crown');
+  const head = {
+    band:() => `<path d="M60 58 Q100 30 140 58" stroke="${p.dress}" stroke-width="7" fill="none" stroke-linecap="round"/><circle cx="72" cy="48" r="8" fill="${p.crown}"/><circle cx="72" cy="48" r="3" fill="#FFD95A"/>`,
+    queen:() => `<path d="M70 48 L74 10 L86 30 L93 2 L100 24 L107 2 L114 30 L126 10 L130 48 Q100 40 70 48 Z" fill="url(#pgIce)" stroke="#5FA8D8" stroke-width="2" stroke-linejoin="round"/><path d="M100 14 l5 9 l-5 9 l-5 -9z" fill="#fff"/>${spark(82,38,3.5)}${spark(118,38,3.5)}`,
+    crown:() => `<path d="M74 46 L78 18 L90 34 L100 8 L110 34 L122 18 L126 46 Q100 39 74 46 Z" fill="${G}" stroke="#B77A0A" stroke-width="2" stroke-linejoin="round"/>
+       <circle cx="78" cy="17" r="3" fill="#FFF4B8" stroke="#B77A0A"/><circle cx="100" cy="7" r="3.5" fill="#FFF4B8" stroke="#B77A0A"/><circle cx="122" cy="17" r="3" fill="#FFF4B8" stroke="#B77A0A"/>${gem(100,32,5,'#E0355A')}${gem(84,38,3,'#4D8DF0')}${gem(116,38,3,'#4D8DF0')}`,
+    tiara:() => `<path d="M70 52 Q100 30 130 52" stroke="${G}" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M90 40 L100 16 L110 40 Q100 36 90 40 Z" fill="${G}" stroke="#B77A0A" stroke-width="1.5" stroke-linejoin="round"/>
+       ${gem(100,32,4,p.gem || '#E0355A')}<circle cx="80" cy="44" r="3" fill="#fff" stroke="#B77A0A"/><circle cx="120" cy="44" r="3" fill="#fff" stroke="#B77A0A"/>`,
+    flowers:() => [[64,56],[80,45],[100,40],[120,45],[136,56]].map(([x,y],k) => `<g fill="${(p.fl || ['#FF8FB0','#FFFFFF'])[k%2]}">${[0,72,144,216,288].map(a => `<circle cx="${x + 5*Math.cos(a*Math.PI/180)}" cy="${y + 5*Math.sin(a*Math.PI/180)}" r="4.2"/>`).join('')}</g><circle cx="${x}" cy="${y}" r="3" fill="#FFD23F"/>`).join('')
+       + `<path d="M70 52 l-6 -5 M130 52 l6 -5" stroke="#4FA35A" stroke-width="4" stroke-linecap="round"/>`,
+    shell:() => `<path d="M72 52 Q100 32 128 52" stroke="${G}" stroke-width="4" fill="none" stroke-linecap="round"/>${[80,100,120].map((x,k) => `<circle cx="${x}" cy="${k === 1 ? 37 : 43}" r="${k === 1 ? 5 : 3.5}" fill="#fff" stroke="#E6C36A"/>`).join('')}
+       <path d="M132 70 Q124 52 140 46 Q156 52 148 70 Z" fill="${p.accent}" stroke="#D9A23A" stroke-width="1.5"/><path d="M140 48 v20 M134 54 l4 14 M146 54 l-4 14" stroke="#D9A23A" stroke-width="1.2"/>`,
+    catears:() => [[66,-1],[134,1]].map(([x,d]) => `<path d="M${x-16} 50 L${x+d*2} 14 L${x+16} 44 Z" fill="${H}" stroke="${HD}" stroke-width="2" stroke-linejoin="round"/><path d="M${x-8} 44 L${x+d*2} 24 L${x+9} 41 Z" fill="#FFB3C7"/>`).join('')
+       + `<path d="M88 42 L92 26 L100 36 L108 26 L112 42 Q100 38 88 42 Z" fill="${G}" stroke="#B77A0A" stroke-width="1.5" stroke-linejoin="round"/>${gem(100,36,2.6,'#E0355A')}`,
+  }[hd]();
+
   return `<svg class="princess" viewBox="0 0 200 270" role="img" aria-label="${p.name}">${PDEFS}
     <ellipse cx="100" cy="263" rx="62" ry="6" fill="#1B1240" opacity=".16"/>
-    ${back}${longHair}
-    <path d="M40 96 Q22 172 44 228 Q60 238 72 224 L128 224 Q140 238 156 228 Q178 172 160 96 Z" fill="${p.hairDark}"/>
-    ${body}
-    <ellipse cx="70" cy="172" rx="8" ry="22" fill="${p.skin}" transform="rotate(18 70 172)"/>
-    <ellipse cx="134" cy="146" rx="8" ry="22" fill="${p.skin}" transform="rotate(-40 134 146)"/>
-    <circle cx="147" cy="130" r="8" fill="${p.skin}"/>
+    ${cape}${back}${body}${arms}
     <rect x="93" y="126" width="14" height="18" rx="6" fill="${p.skin}"/>
-    ${p.tail ? '' : `<path d="M91 135 Q100 143 109 135" stroke="url(#pgGold)" stroke-width="2" fill="none"/><circle cx="100" cy="140.5" r="2.6" fill="#E0355A" stroke="#B77A0A" stroke-width=".8"/>`}
+    ${p.tail ? '' : ds === 'fur' ? `<ellipse cx="100" cy="141" rx="25" ry="9" fill="#fff"/><path d="M84 141 v3 M100 144 v3 M116 141 v3" stroke="#3B2A5C" stroke-width="2.2" stroke-linecap="round"/>`
+      : `<path d="M91 135 Q100 143 109 135" stroke="${G}" stroke-width="2" fill="none"/><circle cx="100" cy="140.5" r="2.6" fill="${p.gem || '#E0355A'}" stroke="#B77A0A" stroke-width=".8"/>`}
     <circle cx="100" cy="88" r="50" fill="${p.skin}"/><circle cx="100" cy="88" r="50" fill="url(#pgSkin)"/>
-    <path d="M52 90 Q40 150 58 204 Q66 210 72 200 Q60 150 66 100 Z" fill="${p.hair}"/>
-    <path d="M148 90 Q160 150 142 204 Q134 210 128 200 Q140 150 134 100 Z" fill="${p.hair}"/>
-    <path d="${BANG}" fill="${p.hair}"/><path d="${BANG}" fill="url(#pgHair)"/>
-    <path d="M66 54 Q98 40 132 52" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round" opacity=".38"/>
-    <g>${eye(80)}${eye(120)}
-      <path d="M68 88 L64 84 M72 85 L70 80" stroke="#2B2340" stroke-width="2.5" stroke-linecap="round"/>
-      <path d="M132 88 L136 84 M128 85 L130 80" stroke="#2B2340" stroke-width="2.5" stroke-linecap="round"/>
-    </g>
-    <ellipse cx="66" cy="112" rx="9" ry="5.5" fill="#FF8FB0" opacity=".5"/>
-    <ellipse cx="134" cy="112" rx="9" ry="5.5" fill="#FF8FB0" opacity=".5"/>
-    <path class="m-closed" d="M91 115 Q100 123 109 115" stroke="#C4456E" stroke-width="3.2" fill="none" stroke-linecap="round"/>
+    ${front}${bangs}${topHair}
+    <g>${eye(80,-1)}${eye(120,1)}</g>
+    <ellipse cx="66" cy="113" rx="9" ry="5.5" fill="${p.blush || '#FF8FB0'}" opacity=".5"/><ellipse cx="134" cy="113" rx="9" ry="5.5" fill="${p.blush || '#FF8FB0'}" opacity=".5"/>
+    ${freck}${mouth}
     <ellipse class="m-open" cx="100" cy="118" rx="6.5" ry="6" fill="#B5476B"/>
-    ${crown}
+    ${head}
   </svg>`;
 }
 
@@ -1134,7 +1213,7 @@ function startStory(i){
     </div>
     <div class="stage gutter" id="stage" style="background:${s.bg}">${sceneSVG(SCENE[s.id])}
       <button class="bubble" id="bubble"><span class="ear">${ICON.ear}</span><span class="btxt"><span id="bubbleText"></span><small id="koText" hidden></small></span></button>
-      <div class="princess-wrap">${princessSVG(s.p)}<div class="friend">${s.friend}</div></div>
+      <div class="princess-wrap">${princessSVG(s.p)}<div class="friend">${s.friend.startsWith('img:') ? `<img src="${s.friend.slice(4)}" alt="">` : s.friend}</div></div>
       <div class="prop" id="prop"></div>
     </div>
     <div class="choices gutter" id="choices"></div>
@@ -1181,6 +1260,7 @@ async function askQuestion(first){
   const prop = $('#prop');
   if (q.prop && q.prop.mon){ prop.className = 'prop'; prop.innerHTML = `<span>${monsterSVG(G.branch)}</span>`; }
   else if (typeof q.prop === 'object'){ prop.className = 'prop count'; prop.innerHTML = Array.from({length:q.prop.n}, () => `<span>${q.prop.e}</span>`).join(''); }
+  else if (String(q.prop).startsWith('img:')){ prop.className = 'prop'; prop.innerHTML = `<span><img class="prop-img" src="${q.prop.slice(4)}" alt=""></span>`; }
   else { prop.className = 'prop'; prop.innerHTML = `<span>${q.prop}</span>`; }
   $('#choices').innerHTML = G.order.map(i => `<button class="choice" data-i="${i}" aria-label="${esc(q.c[i].w)}">${choiceHTML(q.c[i])}</button>`).join('');
   $('#choices').querySelectorAll('.choice').forEach(b => b.onclick = () => tapChoice(+b.dataset.i, b));
