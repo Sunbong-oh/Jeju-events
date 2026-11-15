@@ -41,7 +41,9 @@ button:focus-visible{outline:4px solid var(--gold);outline-offset:3px}
 .story .label{display:grid;justify-items:center;gap:2px;background:rgba(255,255,255,.88);border-radius:18px;padding:6px 12px}
 .story .en{font-size:22px;font-weight:800;line-height:1.1}
 .story .ko{font-family:var(--font-ko);font-size:16px;color:var(--ink-soft)}
-.story .got{font-size:20px;letter-spacing:2px;color:var(--gold);min-height:24px;text-shadow:0 1px 0 rgba(59,42,92,.25)}
+.story .today{font-family:var(--font-ko);font-size:15px;color:var(--ink);background:rgba(255,255,255,.88);border-radius:999px;padding:2px 10px;margin-top:4px}
+.story .got .of{color:rgba(255,255,255,.75)}
+.story .got{font-family:var(--font-ko);font-size:20px;letter-spacing:2px;color:var(--gold);min-height:24px;text-shadow:0 1px 0 rgba(59,42,92,.25)}
 .tips{background:#fff;border-radius:22px;padding:14px 18px;font-family:var(--font-ko);font-size:16px;line-height:1.6;color:var(--ink)}
 .tips ol{margin:6px 0 0;padding-left:22px}
 .tips .engine{margin-top:8px;padding:8px 12px;border-radius:14px;background:var(--lilac)}
@@ -148,304 +150,535 @@ button:focus-visible{outline:4px solid var(--gold);outline-offset:3px}
 <div id="app"></div>
 
 <script>
-/* ---------------- Stories (original characters) ---------------- */
+/* ---------------- Word bank: id: [label, picture, extra sound-alike words] ---------------- */
+/* picture: emoji, '#hex' = color swatch, digits = number card. Keywords: '|' separated; label is always accepted. */
+const V = {
+  red:['Red','#E23B4A','read|rad|wed|bed'], blue:['Blue','#4D8DF0','blew|boo|bloo|glue'], white:['White','#FFFFFF','wide|wite|whyte|why|wait|quite'],
+  black:['Black','#2B2340','back|block|plaque'], pink:['Pink','#FF8FC4','ping|pinky|think|pin'], green:['Green','#3FAF6A','grin|grain|greene|greens'],
+  yellow:['Yellow','#F5C542','yello|yell|jello|mellow|hello|golden|gold'], purple:['Purple','#9B6BE8','people|purpl|popple'],
+  one:['One','1','1|won|want|wan'], two:['Two','2','2|to|too|tu'], three:['Three','3','3|tree|trees|free|sree|through|thee'],
+  four:['Four','4','4|for|fore|floor'], five:['Five','5','5|fife|hive|fi|fine'], seven:['Seven','7','7|heaven|sevens|kevin'],
+  fish:['Fish','🐠','fishy|fishes|fis|fist'], dog:['Dog','🐶','dogs|doggy|dock'], cat:['Cat','🐱','cats|kat|cap'], bird:['Bird','🐦','birds|bud|bert|word'],
+  frog:['Frog','🐸','frogs|fog|frock'], pig:['Pig','🐷','pigs|peg'], horse:['Horse','🐴','horses|hors|force'], mouse:['Mouse','🐭','mice|mouth|mausse'],
+  cow:['Cow','🐮','cows|cal|ciao'], rabbit:['Rabbit','🐰','rabbits|bunny|rabbi'], bear:['Bear','🐻','bears|bare|bea'], reindeer:['Reindeer','🦌','rain deer|deer|dear|raindeer|reindeers'],
+  owl:['Owl','🦉','owls|hoot'], turtle:['Turtle','🐢','turtles|turtel|tuttle'], crab:['Crab','🦀','crabs|grab'], octopus:['Octopus','🐙','octo|octopuses|octopi'],
+  whale:['Whale','🐳','whales|well|wail'], dolphin:['Dolphin','🐬','dolphins|dolfin'], butterfly:['Butterfly','🦋','butterflies|butter fly|butter'],
+  bee:['Bee','🐝','bees|be|b'], lion:['Lion','🦁','lions|ryan|line'], penguin:['Penguin','🐧','penguins|pengin|pengu'], crow:['Crow','🐦','crows|grow|cro|crowd'],
+  unicorn:['Unicorn','🦄','unicorns|uni corn|unicorn'], dino:['Dinosaur','🦕','dinosaurs|dino|dyno|diner|die no|dinah|dina'],
+  apple:['Apple','🍎','apples|happle|appo|apo|appa'], banana:['Banana','🍌','bananas|nana'], cake:['Cake','🎂','cakes|kick|take|kate|cape'],
+  milk:['Milk','🥛','milky|melk|mil|milks|mick'], pizza:['Pizza','🍕','pizzas|peter'], carrot:['Carrot','🥕','carrots|karat|carat|parrot|carol|caret'],
+  candy:['Candy','🍬','candi|candies|andy'], cookie:['Cookie','🍪','cookies|cooky|kooky'], bread:['Bread','🍞','bred|bret'], soup:['Soup','🍲','soupe|super'],
+  tea:['Tea','🍵','tee|t'], fire:['Fire','🔥','fires|far|fair|fi'], watermelon:['Watermelon','🍉','water melon|melon'], leaf:['Leaves','🍃','leaf|leave|leafs|lives'], water:['Water','💧','waters|waiter|wada|wata'],
+  pumpkin:['Pumpkin','🎃','pumpkins|bumpkin|pumkin|punkin|pump'],
+  shoe:['Shoe','👠','shoes|show|sue|slipper|chew'], hat:['Hat','🎩','hats|hot|had'], crown:['Crown','👑','crowns|clown|brown|cown|round'],
+  dress:['Dress','👗','dresses|address|dres'], ball:['Ball','⚽','balls|bowl|bull|bol'], book:['Book','📖','books|look'], bed:['Go to bed','🛏️','bed|bad|go to bed'],
+  boat:['Boat','⛵','boats|both|goat|vote'], ship:['Ship','🚢','ships|sheep|chip'], car:['Car','🚗','cars|ca|call|cart'], bike:['Bike','🚲','bikes|bite'],
+  sled:['Sled','🛷','sleds|slid|slide|sleigh|slay|fled'], key:['Key','🔑','keys|kee|ki'], ring:['Ring','💍','rings|wing|ding'],
+  clock:['Clock','🕛','clocks|lock|clark|clok'], moon:['Moon','🌙','moo|noon|mood'], sun:['Sun','☀️','son|some|san'], rainbow:['Rainbow','🌈','rainbows|rain bow|raymbo|reinbow'],
+  flower:['Flower','🌸','flowers|flour|power'], rose:['Roses','🌹','rose|rosie|rosy|road|rows'], tree:['Tree','🌳','trees|tea'], house:['House','🏠','houses|how|haus'],
+  castle:['Castle','🏰','castles|cassel|cass'], tower:['Tower','🏰','towers|power|tour|tauer|tao'], door:['Door','🚪','doors|dor|da'], window:['Window','🪟','windows|win dough'],
+  mirror:['Mirror','🪞','mirrors|mira|mere'], hairbrush:['Brush','💇‍♀️','brush|brushing|brash|bush|rush|comb'], toothbrush:['Brush','🪥','brush|brushing|brash|bush|rush|brush brush'],
+  broom:['Broom','🧹','brooms|room|bloom|vroom|groom|brom'], spoon:['Spoon','🥄','spoons|soon|spoom'], fork:['Fork','🍴','forks|folk|pork'],
+  basket:['Basket','🧺','baskets|basket ball|bascet'], gift:['Present','🎁','gift|gifts|presents|present'], balloon:['Balloon','🎈','balloons|ballon|baloon'],
+  umbrella:['Umbrella','☂️','umbrellas|umbrela'], boots:['Boots','👢','boot|boo|boats'], gloves:['Gloves','🧤','glove|love|loves|globe|globes|clove|mittens|mitten'],
+  socks:['Socks','🧦','sock|sox|sucks|sack'], coat:['Coat','🧥','coats|code|cut'], drum:['Drum','🥁','drums|dram|trum'], music:['Music','🎵','musics|musik|moosic'],
+  song:['Song','🎶','songs|sang|sung'], shell:['Shell','🐚','shells|sell|cell'], fireworks:['Fireworks','🎆','firework|fire works|fire'],
+  stairs:['Stairs','🪜','stair|stares|chairs|steps'], soap:['Soap','🧼','soaps|sope'], bath:['Bath','🛁','baths|bat|bass|bus'], box:['Box','📦','boxes|bok'],
+  snow:['Snow','❄️','snowy|sno|slow|no'], rain:['Rain','🌧️','rainy|ran|rein|lane'], wind:['Wind','🌬️','win|wend|winds'],
+  sleep:['Sleep','😴','sleepy|slip|sleeping|seep|sleeps'], run:['Run','🏃','ran|running|fun'], jump:['Jump','🤸','jumps|jam|chump|jumping'],
+  swim:['Swim','🏊','swimming|swing|swims'], walk:['Walk','🚶','walking|work|woke|walks'], fly:['Fly','🕊️','flying|fry|flies'], dance:['Dance','💃','dancing|dense|dans'],
+  sing:['Sing','🎤','sings|sink|thing|singing'], eat:['Eat','😋','eating|heat|eats|it'], hug:['Hug','🤗','hugs|hag|hog|hook|huck|hugging|hut'],
+  cry:['Cry','😭','crying|cri|try'], play:['Play','🎮','pray|plate|played|playing'], wash:['Wash','🧼','washing|watch|wish|wosh'],
+  happy:['Happy','😊','happi|hobby|hoppy'], sad:['Sad','😢','set|said|sat'], angry:['Angry','😠','angri|angy|hungry'], sleepy:['Sleepy','😪','sleep|slippy|sleeping|sippy|sleepi'],
+  hungry:['Hungry','🤤','hungary|hungri|ungry|hunger'], dirty:['Dirty','🦠','dirt|dirtee|thirty|birdie|derby|durty'], clean:['Clean','✨','cleen|lean|cling|kleen'],
+  smelly:['Smelly','🦨','smell|smelling|smally|stinky|stink'], ouch:['Ouch','🤕','ouchie|out|auch|ow|owie'], messy:['Messy','🧸','mess|messi|missy'],
+  big:['Big','🐘','pig|bick|bigg'], small:['Small','🐭','smaller|smol|smoll|mall|smile|little'], hot:['Hot','🔥','hut|hat|haught'], cold:['Cold','🥶','called|colt|code|coal'],
+  fast:['Fast','🏎️','fat|fest|first|faster'], slowp:['Slow','🐌','slo|so low|slower'], up:['Up','⬆️','op|app|upp'], down:['Down','⬇️','town|dawn|done'],
+  yes:['Yes!','😊','yes|yeah|yep|yay|ya|yess|yea|yup'], no:['No','🙅','no|nope|nah|know'], hello:['Hello','👋','hi|hallo|hullo|hey|halo|yellow|hello prince'],
+  bye:['Bye','👋','by|buy|bye bye|bay'], thankyou:['Thank you','🙏','thank|thanks|thank you|sank you|tank you|thankyou'],
+  morning:['Good morning','☀️','morning|mourning|morn'], night:['Good night','🌙','night|nite|knight|nights|goodnight'],
+  wakeup:['Wake up!','☀️','wake|wakeup|wake up|weak|wait up|make up|wakey'], love:['I love you','💕','love|loves|love you|lub|lav|lov|i love'],
+  queen:['Queen','👸','queens|quin|qeen|ween|queeen|the queen'], king:['King','🤴','kings|kin|keen|kim'], prince:['Prince','🤴','prints|princes|pins|print|prance'],
+  fairy:['Fairy','🧚','fairies|ferry|very|fair|berries|fairys'], witch:['Witch','🧙‍♀️','which|wish|wich|witches'], baby:['Baby','👶','babies|bebe|maybe|bay bee'],
+  grandma:['Grandma','👵','grandmother|gramma|granma|grammy|nana'], kai:['Kai','👦','kye|guy|kay|kite'], snowwhite:['Snow White','👸','snow white|snow|white|snowwhite|snow wide'],
+  rapunzel:['Rapunzel','👸','rapunzel|punzel|rapun|zel|ra punzel|rapanzel'], lalala:['La la la','🎵','la|lala|la la|la la la|ra|laa|lalala'],
+  birthday:['Birthday','🎂','birth day|bird day|birthdays|happy birthday'], roar:['Roar!','🦖','rawr|raw|roll|row|war|wore|ror|rar|road|rah|ra'],
+  moo:['Moo','🐮','mu|move|mooo'], meow:['Meow','🐱','mew|miaow|meo|mio|mao|miao|me ow|meow meow|mow|now'], woof:['Woof','🐶','wolf|woo|roof|wuf'],
+  tail:['Tail','🐟','tails|tale|tell|till|tel|tile'], legs:['Legs','🦵','leg|lake|lex|eggs|lags|lacks'], feet:['Feet','🦶','foot|feat|fit'],
+  hair:['Hair','👱‍♀️','hairs|hare|her|air'], freeze:['Freeze!','❄️','free|freezy|frieze|fries|frees|breeze|please|fre|freezing'],
+  ice:['Ice!','🧊','eyes|nice|ice ice|rice|i see'], snowball:['Snowball!','⚪','snow ball|snowballs|snow|ball'],
+};
+function W(id){
+  const v = V[id]; if (!v) throw new Error('missing word ' + id);
+  const c = {w:v[0], k:[v[0].toLowerCase().replace(/[^a-z0-9 ]/g,'').trim(), ...v[2].split('|')]};
+  if (v[1][0] === '#') c.col = v[1]; else if (/^\d+$/.test(v[1])) c.num = v[1]; else c.e = v[1];
+  return c;
+}
+/* Q(narration, korean, question, prop, right, wrong). prop 'n3:🐚' = three of them, 'mon' = today's villain. */
+function Q(n, ko, q, prop, right, wrong, extra){
+  let pr = prop; const m = /^n(\d+):(.+)$/.exec(prop);
+  if (m) pr = {n:+m[1], e:m[2]}; else if (prop === 'mon') pr = {mon:true};
+  return Object.assign({n:n||null, ko:ko||null, q, prop:pr, a:0, c:[W(right), W(wrong)]}, extra||{});
+}
+const E = (en, ko, qs, more) => Object.assign({en, ko, qs}, more||{});
+
+/* ---------------- Classic tales (public-domain plots, original drawings) ---------------- */
 const CLASSICS = [
   { id:'snowwhite', group:'classic', en:'Snow White', ko:'백설공주 (그림 형제)', friend:'🍎', fx:{ch:'✿',mode:'fall'},
     bg:'linear-gradient(180deg,#CDEBC0 0%,#F1F9E6 60%,#FFF6F0 100%)',
     p:{name:'Snow White', skin:'#FFF1EA', hair:'#231C2A', hairDark:'#120E16', dress:'#D64550', accent:'#FFFFFF', eye:'#3A2A44', crown:'#FFD95A'},
-    hi:"Hello! I'm Snow White. My skin is white as snow. Let me tell you my story!",
+    hi:"Hello! I'm Snow White. My skin is white as snow. Let me tell you a story!",
     bye:"And we lived happily ever after! Thank you, friend! Bye-bye!",
-    qs:[
-      {n:"A queen has a magic mirror.", ko:"왕비에게는 말하는 마법 거울이 있었어요.",
-       q:"Mirror, mirror! Who is the prettiest?", prop:'🪞', a:0, c:[
-        {w:'Snow White', e:'👸', k:['snow white','snow','white','snowwhite','snow wide','no white']},
-        {w:'Frog', e:'🐸', k:['frog','frogs','fog','frock']}]},
-      {n:"Snow White runs into the forest. She finds a little house.", ko:"백설공주는 숲으로 도망쳐서 작은 집을 찾았어요.",
-       q:"How many little men live in the house?", prop:'🏠', a:0, c:[
-        {w:'Seven', num:'7', k:['seven','7','heaven','sevens','kevin']},
-        {w:'Two', num:'2', k:['two','2','to','too','tu']}]},
-      {n:"The bad queen brings an apple.", ko:"나쁜 왕비가 사과를 가지고 왔어요.",
-       q:"What color is the apple?", prop:'🍎', a:0, c:[
-        {w:'Red', col:'#E23B4A', k:['red','read','bread','rad','wed']},
-        {w:'Blue', col:'#4D8DF0', k:['blue','blew','boo','bloo','glue']}]},
-      {n:"Snow White eats the apple and falls asleep. A prince comes.", ko:"사과를 먹은 백설공주는 잠들었어요. 왕자님이 왔어요.",
-       q:"Let's help! Say: Wake up!", prop:'😴', a:0, c:[
-        {w:'Wake up!', e:'☀️', k:['wake up','wake','wakeup','weak','wait up','make up','wakey','wake wake']},
-        {w:'Go to bed', e:'🛏️', k:['bed','go to bed','bad']}]},
+    eps:[
+      E('The Magic Mirror','마법 거울',[
+        Q("A queen has a magic mirror.","왕비에게는 말하는 마법 거울이 있었어요.","Mirror, mirror! Who is the prettiest?","🪞","snowwhite","frog"),
+        Q("The queen is very, very angry.","왕비는 아주 아주 화가 났어요.","Is the queen happy or angry?","👑","angry","happy"),
+        Q("Snow White runs into the big forest.","백설공주는 커다란 숲으로 도망쳤어요.","What is in the forest?","🌲","tree","car"),
+        Q("She finds a little house.","작은 집을 하나 찾았어요.","How many little men live there?","🏠","seven","two")]),
+      E('The Little House','일곱 난쟁이의 집',[
+        Q("Snow White goes into the little house.","백설공주는 작은 집에 들어갔어요.","What is on the table?","🍽️","spoon","shoe"),
+        Q("There are little cups on the table.","식탁 위에 작은 컵들이 있어요.","How many cups? Let's count!","n7:☕","seven","three"),
+        Q("Snow White is so tired.","백설공주는 너무 피곤했어요.","What does she do?","🛏️","sleep","run"),
+        Q("The little men come home. They say hello!","난쟁이들이 집에 와서 인사했어요!","Let's say it too!","👋","hello","bye")]),
+      E('Three Tricks','왕비의 세 가지 꾀',[
+        Q("The queen dresses up as an old woman.","왕비가 할머니로 변장했어요.","Who is she, really?","👵","queen","king"),
+        Q("First, she brings a pretty comb.","처음에는 예쁜 빗을 가져왔어요.","What do we use for our hair?","🎀","hairbrush","fork"),
+        Q("Next, she brings an apple.","다음에는 사과를 가져왔어요.","What color is the apple?","🍎","red","blue"),
+        Q("The little men say: Don't open the door!","난쟁이들이 말했어요. '문 열면 안 돼!'","What should she not open?","🏠","door","book")]),
+      E('Wake Up, Snow White','백설공주가 깨어나요',[
+        Q("Snow White eats the apple and falls asleep.","사과를 먹은 백설공주가 잠들었어요.","What is she doing?","😴","sleep","dance"),
+        Q("The little men are very sad.","난쟁이들은 아주 슬펐어요.","How do they feel?","😢","sad","happy"),
+        Q("A prince comes by on his horse.","왕자님이 말을 타고 지나갔어요.","What does the prince ride?","🤴","horse","bike"),
+        Q("Pop! The apple piece comes out! Let's help.","톡! 사과 조각이 튀어나왔어요. 우리가 깨워요!","Let's say: Wake up!","😴","wakeup","bed")]),
+      E('Forest Picnic','숲속 소풍',[
+        Q("Snow White and the little men go on a picnic.","백설공주와 난쟁이들이 소풍을 가요.","What do we carry?","🌳","basket","car"),
+        Q("They eat yummy food.","맛있는 음식을 먹어요.","What do they eat?","🧺","bread","shoe"),
+        Q("A little bird sings a song.","작은 새가 노래를 불러요.","Who sings?","🎶","bird","fish"),
+        Q("Look at all the little hats!","작은 모자들을 봐요!","How many hats?","n7:🧢","seven","four")]),
     ]},
   { id:'sleeping', group:'classic', en:'Sleeping Beauty', ko:'잠자는 숲속의 공주 (페로·그림 형제)', friend:'🌹', fx:{ch:'❀',mode:'fall'},
     bg:'linear-gradient(180deg,#D9CCF5 0%,#F3EAFF 60%,#FFF2F6 100%)',
     p:{name:'Sleeping Beauty', skin:'#F8DCC8', hair:'#9A6A3E', hairDark:'#7A4F2A', dress:'#5FAF7A', accent:'#E6F7E9', eye:'#3F6E4E', crown:'#FFD95A'},
-    hi:"Hello! I am the Sleeping Beauty. Let me tell you my story!",
-    bye:"I slept for so long! Thank you, friend! Bye-bye!",
-    qs:[
-      {n:"A baby princess is born. Fairies bring her gifts.", ko:"아기 공주가 태어나자 요정들이 선물을 가져왔어요.",
-       q:"Who brings the gifts?", prop:'👶', a:0, c:[
-        {w:'Fairies', e:'🧚', k:['fairies','fairy','ferry','very','fair','berries','fairys']},
-        {w:'Dogs', e:'🐶', k:['dog','dogs','doggy','dock','duck']}]},
-      {n:"One bad fairy is angry. She says: You will sleep!", ko:"화가 난 나쁜 요정이 '공주는 잠들 거야!' 하고 말했어요.",
-       q:"What does the princess do?", prop:'💤', a:0, c:[
-        {w:'Sleep', e:'😴', k:['sleep','sleepy','slip','sleeping','seep','sleeps']},
-        {w:'Run', e:'🏃', k:['run','ran','round','fun']}]},
-      {n:"She sleeps for one hundred years. Roses grow all around the castle.", ko:"공주는 백 년 동안 잠들고, 성 둘레에 장미 덩굴이 자랐어요.",
-       q:"What grows around the castle?", prop:'🏰', a:0, c:[
-        {w:'Roses', e:'🌹', k:['rose','roses','rosie','rosy','flower','flowers','road','rows']},
-        {w:'Cars', e:'🚗', k:['car','cars','ca','call','cart']}]},
-      {n:"A prince comes. The princess wakes up!", ko:"왕자님이 오자 공주가 잠에서 깼어요!",
-       q:"Let's say hi! Good... ?", prop:'☀️', a:0, c:[
-        {w:'Good morning', e:'☀️', k:['morning','good morning','mourning','morn']},
-        {w:'Good night', e:'🌙', k:['night','good night','nite','knight','goodnight']}]},
+    hi:"Hello! I am the Sleeping Beauty. Let me tell you a story!",
+    bye:"What a long sleep! Thank you, friend! Bye-bye!",
+    eps:[
+      E("The Fairies' Gifts",'요정들의 선물',[
+        Q("A baby princess is born.","아기 공주가 태어났어요.","Who is this?","🍼","baby","dog"),
+        Q("The king has a big party.","왕은 큰 잔치를 열었어요.","What do we eat at a party?","🎉","cake","shoe"),
+        Q("Fairies come with gifts.","요정들이 선물을 가지고 왔어요.","Who comes?","🎁","fairy","pig"),
+        Q("One bad fairy is angry. She says: You will sleep!","화난 요정이 '공주는 잠들 거야!' 하고 말했어요.","What will the princess do?","💤","sleep","run")]),
+      E('The Old Tower','낡은 탑',[
+        Q("The princess grows up.","공주가 자랐어요.","Is she big or small now?","👸","big","small"),
+        Q("She finds an old tower. She goes up and up.","낡은 탑을 찾아 위로 위로 올라갔어요.","What does she go up?","🏰","stairs","boat"),
+        Q("There is a little door. It has a little key.","작은 문에 작은 열쇠가 꽂혀 있었어요.","What opens the door?","🚪","key","banana"),
+        Q("An old woman is spinning. The princess touches it.","할머니가 실을 잣고 있었어요. 공주가 만졌어요.","What does she do now?","💤","sleep","dance")]),
+      E('Everyone Sleeps','모두 잠들었어요',[
+        Q("Everyone in the castle falls asleep.","성 안의 모두가 잠들었어요.","The king sleeps on his chair. Who?","👑","king","fish"),
+        Q("The dog in the yard falls asleep too.","마당의 강아지도 잠들었어요.","Which animal sleeps?","💤","dog","fish"),
+        Q("The horses sleep in the barn.","마구간의 말들도 잠들었어요.","What animal is this?","n2:🐴","horse","cow"),
+        Q("Shh! Everyone is sleeping.","쉿! 모두 자고 있어요.","Let's whisper: Good... ?","🤫","night","morning")]),
+      E('The Rose Hedge','장미 울타리',[
+        Q("Roses grow all around the castle.","성 둘레에 장미 덩굴이 자랐어요.","What grows?","🏰","rose","car"),
+        Q("The roses are so pretty.","장미꽃이 정말 예뻐요.","What color are the roses?","🌹","red","blue"),
+        Q("After one hundred years, a prince comes.","백 년이 지나 왕자님이 왔어요.","Who comes?","🏰","prince","witch"),
+        Q("The roses open like a door!","장미꽃이 문처럼 활짝 열렸어요!","Where does the prince go?","🌹","castle","boat")]),
+      E('Good Morning, Castle','성이 깨어나요',[
+        Q("The prince finds the princess. She wakes up!","왕자님이 공주를 찾자 공주가 깨어났어요!","What do we say?","☀️","morning","night"),
+        Q("The dog wakes up too.","강아지도 깨어났어요.","What does a dog say?","🐶","woof","meow"),
+        Q("The cook wakes up and makes food.","요리사가 깨어나 음식을 만들어요.","What does the cook make?","🍳","soup","shoe"),
+        Q("There is a big party!","커다란 잔치가 열렸어요!","Let's dance! Are you happy?","💃","yes","no")]),
     ]},
   { id:'cinderella', group:'classic', en:'Cinderella', ko:'신데렐라 (페로)', friend:'🎃', fx:{ch:'✦',mode:'fall'},
     bg:'linear-gradient(180deg,#2E3A78 0%,#5867B0 55%,#B9C2EE 100%)',
     p:{name:'Cinderella', skin:'#F6D7C2', hair:'#4A3226', hairDark:'#33211A', dress:'#F2C14E', accent:'#FFF3C4', eye:'#4E6B8C', crown:'#E8EEF8'},
-    hi:"Hello! I'm Cinderella. Let me tell you my story!",
-    bye:"The shoe fits! Thank you, friend! Bye-bye!",
-    qs:[
-      {n:"Cinderella works all day. She cleans the floor.", ko:"신데렐라는 하루 종일 바닥을 쓸고 일했어요.",
-       q:"What does she use?", prop:'🧽', a:0, c:[
-        {w:'Broom', e:'🧹', k:['broom','brooms','room','bloom','vroom','groom','brom']},
-        {w:'Spoon', e:'🥄', k:['spoon','spoons','soon','spoom']}]},
-      {n:"A fairy godmother comes. She makes magic!", ko:"요정 할머니가 와서 마법을 부렸어요!",
-       q:"What is this? It turns into a golden coach!", prop:'🪄', a:0, c:[
-        {w:'Pumpkin', e:'🎃', k:['pumpkin','pumpkins','bumpkin','pumkin','punkin','pump']},
-        {w:'Apple', e:'🍎', k:['apple','apples','happle','appo','apo','appa']}]},
-      {n:"Cinderella dances with the prince. At midnight, she must run home!", ko:"왕자님과 춤을 추다가, 밤 12시가 되자 서둘러 집으로 달려갔어요!",
-       q:"Oh no! What does she lose?", prop:'🕛', a:0, c:[
-        {w:'Shoe', e:'👠', k:['shoe','shoes','show','sue','slipper','chew']},
-        {w:'Hat', e:'🎩', k:['hat','hats','hot','cat','had']}]},
-      {n:"The prince looks for her. The shoe fits!", ko:"왕자님이 신데렐라를 찾았어요. 구두가 꼭 맞았어요!",
-       q:"Are they happy?", prop:'💖', a:0, c:[
-        {w:'Yes!', e:'😊', k:['yes','yeah','yep','yay','ya','yess','yea','yup']},
-        {w:'No', e:'😢', k:['no','nope','nah']}]},
+    hi:"Hello! I'm Cinderella. Let me tell you a story!",
+    bye:"Thank you, friend! Bye-bye!",
+    eps:[
+      E('Hard Work','열심히 일해요',[
+        Q("Cinderella works all day. She cleans the floor.","신데렐라는 하루 종일 바닥을 쓸고 일했어요.","What does she use?","🧽","broom","spoon"),
+        Q("Her stepsisters shout at her.","새언니들이 소리를 질러요.","Are they happy or angry?","🗯️","angry","happy"),
+        Q("She sits by the fire. Her face is dusty.","난롯가에 앉아서 얼굴에 재가 묻었어요.","Is her face clean or dirty?","🔥","dirty","clean"),
+        Q("A little mouse is her friend.","작은 생쥐가 친구예요.","Who is her friend?","🧀","mouse","lion")]),
+      E('Fairy Magic','요정 할머니의 마법',[
+        Q("Cinderella is crying. Then someone comes!","신데렐라가 울고 있는데 누군가 나타났어요!","Who is she? A fairy godmother!","🪄","fairy","pig"),
+        Q("She asks for something from the garden.","정원에서 무언가를 가져오래요.","What is this?","🪄","pumpkin","apple"),
+        Q("Six little mice become horses!","생쥐 여섯 마리가 말이 되었어요!","What do the mice become?","🐭","horse","fish"),
+        Q("Her old clothes become beautiful!","낡은 옷이 아름답게 변했어요!","What does she wear now?","✨","dress","socks")]),
+      E('The Royal Ball','왕궁 무도회',[
+        Q("Cinderella goes to the ball in a golden coach.","신데렐라는 황금 마차를 타고 무도회에 갔어요.","What color is the coach?","🎃","yellow","black"),
+        Q("The prince sees her.","왕자님이 신데렐라를 보았어요.","Who sees her?","🏰","prince","frog"),
+        Q("They dance and dance.","둘은 춤을 추고 또 추었어요.","What do they do?","🎶","dance","sleep"),
+        Q("The music is so beautiful.","음악이 정말 아름다워요.","What do we hear?","🎻","music","rain")]),
+      E('Midnight!','밤 열두 시',[
+        Q("Ding dong! Something rings.","댕댕! 무언가가 울려요.","What rings?","🔔","clock","fish"),
+        Q("It is twelve o'clock. She must go home!","열두 시예요. 집에 가야 해요!","What does she do?","🕛","run","sleep"),
+        Q("She runs down, down, down.","아래로 아래로 뛰어 내려갔어요.","What does she run down?","🏰","stairs","tree"),
+        Q("Oh no! She loses something.","앗! 무언가를 잃어버렸어요.","What does she lose?","🕛","shoe","hat")]),
+      E('The Shoe Fits','구두가 꼭 맞아요',[
+        Q("The prince has a glass shoe.","왕자님이 유리 구두를 들고 있어요.","What does he have?","🤴","shoe","cake"),
+        Q("He looks for her everywhere.","왕자님은 여기저기 찾아다녔어요.","Where does he look?","🏘️","house","whale"),
+        Q("The stepsisters try it. Too small!","새언니들이 신어 봤지만 너무 작아요!","Does it fit?","👠","no","yes"),
+        Q("Cinderella tries it. It fits!","신데렐라가 신으니 꼭 맞아요!","Are they happy?","💖","yes","no")]),
     ]},
   { id:'mermaid', group:'classic', en:'The Little Mermaid', ko:'인어공주 (안데르센)', friend:'🐚', fx:{ch:'○',mode:'rise'},
     bg:'linear-gradient(180deg,#4FC3E0 0%,#2A8FC4 60%,#1D6FA8 100%)',
     p:{name:'The Little Mermaid', skin:'#FBE2D2', hair:'#8FB2F0', hairDark:'#6A8ED6', dress:'#F0889B', accent:'#FFF0B3', eye:'#2F6FA8', crown:'#FFD95A', tail:true},
-    hi:"Hello! I am the little mermaid. I am the youngest daughter of the sea king.",
-    bye:"Now I can walk on land! Thank you, friend! Bye-bye!",
-    qs:[
-      {n:"The little mermaid lives deep under the sea.", ko:"인어공주는 깊은 바닷속에 살았어요.",
-       q:"She has no legs. What does she have?", prop:'🌊', a:0, c:[
-        {w:'Tail', e:'🐟', k:['tail','tails','tale','tell','till','tel','tile']},
-        {w:'Feet', e:'🦶', k:['feet','foot','feat','fit']}]},
-      {n:"A big storm comes! A prince falls into the sea.", ko:"큰 폭풍이 와서 왕자님이 바다에 빠졌어요!",
-       q:"What falls from the sky?", prop:'⛈️', a:0, c:[
-        {w:'Rain', e:'🌧️', k:['rain','rainy','ran','rein','lane']},
-        {w:'Candy', e:'🍬', k:['candy','candi','can','candies','andy']}]},
-      {n:"She saves the prince. Now she wants to walk on land.", ko:"인어공주는 왕자님을 구해 주고, 땅 위를 걷고 싶어졌어요.",
-       q:"What does she want?", prop:'🏝️', a:0, c:[
-        {w:'Legs', e:'🦵', k:['leg','legs','lake','lex','eggs','lags','lacks']},
-        {w:'Hat', e:'🎩', k:['hat','hats','hot','cat','had']}]},
-      {n:"The sea witch gives her legs. But she takes her voice!", ko:"바다 마녀가 다리를 주었지만, 목소리를 가져갔어요!",
-       q:"She can not talk. Say it for her: Hello, prince!", prop:'🤐', a:0, c:[
-        {w:'Hello', e:'👋', k:['hello','hi','hallo','hullo','hey','halo','yellow','hello prince']},
-        {w:'Bye', e:'💤', k:['bye','by','buy','bye bye','bay']}]},
+    hi:"Hello! I am the little mermaid, the youngest daughter of the sea king.",
+    bye:"Thank you, friend! See you in the sea! Bye-bye!",
+    eps:[
+      E('Under the Sea','바닷속 궁전',[
+        Q("The little mermaid lives deep under the sea.","인어공주는 깊은 바닷속에 살아요.","She has no legs. What does she have?","🌊","tail","feet"),
+        Q("She has big sisters.","인어공주에게는 언니들이 있어요.","How many sisters? Let's count!","n5:🧜‍♀️","five","two"),
+        Q("Her grandma tells stories about the land.","할머니가 땅 위 세상 이야기를 들려줘요.","Who tells the stories?","📖","grandma","baby"),
+        Q("She has a little garden of flowers.","작은 꽃밭이 있어요.","What color are her flowers?","🌺","red","blue")]),
+      E('Up to the Top','처음으로 바다 위에',[
+        Q("Today she can swim up to the top!","오늘은 바다 위로 올라갈 수 있어요!","Which way does she go?","🌊","up","down"),
+        Q("She sees the sky for the first time.","처음으로 하늘을 보았어요.","What is in the sky?","☁️","sun","fish"),
+        Q("She sees something big on the sea.","바다 위에 커다란 것이 있어요.","What is it?","🌊","ship","car"),
+        Q("Boom! Pop! Lights in the sky!","펑! 펑! 하늘에 불빛이 반짝여요!","What are they?","🌃","fireworks","rain")]),
+      E('The Storm','폭풍',[
+        Q("A big storm comes!","큰 폭풍이 왔어요!","What falls from the sky?","⛈️","rain","candy"),
+        Q("Whoosh! Something blows hard.","쌩쌩! 무언가 세게 불어요.","What blows?","🌊","wind","cake"),
+        Q("Someone falls into the sea!","누군가 바다에 빠졌어요!","Who falls?","🌊","prince","dog"),
+        Q("She saves him.","인어공주가 왕자님을 구했어요.","What does she do?","🌊","swim","sleep")]),
+      E('The Sea Witch','바다 마녀',[
+        Q("She wants to walk on land.","땅 위를 걷고 싶어요.","What does she want?","🏝️","legs","hat"),
+        Q("She goes to see someone scary.","무서운 누군가를 찾아갔어요.","Who does she see?","🐙","witch","baby"),
+        Q("The witch takes her voice.","마녀가 목소리를 가져갔어요.","Can she talk now?","🤐","no","yes"),
+        Q("Now she has legs!","이제 다리가 생겼어요!","What can she do now?","🦵","walk","fly")]),
+      E('Dancing on Land','땅 위에서 춤을',[
+        Q("She meets the prince on land.","땅 위에서 왕자님을 만났어요.","Who does she meet?","🏰","prince","whale"),
+        Q("She can not talk, so she smiles.","말을 못 해서 방긋 웃었어요.","Is she happy?","😊","yes","no"),
+        Q("Let's talk for her!","우리가 대신 말해 줘요!","Say: Hello!","🤐","hello","bye"),
+        Q("Music plays on the ship.","배 위에서 음악이 흘러요.","What does she do?","🚢","dance","sleep")]),
     ]},
   { id:'rapunzel', group:'classic', en:'Rapunzel', ko:'라푼젤 (그림 형제)', friend:'🐦', fx:{ch:'✦',mode:'fall'},
     bg:'linear-gradient(180deg,#FFE3B8 0%,#FFF2D9 55%,#E6F4D8 100%)',
     p:{name:'Rapunzel', skin:'#F8DFCC', hair:'#F5C542', hairDark:'#D9A521', dress:'#7CB66A', accent:'#EAF6E2', eye:'#5A7A3A', crown:'#FF9FB8', longHair:true},
     hi:"Hello! I'm Rapunzel. My hair is very, very long!",
-    bye:"Now I am free! Thank you, friend! Bye-bye!",
-    qs:[
-      {n:"A witch puts Rapunzel in a tall tower. There is no door!", ko:"마녀가 라푼젤을 문이 없는 높은 탑에 가두었어요.",
-       q:"Where is Rapunzel?", prop:'🏰', a:0, c:[
-        {w:'Tower', e:'🏰', k:['tower','towers','power','tour','tauer','tao','tall']},
-        {w:'Boat', e:'⛵', k:['boat','boats','both','goat','vote']}]},
-      {n:"Her hair grows long and golden.", ko:"라푼젤의 머리카락은 길고 금빛으로 자랐어요.",
-       q:"What color is her hair?", prop:'💇‍♀️', a:0, c:[
-        {w:'Yellow', col:'#F5C542', k:['yellow','yello','yell','jello','mellow','hello','golden','gold']},
-        {w:'Green', col:'#3FAF6A', k:['green','grin','grain','greene','greens']}]},
-      {n:"Rapunzel, Rapunzel, let down your hair!", ko:"“라푼젤, 라푼젤, 머리카락을 내려 주렴!”",
-       q:"Who climbs up her hair?", prop:'🧗', a:0, c:[
-        {w:'Prince', e:'🤴', k:['prince','prints','princes','pins','print','fins','prance']},
-        {w:'Fish', e:'🐟', k:['fish','fishy','fishes','fis','fist']}]},
-      {n:"The prince and Rapunzel find each other. They are happy!", ko:"왕자님과 라푼젤은 다시 만나 행복하게 살았어요!",
-       q:"Let's brush her long hair! What do we use?", prop:'👸', a:0, c:[
-        {w:'Brush', e:'💇‍♀️', k:['brush','brushing','brash','bush','rush','comb']},
-        {w:'Fork', e:'🍴', k:['fork','forks','folk','for','pork']}]},
+    bye:"Thank you, friend! Bye-bye!",
+    eps:[
+      E("The Witch's Garden",'마녀의 정원',[
+        Q("A mom and dad wish for a baby.","엄마 아빠는 아기를 기다렸어요.","Who do they want?","🍼","baby","pig"),
+        Q("Next door is a garden with a high wall.","옆집에는 담이 높은 정원이 있어요.","Whose garden is it?","🌿","witch","king"),
+        Q("Mom wants to eat the plants in the garden.","엄마는 정원의 풀이 먹고 싶었어요.","What color are the plants?","🥬","green","red"),
+        Q("Rapunzel is born! She is so little.","라푼젤이 태어났어요! 아주 작아요.","Is the baby big or small?","👶","small","big")]),
+      E('The Tall Tower','높은 탑',[
+        Q("The witch puts Rapunzel in a tall tower.","마녀가 라푼젤을 높은 탑에 가두었어요.","Where is Rapunzel?","🏰","tower","boat"),
+        Q("There is no door. There is only a window.","문은 없고 창문만 하나 있어요.","What does the tower have?","🏰","window","door"),
+        Q("Her hair grows long and golden.","머리카락이 길고 금빛으로 자랐어요.","What color is her hair?","👱‍♀️","yellow","green"),
+        Q("She looks out at the sky.","창밖 하늘을 바라봐요.","What does she see?","🪟","bird","fish")]),
+      E('Let Down Your Hair','머리카락을 내려 주렴',[
+        Q("Rapunzel, Rapunzel, let down your hair!","“라푼젤, 라푼젤, 머리카락을 내려 주렴!”","What does she let down?","🏰","hair","hat"),
+        Q("The witch climbs up the hair.","마녀가 머리카락을 타고 올라가요.","Who climbs?","🧗","witch","fish"),
+        Q("Someone is watching from the trees.","나무 뒤에서 누군가 보고 있어요.","Who is it?","🌳","prince","cat"),
+        Q("Now the prince calls her!","이번엔 왕자님이 불러요!","Say her name!","🏰","rapunzel","bye")]),
+      E('Her Song','라푼젤의 노래',[
+        Q("Rapunzel is alone in her tower.","라푼젤은 탑에 혼자 있어요.","What does she do?","🎶","sing","eat"),
+        Q("Her song is so pretty.","노래가 정말 예뻐요.","Let's sing too!","🎵","lalala","moo"),
+        Q("Someone hears the song.","누군가 노래를 들었어요.","Who hears it?","👂","prince","pig"),
+        Q("He climbs up to see her.","왕자님이 올라와요.","What does he say?","👋","hello","bye")]),
+      E('Together Again','다시 만났어요',[
+        Q("The prince is lost in the forest.","왕자님이 숲에서 길을 잃었어요.","What is in the forest?","🌲","tree","car"),
+        Q("He hears a song again!","다시 노래가 들려요!","What does he hear?","🎶","song","rain"),
+        Q("They find each other.","둘이 다시 만났어요.","What do they do?","🤗","hug","run"),
+        Q("They go home together.","함께 집으로 가요.","Where do they live?","🏰","castle","boat")]),
     ]},
   { id:'snowqueen', group:'classic', en:'The Snow Queen', ko:'눈의 여왕 (안데르센, 겨울왕국의 원작 동화)', friend:'🦌', fx:{ch:'❄',mode:'fall'},
     bg:'linear-gradient(180deg,#B7DBFF 0%,#E3F1FF 60%,#F8FCFF 100%)',
     p:{name:'Gerda', skin:'#FBE0CF', hair:'#B5652E', hairDark:'#8E4C1F', dress:'#E2575F', accent:'#FFE9EA', eye:'#3E7AB0', crown:'#FF8FA8', noCrown:true},
     hi:"Hello! I'm Gerda. This is the story of the Snow Queen!",
-    bye:"Kai is home again! Thank you, friend! Bye-bye!",
-    qs:[
-      {n:"Gerda and Kai are best friends. They play with the roses.", ko:"게르다와 카이는 단짝 친구예요. 함께 장미꽃 옆에서 놀았어요.",
-       q:"What color are the roses?", prop:'🌹', a:0, c:[
-        {w:'Red', col:'#E23B4A', k:['red','read','bread','rad','wed']},
-        {w:'Blue', col:'#4D8DF0', k:['blue','blew','boo','bloo','glue']}]},
-      {n:"Snow falls. The Snow Queen comes and takes Kai away!", ko:"눈이 오던 날, 눈의 여왕이 와서 카이를 데려갔어요!",
-       q:"What does the Snow Queen ride?", prop:'❄️', a:0, c:[
-        {w:'Sled', e:'🛷', k:['sled','sleds','slid','slide','sleigh','slay','fled','said']},
-        {w:'Bike', e:'🚲', k:['bike','bikes','back','bite']}]},
-      {n:"Gerda goes far, far away to find Kai. Someone helps her!", ko:"게르다는 카이를 찾아 멀리 떠났어요. 누군가 도와주었어요!",
-       q:"Who helps Gerda?", prop:'🧭', a:0, c:[
-        {w:'Reindeer', e:'🦌', k:['reindeer','rain deer','deer','dear','rain','raindeer','reindeers']},
-        {w:'Pig', e:'🐷', k:['pig','pigs','big','peg']}]},
-      {n:"Gerda finds Kai in the ice palace. She hugs him. The ice melts!", ko:"게르다가 얼음 궁전에서 카이를 꼭 안아 주자 얼음이 녹았어요!",
-       q:"Let's give a big hug! Say: Hug!", prop:'🤗', a:0, c:[
-        {w:'Hug', e:'🤗', k:['hug','hugs','hag','hog','hook','huck','hugging','hut']},
-        {w:'Run', e:'🏃', k:['run','ran','round','fun']}]},
+    bye:"Thank you, friend! Bye-bye!",
+    eps:[
+      E('Kai and Gerda','카이와 게르다',[
+        Q("Gerda and Kai live next door.","게르다와 카이는 이웃에 살아요.","Are they friends?","👫","yes","no"),
+        Q("They grow roses together.","함께 장미를 키워요.","What color are the roses?","🌹","red","blue"),
+        Q("Grandma tells a story about the Snow Queen.","할머니가 눈의 여왕 이야기를 들려줘요.","Who tells the story?","📖","grandma","baby"),
+        Q("Outside, something is falling.","밖에 무언가가 내려요.","What is falling?","🪟","snow","rain")]),
+      E('The Broken Mirror','깨진 거울',[
+        Q("A bad troll breaks a magic mirror.","나쁜 트롤이 마법 거울을 깨뜨렸어요.","What breaks?","💥","mirror","cake"),
+        Q("A tiny piece flies into Kai's eye.","작은 조각이 카이의 눈에 들어갔어요.","Is it big or small?","✨","small","big"),
+        Q("Now Kai is grumpy.","카이는 심술쟁이가 되었어요.","Is Kai happy or angry?","😠","angry","happy"),
+        Q("Kai plays in the snow.","카이는 눈밭에서 놀아요.","What does he ride?","❄️","sled","bike")]),
+      E("Gerda's Journey",'게르다의 여행',[
+        Q("The Snow Queen takes Kai away. Gerda goes to find him.","눈의 여왕이 카이를 데려가서 게르다가 찾아 나섰어요.","Who does she look for?","🧭","kai","cat"),
+        Q("She gets into a little boat.","작은 배를 탔어요.","What does she ride?","🏞️","boat","horse"),
+        Q("She visits a garden.","어느 정원에 갔어요.","What is in the garden?","🏡","flower","car"),
+        Q("She walks and walks in her red shoes.","빨간 신발을 신고 걷고 또 걸었어요.","What does she do?","👣","walk","sleep")]),
+      E('New Friends','도와주는 친구들',[
+        Q("A black bird helps Gerda.","까만 새가 게르다를 도와줘요.","Who helps her?","🌳","crow","fish"),
+        Q("A prince and a princess give her something warm.","왕자님과 공주님이 따뜻한 것을 줬어요.","What does she get?","🥶","coat","cake"),
+        Q("A robber girl becomes her friend.","산적 소녀가 친구가 되었어요.","Is she a friend?","🤝","yes","no"),
+        Q("Someone takes her to the snow land.","누군가 눈의 나라로 데려다줘요.","Who takes her?","❄️","reindeer","pig")]),
+      E('The Ice Palace','얼음 궁전',[
+        Q("Gerda comes to the Snow Queen's palace.","게르다가 눈의 여왕 궁전에 왔어요.","Is it hot or cold?","🏰","cold","hot"),
+        Q("Someone is there, all cold and blue.","누군가 꽁꽁 얼어 있어요.","Who is there?","🧊","kai","cat"),
+        Q("Gerda cries warm tears.","게르다가 따뜻한 눈물을 흘려요.","What does she do?","🤗","hug","run"),
+        Q("The ice melts! Kai smiles again!","얼음이 녹고 카이가 다시 웃어요!","Are they happy?","😊","yes","no")]),
     ]},
 ];
+
+/* ---------------- Ice Queen: villains, built fresh every day ---------------- */
+const VILLAINS = {
+  sleep:{label:'No sleep', face:'sleep', col:'#9A86D6', k:['sleep','sleepy','slip','sleeping','seep','no sleep','sleeps'],
+    n:"He did not sleep last night!", ko:"이 괴물은 어젯밤에 잠을 안 잤어요!", q:"He is so... ?", s:['sleepy','happy'],
+    hq:"To be strong like the Queen, what do we do at night?", hko:"여왕처럼 힘이 세지려면 밤에 뭘 해야 할까요?", h:['sleep','play']},
+  eat:{label:'No food', face:'eat', col:'#86C46F', k:['food','eat','eating','foo','fruit','no food','rice'],
+    n:"He did not eat his food!", ko:"이 괴물은 밥을 안 먹었어요!", q:"His tummy says grr. He is... ?", s:['hungry','happy'],
+    hq:"To be strong like the Queen, what do we do at dinner?", hko:"여왕처럼 힘이 세지려면 저녁에 뭘 해야 할까요?", h:['eat','cry']},
+  teeth:{label:'No brush', face:'teeth', col:'#EE9A62', k:['brush','brushing','brash','bush','rush','teeth','tooth','no brush'],
+    n:"He did not brush his teeth!", ko:"이 괴물은 양치를 안 했어요!", q:"His teeth are... ?", s:['dirty','clean'],
+    hq:"To be strong like the Queen, what do we do before bed?", hko:"여왕처럼 힘이 세지려면 자기 전에 뭘 해야 할까요?", h:['toothbrush','candy']},
+  bath:{label:'No bath', face:'stink', col:'#B7A24E', k:['bath','baths','bat','bass','no bath','bus','shower'],
+    n:"He did not take a bath for ten days!", ko:"이 괴물은 열흘 동안 목욕을 안 했어요!", q:"Pee-yew! He is... ?", s:['smelly','clean'],
+    hq:"To be strong like the Queen, what do we take every night?", hko:"여왕처럼 힘이 세지려면 매일 밤 무엇을 할까요?", h:['bath','candy']},
+  hands:{label:'No wash', face:'mud', col:'#C98BB9', k:['wash','washing','watch','wish','no wash','hands','hand'],
+    n:"He did not wash his hands!", ko:"이 괴물은 손을 안 씻었어요!", q:"His hands are... ?", s:['dirty','clean'],
+    hq:"To be strong like the Queen, what do we do before we eat?", hko:"여왕처럼 힘이 세지려면 밥 먹기 전에 뭘 할까요?", h:['wash','play']},
+  sweets:{label:'Too much candy', face:'sweet', col:'#F07FA8', k:['candy','candies','candi','sweets','too much candy','andy'],
+    n:"He ate too much candy!", ko:"이 괴물은 사탕을 너무 많이 먹었어요!", q:"His tummy hurts! He says... ?", s:['ouch','happy'],
+    hq:"To be strong like the Queen, what do we eat?", hko:"여왕처럼 힘이 세지려면 무엇을 먹을까요?", h:['carrot','candy']},
+  messy:{label:'No clean up', face:'messy', col:'#6FB3C9', k:['clean','clean up','cleanup','messy','mess','toys','toy'],
+    n:"He did not clean up his toys!", ko:"이 괴물은 장난감을 안 치웠어요!", q:"His room is... ?", s:['messy','clean'],
+    hq:"To be strong like the Queen, what do we do with our toys?", hko:"여왕처럼 멋지려면 장난감을 어떻게 할까요?", h:['basket','cry']},
+};
+const BATTLE = {
+  places:[
+    ["The Ice Queen flies to the dark forest.","얼음 여왕이 어두운 숲으로 날아가요.",'The Dark Forest','어두운 숲'],
+    ["The Ice Queen rides her ice horse up the mountain.","얼음 여왕이 얼음 말을 타고 산에 올라요.",'The Ice Mountain','얼음 산'],
+    ["Monsters are in the castle garden!","성 정원에 괴물들이 나타났어요!",'The Castle Garden','성의 정원'],
+    ["The Queen and the King go to the village.","여왕과 왕이 마을로 가요.",'The Snowy Village','눈 덮인 마을'],
+    ["It is a stormy night. Monsters are coming!","폭풍이 치는 밤, 괴물들이 몰려와요!",'The Stormy Night','폭풍 치는 밤'],
+    ["The Ice Queen walks on the frozen sea.","얼음 여왕이 꽁꽁 언 바다 위를 걸어요.",'The Frozen Sea','얼어붙은 바다'],
+    ["The Queen hears a noise in the kitchen!","여왕이 부엌에서 이상한 소리를 들었어요!",'The Castle Kitchen','성의 부엌'],
+  ],
+  hi:["I am the Ice Queen! I am stronger than the King!","Good morning! I have so much energy today!",
+      "The Ice Queen is here! The King is still sleeping, so I will go!","I am the Ice Queen! Let's go on an adventure!"],
+  strong:[
+    ["I have lots of energy! Who is stronger?",'queen','king'],
+    ["The King is tired already. Who has more energy?",'queen','king'],
+    ["Who is the best fighter in the castle?",'queen','king'],
+    ["Who is faster, the Queen or the snail?",'queen','slowp'],
+  ],
+  magic:[
+    ["Ice magic time! Say: Freeze!",'freeze','hot'],
+    ["Ice magic time! Say: Ice!",'ice','hot'],
+    ["Throw a snowball! Say: Snowball!",'snowball','hot'],
+  ],
+  bye:["We won! The Ice Queen is the best! You be strong too. Bye-bye!",
+       "The monster is ice now! Thank you for helping me! Bye-bye!",
+       "Hooray! The castle is safe! See you tomorrow, my brave friend!"],
+};
+function buildBattle(rng){
+  const pick = a => a[Math.floor(rng()*a.length)];
+  const ids = Object.keys(VILLAINS).sort(() => rng() - .5).slice(0, 3);
+  const place = pick(BATTLE.places), st = pick(BATTLE.strong), mg = pick(BATTLE.magic);
+  const by = f => Object.fromEntries(ids.map(id => [id, f(VILLAINS[id])]));
+  return E(place[2], place[3], [
+    {n:place[0], ko:place[1], q:"Who should we beat today?", open:true, prop:'⚔️', a:0,
+     c:ids.map(id => ({w:VILLAINS[id].label, m:id, branch:id, k:VILLAINS[id].k}))},
+    {by:by(v => Q(v.n, v.ko, v.q, 'mon', v.s[0], v.s[1]))},
+    Q(null, null, st[0], '💪', st[1], st[2]),
+    Q(null, null, mg[0], 'mon', mg[1], mg[2], {freeze:true}),
+    {by:by(v => Q("We won!", "우리가 이겼어요!", v.hq, '🏆', v.h[0], v.h[1]))},
+  ], {hi:pick(BATTLE.hi), bye:pick(BATTLE.bye)});
+}
+
+/* ---------------- Play stories ---------------- */
 const QUEEN = {name:'The Ice Queen', skin:'#FCE6DA', hair:'#EDEBFA', hairDark:'#C9C3EA', dress:'#4C6FD9', accent:'#BFE6FF', eye:'#2F7FD0', crown:'#9FE3FF', queen:true, cape:'#8AB8F5'};
-const STORIES = [
-  { id:'battle', en:'Ice Queen Power', ko:'얼음 여왕: 오늘은 누굴 해치울까?', friend:'🤴', fx:{ch:'❄',mode:'fall'},
-    bg:'linear-gradient(180deg,#5B6FD6 0%,#8FB6F2 55%,#DDEEFF 100%)',
-    p:QUEEN,
-    hi:"I am the Ice Queen! I am stronger than the King, and I have lots of energy!",
-    bye:"We won! The Ice Queen is the best! You be strong too. Bye-bye!",
-    qs:[
-      {q:"Who should we beat today?", open:true, prop:'⚔️', c:[
-        {w:'No sleep', m:'sleep', branch:'sleep', k:['sleep','sleepy','slip','sleeping','seep','no sleep','sleeps']},
-        {w:'No food', m:'eat', branch:'eat', k:['food','eat','eating','foo','fruit','no food','rice']},
-        {w:'No brush', m:'teeth', branch:'teeth', k:['brush','brushing','brash','bush','rush','teeth','tooth','no brush']}]},
-      {by:{
-        sleep:{q:"He did not sleep! He is so... ?", prop:{mon:true}, a:0, c:[
-          {w:'Sleepy', e:'😪', k:['sleepy','sleep','slippy','sleeping','sippy','sleepi']},
-          {w:'Happy', e:'😄', k:['happy','happi','hobby','hoppy']}]},
-        eat:{q:"He did not eat his food! He is... ?", prop:{mon:true}, a:0, c:[
-          {w:'Hungry', e:'🤤', k:['hungry','hungary','hungri','ungry','hunger','angry']},
-          {w:'Happy', e:'😄', k:['happy','happi','hobby','hoppy']}]},
-        teeth:{q:"He did not brush his teeth! His teeth are... ?", prop:{mon:true}, a:0, c:[
-          {w:'Dirty', e:'🦠', k:['dirty','dirt','dirtee','thirty','birdie','derby','durty']},
-          {w:'Clean', e:'✨', k:['clean','cleen','lean','cling','kleen']}]},
-      }},
-      {q:"I have lots of energy! Who is stronger?", prop:'💪', a:0, c:[
-        {w:'Queen', e:'👸', k:['queen','queens','quin','qeen','ween','queeen','the queen']},
-        {w:'King', e:'🤴', k:['king','kings','kin','keen','kim']}]},
-      {q:"Ice magic time! Say: Freeze!", prop:{mon:true}, a:0, freeze:true, c:[
-        {w:'Freeze!', e:'❄️', k:['freeze','free','freezy','frieze','fries','frees','breeze','please','fre','freezing','three']},
-        {w:'Hot', e:'🔥', k:['hot','hut','hat','haught']}]},
-      {by:{
-        sleep:{q:"We won! To be strong like the Queen, what do we do at night?", prop:'🌙', a:0, c:[
-          {w:'Sleep', e:'🛌', k:['sleep','sleepy','slip','sleeping','seep','sleeps']},
-          {w:'Play', e:'🎮', k:['play','pray','plate','played']}]},
-        eat:{q:"We won! To be strong like the Queen, what do we do at dinner?", prop:'🍽️', a:0, c:[
-          {w:'Eat', e:'🍚', k:['eat','eating','heat','eat eat','eats','it']},
-          {w:'Cry', e:'😭', k:['cry','crying','cri','try']}]},
-        teeth:{q:"We won! To be strong like the Queen, what do we do before bed?", prop:'🌙', a:0, c:[
-          {w:'Brush', e:'🪥', k:['brush','brushing','brash','bush','rush','brush brush']},
-          {w:'Candy', e:'🍬', k:['candy','candi','can','candies','andy']}]},
-      }},
-    ]},
-  { id:'wedding', en:'Royal Wedding', ko:'얼음 여왕의 결혼식', friend:'🤴', fx:{ch:'♥',mode:'fall'},
+const PLAY = [
+  { id:'battle', group:'play', en:'Ice Queen Power', ko:'얼음 여왕: 오늘은 누굴 해치울까?', friend:'🤴', fx:{ch:'❄',mode:'fall'},
+    bg:'linear-gradient(180deg,#5B6FD6 0%,#8FB6F2 55%,#DDEEFF 100%)', p:QUEEN, gen:buildBattle,
+    hi:"I am the Ice Queen!", bye:"Bye-bye!" },
+  { id:'wedding', group:'play', en:'Royal Wedding', ko:'얼음 여왕과 왕의 이야기', friend:'🤴', fx:{ch:'♥',mode:'fall'},
     bg:'linear-gradient(180deg,#FFD3E6 0%,#FBEAFF 55%,#FFFFFF 100%)',
     p:{...QUEEN, dress:'#FFFFFF', accent:'#FFD3E6', cape:null, veil:true},
-    hi:"Today is my royal wedding! The King and I are getting married!",
-    bye:"What a beautiful wedding! Thank you, friend! Bye-bye!",
-    qs:[
-      {q:"What do I wear on my head?", prop:'👰', a:0, c:[
-        {w:'Crown', e:'👑', k:['crown','crowns','clown','brown','cown','round','crow']},
-        {w:'Hat', e:'🧢', k:['hat','hats','hot','cat','had']}]},
-      {q:"Look at the wedding cake! What color is it?", prop:'🍰', a:0, c:[
-        {w:'White', col:'#FFFFFF', k:['white','wide','wite','whyte','why','wait','quite']},
-        {w:'Black', col:'#2B2340', k:['black','back','block','plaque']}]},
-      {q:"Ding dong! How many bells?", prop:{n:2,e:'🔔'}, a:0, c:[
-        {w:'Two', num:'2', k:['two','2','to','too','tu']},
-        {w:'Five', num:'5', k:['five','5','fife','fight','hive','fi','fine']}]},
-      {q:"The King says I love you! Can you say I love you?", prop:'💕', a:0, c:[
-        {w:'I love you', e:'💕', k:['love','loves','i love you','love you','lub','lav','lov','i love']},
-        {w:'Bye', e:'👋', k:['bye','by','buy','bye bye','bay']}]},
+    hi:"Hello! I am the Ice Queen, and this is my King!", bye:"What a happy day! Thank you, friend! Bye-bye!",
+    eps:[
+      E('Wedding Day','결혼식 날',[
+        Q("Today is my royal wedding!","오늘은 여왕의 결혼식이에요!","What do I wear on my head?","👰","crown","hat"),
+        Q("Look at the wedding cake!","결혼 케이크를 봐요!","What color is it?","🍰","white","black"),
+        Q("Ding dong! The bells ring.","댕동! 종이 울려요.","How many bells?","n2:🔔","two","five"),
+        Q("The King says I love you!","왕이 사랑한다고 말해요!","Can you say it too?","💕","love","bye")]),
+      E('Wedding Party','결혼 잔치',[
+        Q("The party starts!","잔치가 시작됐어요!","What is on the table?","🍽️","cake","shoe"),
+        Q("The music starts!","음악이 나와요!","What do we do?","🎶","dance","sleep"),
+        Q("Pop! Look at the balloons!","풍선을 봐요!","How many balloons?","n3:🎈","three","one"),
+        Q("Everyone gets a present.","모두 선물을 받아요.","What do we say?","🎁","thankyou","bye")]),
+      E('Trip to the Sea','바닷가 여행',[
+        Q("The Queen and the King go to the sea.","여왕과 왕이 바다로 여행을 가요.","What do they ride?","🌊","ship","bike"),
+        Q("The sun is so hot!","해가 정말 뜨거워요!","What do we wear?","☀️","hat","gloves"),
+        Q("Someone jumps out of the water!","누군가 물 위로 뛰어올라요!","Who is it?","🌊","dolphin","cow"),
+        Q("They find something on the sand.","모래 위에서 무언가를 찾았어요.","What is it?","🏖️","shell","pizza")]),
+      E('Royal Baby','아기가 태어났어요',[
+        Q("Good news! Someone new is here!","좋은 소식! 새 식구가 생겼어요!","Who is it?","🍼","baby","dog"),
+        Q("The baby is hungry.","아기가 배고파요.","What does the baby drink?","🍼","milk","pizza"),
+        Q("The baby is sleepy.","아기가 졸려요.","Let's do it softly. What?","🎶","sing","run"),
+        Q("Look at the tiny hands!","작은 손을 봐요!","Is the baby big or small?","👶","small","big")]),
+      E("The Queen's Birthday",'여왕의 생일',[
+        Q("Today is the Queen's birthday!","오늘은 여왕의 생일이에요!","What do we eat?","🎉","cake","soup"),
+        Q("Look at the candles!","촛불을 봐요!","How many candles?","n4:🕯️","four","two"),
+        Q("The King gives a present.","왕이 선물을 줘요.","What is in the box?","🎁","ring","fish"),
+        Q("Let's sing! Happy... ?","노래해요! 해피...?","What do we say?","🎂","birthday","night")]),
     ]},
-  { id:'snow', en:'Snow Castle', ko:'크리스탈 공주의 눈의 성', friend:'⛄', fx:{ch:'❄',mode:'fall'},
+  { id:'snow', group:'play', en:'Snow Castle', ko:'크리스탈 공주의 눈의 성', friend:'⛄', fx:{ch:'❄',mode:'fall'},
     bg:'linear-gradient(180deg,#A9D8FF 0%,#DDF0FF 65%,#F4FBFF 100%)',
     p:{name:'Princess Crystal', skin:'#FCE4D4', hair:'#F6E7B0', hairDark:'#E2CB82', dress:'#86D4F2', accent:'#D6F4FF', eye:'#3E8FD6', crown:'#FFD95A'},
-    hi:"Hello! I'm Princess Crystal. Welcome to my snow castle!",
-    bye:"Thank you, my friend! Bye-bye!",
-    qs:[
-      {q:"Look! What is falling from the sky?", prop:'❄️', a:0, c:[
-        {w:'Snow', e:'❄️', k:['snow','snowy','sno','slow','no']},
-        {w:'Rain', e:'🌧️', k:['rain','rainy','ran','rein']}]},
-      {q:"What color is the snow?", prop:{n:3,e:'❄️'}, a:0, c:[
-        {w:'White', col:'#FFFFFF', k:['white','wide','wite','whyte','why','wait','quite']},
-        {w:'Red', col:'#EF4B5B', k:['red','read','bread','rad','wed']}]},
-      {q:"Let's make a snowman! What is his nose?", prop:'⛄', a:0, c:[
-        {w:'Carrot', e:'🥕', k:['carrot','carrots','karat','carat','parrot','carol','caret','care']},
-        {w:'Banana', e:'🍌', k:['banana','bananas','nana']}]},
-      {q:"Brrr! It's cold! What do I wear on my hands?", prop:'🥶', a:0, c:[
-        {w:'Gloves', e:'🧤', k:['gloves','glove','love','loves','globe','globes','clove','mittens','mitten']},
-        {w:'Socks', e:'🧦', k:['socks','sock','sox','sucks','sack']}]},
+    hi:"Hello! I'm Princess Crystal. Welcome to my snow castle!", bye:"Thank you, my friend! Bye-bye!",
+    eps:[
+      E('Snowman','눈사람 만들기',[
+        Q(null,null,"Look! What is falling from the sky?","❄️","snow","rain"),
+        Q(null,null,"What color is the snow?","n3:❄️","white","red"),
+        Q(null,null,"Let's make a snowman! What is his nose?","⛄","carrot","banana"),
+        Q(null,null,"Brrr! It's cold! What do I wear on my hands?","🥶","gloves","socks")]),
+      E('Ice Skating','얼음 스케이트',[
+        Q("The lake is frozen.","호수가 꽁꽁 얼었어요.","Is it hot or cold?","⛸️","cold","hot"),
+        Q("Someone skates with us. Waddle waddle!","뒤뚱뒤뚱! 누가 같이 타요.","Who is it?","⛸️","penguin","lion"),
+        Q("Whee! We spin and spin!","빙글빙글 돌아요!","Are you happy?","😆","yes","no"),
+        Q("Oops! The penguin falls down.","앗! 펭귄이 넘어졌어요.","Which way? Up or down?","🐧","down","up")]),
+      E('Snowball Fun','눈싸움',[
+        Q("Let's make snowballs!","눈뭉치를 만들어요!","How many snowballs?","n3:⚪","three","one"),
+        Q("Throw it! Who gets hit? Ha ha!","던져요! 누가 맞았을까요? 하하!","Who is it?","🤴","king","fish"),
+        Q("The King throws one back!","왕도 던졌어요!","What do we say?","❄️","snowball","hot"),
+        Q("Brr, my hands are cold.","손이 너무 차가워요.","What do I wear?","🥶","gloves","socks")]),
+      E('Warm Inside','따뜻한 성 안',[
+        Q("We go inside the castle.","성 안으로 들어가요.","What makes us warm?","🏰","fire","ice"),
+        Q("Let's drink something warm.","따뜻한 걸 마셔요.","What do we drink?","☕","milk","pizza"),
+        Q("Yum! Something sweet!","냠! 달콤한 걸 먹어요!","What do we eat?","🍽️","cookie","shoe"),
+        Q("It is time for bed.","잘 시간이에요.","Good... ?","🌙","night","morning")]),
+      E('Snow Animals','눈 속 동물 친구',[
+        Q("Someone big and white lives in the snow.","크고 하얀 동물이 눈 속에 살아요.","Who is it?","🏔️","bear","fish"),
+        Q("Someone hops in the snow. Hop hop!","깡충깡충 뛰는 친구가 있어요.","Who is it?","❄️","rabbit","whale"),
+        Q("Someone says hoot hoot at night.","밤에 부엉부엉 우는 친구가 있어요.","Who is it?","🌙","owl","cow"),
+        Q("Look at the penguins!","펭귄들을 봐요!","How many penguins?","n2:🐧","two","five")]),
     ]},
-  { id:'sea', en:'Under the Sea', ko:'코랄 공주의 바닷속 생일', friend:'🐢', fx:{ch:'○',mode:'rise'},
+  { id:'sea', group:'play', en:'Under the Sea', ko:'코랄 공주의 바닷속 이야기', friend:'🐢', fx:{ch:'○',mode:'rise'},
     bg:'linear-gradient(180deg,#5FD0EE 0%,#2C9BD1 60%,#1F7DB5 100%)',
     p:{name:'Princess Coral', skin:'#FBDCC8', hair:'#F28DB2', hairDark:'#D96C96', dress:'#8F7CF0', accent:'#FFD95A', eye:'#5A3E2B', crown:'#FFD95A', tail:true},
-    hi:"Hi! I'm Princess Coral. I live in the sea. Today is my birthday!",
-    bye:"What a happy birthday! Thank you, friend! Bye-bye!",
-    qs:[
-      {q:"Who swims with me in the sea?", prop:'🌊', a:0, c:[
-        {w:'Fish', e:'🐠', k:['fish','fishy','fishes','fis','fist','fist']},
-        {w:'Dog', e:'🐶', k:['dog','dogs','doggy','dock','duck']}]},
-      {q:"It's my birthday! What do we eat?", prop:'🎉', a:0, c:[
-        {w:'Cake', e:'🎂', k:['cake','cakes','kick','take','kate','cape','k']},
-        {w:'Shoe', e:'👟', k:['shoe','shoes','show','sue']}]},
-      {q:"How many shells? Let's count!", prop:{n:3,e:'🐚'}, a:1, c:[
-        {w:'One', num:'1', k:['one','1','won','want','wan']},
-        {w:'Three', num:'3', k:['three','3','tree','trees','free','sree','through','thee']}]},
-      {q:"What color is my tail?", prop:'🧜‍♀️', a:0, c:[
-        {w:'Purple', col:'#8F7CF0', k:['purple','people','purpl','popple','purple purple']},
-        {w:'Green', col:'#2FC7A0', k:['green','grin','grain','greene','greens','grim']}]},
+    hi:"Hi! I'm Princess Coral. I live in the sea!", bye:"Thank you, friend! Bye-bye!",
+    eps:[
+      E('My Birthday','코랄 공주의 생일',[
+        Q("Today is my birthday!","오늘은 코랄 공주의 생일이에요!","Who swims with me?","🌊","fish","dog"),
+        Q(null,null,"What do we eat?","🎉","cake","shoe"),
+        Q(null,null,"How many shells? Let's count!","n3:🐚","three","one"),
+        Q(null,null,"What color is my tail?","🧜‍♀️","purple","green")]),
+      E('Sea Friends','바다 친구들',[
+        Q("Someone has eight long legs.","다리가 여덟 개인 친구가 있어요.","Who is it?","🌊","octopus","dog"),
+        Q("Someone is very, very big.","아주 아주 큰 친구가 있어요.","Who is it?","🌊","whale","mouse"),
+        Q("Someone walks sideways. Click click!","옆으로 걷는 친구가 있어요.","Who is it?","🏖️","crab","horse"),
+        Q("Someone jumps out of the water!","물 위로 뛰어오르는 친구가 있어요!","Who is it?","🌊","dolphin","cow")]),
+      E('Treasure Hunt','보물 찾기',[
+        Q("Look! A treasure box!","보물 상자를 찾았어요!","What opens it?","🧰","key","banana"),
+        Q("Something shines inside!","안에서 반짝반짝 빛나요!","What is it?","✨","ring","socks"),
+        Q("Sea stars are all around.","불가사리가 가득해요.","How many stars?","n4:⭐","four","one"),
+        Q("The treasure is shiny gold.","보물이 금빛으로 반짝여요.","What color is it?","💰","yellow","black")]),
+      E('Sea Garden','바닷속 정원',[
+        Q("I have a garden under the sea.","바닷속에 정원이 있어요.","What grows in my garden?","🪸","flower","car"),
+        Q("Someone is very slow.","아주 느린 친구가 있어요.","Who is it?","🌿","turtle","rabbit"),
+        Q("Look around!","주위를 봐요!","What color is the sea?","🌊","blue","red"),
+        Q("Bubbles go... ?","방울이 어디로 갈까요?","Up or down?","🫧","up","down")]),
+      E('Sea Concert','바닷속 음악회',[
+        Q("Let's have a concert!","음악회를 열어요!","What do we do?","🎤","sing","sleep"),
+        Q("Boom boom boom!","둥둥둥!","What do we play?","🎶","drum","fork"),
+        Q("Fish come to dance.","물고기들이 춤추러 왔어요.","How many fish?","n3:🐠","three","two"),
+        Q("Everyone claps!","모두 박수를 쳐요!","Are you happy?","👏","yes","no")]),
     ]},
-  { id:'unicorn', en:'Rainbow Meadow', ko:'로지 공주와 유니콘', friend:'🦄', fx:{ch:'✦',mode:'fall'},
+  { id:'unicorn', group:'play', en:'Rainbow Meadow', ko:'로지 공주와 유니콘', friend:'🦄', fx:{ch:'✦',mode:'fall'},
     bg:'linear-gradient(180deg,#FFC7E4 0%,#FFE7F2 55%,#FFF6DA 100%)',
     p:{name:'Princess Rosie', skin:'#F6D2B8', hair:'#8A5534', hairDark:'#6A3D22', dress:'#FF8FC4', accent:'#FFE1F0', eye:'#4E7A3A', crown:'#FFD95A'},
-    hi:"Hello! I'm Princess Rosie. This is my unicorn, Sunny!",
-    bye:"Sunny is so happy! Thank you, friend! Bye-bye!",
-    qs:[
-      {q:"Look at the sky! What do you see?", prop:'🌈', a:0, c:[
-        {w:'Rainbow', e:'🌈', k:['rainbow','rainbows','rain','bow','raymbo','reinbow']},
-        {w:'Moon', e:'🌙', k:['moon','moo','noon','mood']}]},
-      {q:"Sunny is hungry. What does she eat?", prop:'🦄', a:0, c:[
-        {w:'Apple', e:'🍎', k:['apple','apples','happle','appo','apo','appa']},
-        {w:'Pencil', e:'✏️', k:['pencil','pencils','pensil']}]},
-      {q:"What color is my dress?", prop:'👗', a:0, c:[
-        {w:'Pink', col:'#FF8FC4', k:['pink','ping','pinky','think','pin']},
-        {w:'Blue', col:'#4D8DF0', k:['blue','blew','boo','bloo','glue']}]},
-      {q:"Let's dance together! Are you happy?", prop:'💃', a:0, c:[
-        {w:'Yes!', e:'😊', k:['yes','yeah','yep','yay','ya','yess','yea','yup','yes yes']},
-        {w:'No', e:'😢', k:['no','nope','nah']}]},
+    hi:"Hello! I'm Princess Rosie. This is my unicorn, Sunny!", bye:"Sunny is so happy! Thank you, friend! Bye-bye!",
+    eps:[
+      E('Hello, Sunny','안녕, 써니',[
+        Q(null,null,"Look at the sky! What do you see?","🌈","rainbow","moon"),
+        Q(null,null,"Sunny is hungry. What does she eat?","🦄","apple","fork"),
+        Q(null,null,"What color is my dress?","👗","pink","blue"),
+        Q(null,null,"Let's dance together! Are you happy?","💃","yes","no")]),
+      E('Unicorn Ride','유니콘 타기',[
+        Q("Let's go for a ride!","함께 달려요!","Who do I ride?","🌸","unicorn","pig"),
+        Q("Sunny runs and runs!","써니가 달리고 또 달려요!","Is she fast or slow?","💨","fast","slowp"),
+        Q("We fly up, up, up!","하늘 높이 날아가요!","What do we fly over?","☁️","rainbow","car"),
+        Q("Sunny is thirsty.","써니가 목이 말라요.","What does she drink?","🦄","water","pizza")]),
+      E('Butterfly Friends','나비 친구들',[
+        Q("Someone flies on the flowers.","꽃 위를 날아다니는 친구가 있어요.","Who is it?","🌼","butterfly","pig"),
+        Q("Buzz, buzz!","윙윙!","Who says buzz?","🌻","bee","dog"),
+        Q("Look at all the butterflies!","나비들을 봐요!","How many?","n3:🦋","three","one"),
+        Q("The bee likes this flower.","벌이 이 꽃을 좋아해요.","What color is it?","🌼","yellow","blue")]),
+      E('Rainy Day','비 오는 날',[
+        Q("Pitter patter!","토독토독!","What falls from the sky?","☁️","rain","candy"),
+        Q("We don't want to get wet.","젖으면 안 돼요.","What do we use?","🌧️","umbrella","fork"),
+        Q("Splash! Puddles!","첨벙! 물웅덩이예요!","What do we wear on our feet?","💦","boots","gloves"),
+        Q("The sun comes out!","해가 나왔어요!","What do we see?","☀️","rainbow","moon")]),
+      E('Tea Party','티 파티',[
+        Q("Let's have a tea party!","티 파티를 열어요!","What do we drink?","🫖","tea","shoe"),
+        Q("Something sweet is on the plate.","접시에 달콤한 게 있어요.","What do we eat?","🍽️","cookie","socks"),
+        Q("Someone with a horn comes!","뿔이 있는 친구가 왔어요!","Who is it?","🌈","unicorn","whale"),
+        Q("Sunny gives me a flower.","써니가 꽃을 줬어요.","What do we say?","🌸","thankyou","bye")]),
     ]},
-  { id:'dino', en:'Dino Egg', ko:'릴리 공주와 아기 공룡', friend:'🌴', fx:{ch:'❀',mode:'fall'},
+  { id:'dino', group:'play', en:'Dino Egg', ko:'릴리 공주와 아기 공룡', friend:'🌴', fx:{ch:'❀',mode:'fall'},
     bg:'linear-gradient(180deg,#BFEFB4 0%,#E6F9D6 60%,#FFF4C9 100%)',
     p:{name:'Princess Lily', skin:'#EBC3A2', hair:'#2E2433', hairDark:'#1B1520', dress:'#FFCF3F', accent:'#FFF0B8', eye:'#3B2A1E', crown:'#FFD95A'},
-    hi:"Hi! I'm Princess Lily. I found a big egg in my garden!",
-    bye:"Good night, little dino! Thank you, friend! Bye-bye!",
-    qs:[
-      {q:"Crack, crack! What is inside the egg?", prop:'🥚', a:0, c:[
-        {w:'Dinosaur', e:'🦕', k:['dinosaur','dinosaurs','dino','dyno','diner','die no','dinah','dina','dino saur']},
-        {w:'Car', e:'🚗', k:['car','cars','ca','call','cart']}]},
-      {q:"Baby dino says roar! Can you say roar?", prop:'🦖', a:0, c:[
-        {w:'Roar!', e:'🦖', k:['roar','rawr','raw','roll','row','war','wore','ror','rar','road','raah','rah','ra']},
-        {w:'Moo', e:'🐮', k:['moo','mu','move','mooo']}]},
-      {q:"Baby dino is little. Is he big or small?", prop:'🐣', a:1, c:[
-        {w:'Big', e:'🐘', k:['big','pig','bick','bigg']},
-        {w:'Small', e:'🐭', k:['small','smaller','smol','smoll','mall','small small','smile']}]},
-      {q:"Dino is sleepy. Let's say good... ?", prop:'😴', a:0, c:[
-        {w:'Night', e:'🌙', k:['night','nite','knight','nights','nigh','good night','goodnight']},
-        {w:'Morning', e:'☀️', k:['morning','mourning','morn']}]},
+    hi:"Hi! I'm Princess Lily. I have a baby dino!", bye:"Thank you, friend! Bye-bye!",
+    eps:[
+      E('The Big Egg','커다란 알',[
+        Q("I found a big egg in my garden!","정원에서 커다란 알을 찾았어요!","Crack, crack! What is inside?","🥚","dino","car"),
+        Q(null,null,"Baby dino says roar! Can you say roar?","🦖","roar","moo"),
+        Q(null,null,"Baby dino is little. Is he big or small?","🐣","small","big"),
+        Q(null,null,"Dino is sleepy. Let's say good... ?","😴","night","morning")]),
+      E('Dino Breakfast','공룡의 아침밥',[
+        Q("Baby dino is hungry!","아기 공룡이 배고파요!","What does he eat?","🦕","leaf","shoe"),
+        Q("He is thirsty too.","목도 말라요.","What does he drink?","🦕","water","pizza"),
+        Q("Now a big fruit!","이번엔 커다란 과일!","What is it?","🍽️","watermelon","car"),
+        Q("Is his tummy full now?","이제 배부를까요?","Yes or no?","😋","yes","no")]),
+      E('Dino Walk','공룡과 산책',[
+        Q("Stomp, stomp! Baby dino grew!","쿵쿵! 아기 공룡이 자랐어요!","Is he big or small now?","🦕","big","small"),
+        Q("We walk in the forest.","숲속을 걸어요.","What do we see?","🌴","tree","boat"),
+        Q("Splash! Dino jumps in!","첨벙! 공룡이 뛰어들었어요!","What is it?","💦","water","bed"),
+        Q("Dino is tired now.","공룡이 지쳤어요.","What does he do?","🌙","sleep","dance")]),
+      E('Dino Friends','공룡의 친구들',[
+        Q("Someone flies in the sky. Tweet tweet!","짹짹! 하늘을 나는 친구가 있어요.","Who is it?","☁️","bird","fish"),
+        Q("Dino meets a slow friend.","느린 친구를 만났어요.","Who is it?","🌿","turtle","lion"),
+        Q("Let's play together!","같이 놀아요!","What do we kick?","🦕","ball","cake"),
+        Q("Dino is happy! Can you say roar?","공룡이 신났어요!","Roar!","🦖","roar","moo")]),
+      E('Dino Bath','공룡 목욕',[
+        Q("Dino played in the mud!","공룡이 진흙에서 놀았어요!","Is he clean or dirty?","🦕","dirty","clean"),
+        Q("What does he need?","무엇이 필요할까요?","A bath or candy?","🛁","bath","candy"),
+        Q("Scrub, scrub, scrub!","뽀득뽀득 씻어요!","What do we use?","🫧","soap","fork"),
+        Q("All done!","다 씻었어요!","Now he is... ?","✨","clean","dirty")]),
     ]},
-  { id:'kitten', en:'Kitten Garden', ko:'벨라 공주와 아기 고양이', friend:'🐈', fx:{ch:'✿',mode:'fall'},
+  { id:'kitten', group:'play', en:'Kitten Garden', ko:'벨라 공주와 아기 고양이', friend:'🐈', fx:{ch:'✿',mode:'fall'},
     bg:'linear-gradient(180deg,#E3D2FF 0%,#F4E9FF 55%,#FFE6F1 100%)',
     p:{name:'Princess Bella', skin:'#FCE0CF', hair:'#F2A53A', hairDark:'#D6861E', dress:'#B595F0', accent:'#EFE4FF', eye:'#3F7E9C', crown:'#FFD95A'},
-    hi:"Hello! I'm Princess Bella. Come and see my kittens!",
-    bye:"The kittens love you! Thank you, friend! Bye-bye!",
-    qs:[
-      {q:"What does a kitten say?", prop:'🐱', a:0, c:[
-        {w:'Meow', e:'🐱', k:['meow','mew','miaow','meo','mio','mao','miao','me ow','meow meow','mow','now']},
-        {w:'Woof', e:'🐶', k:['woof','wolf','woo','roof','wuf']}]},
-      {q:"How many kittens? Let's count!", prop:{n:3,e:'🐱'}, a:1, c:[
-        {w:'Two', num:'2', k:['two','2','to','too','tu']},
-        {w:'Three', num:'3', k:['three','3','tree','trees','free','sree','through','thee']}]},
-      {q:"The kittens are thirsty. What do they drink?", prop:'🐾', a:0, c:[
-        {w:'Milk', e:'🥛', k:['milk','milky','melk','mil','milks','mick']},
-        {w:'Pizza', e:'🍕', k:['pizza','pizzas','peter']}]},
-      {q:"Let's pick a flower! What color is it?", prop:'🌼', a:0, c:[
-        {w:'Yellow', col:'#FFD23F', k:['yellow','yello','yell','jello','mellow','hello','yeah low']},
-        {w:'Purple', col:'#9B6BE8', k:['purple','people','purpl','popple']}]},
+    hi:"Hello! I'm Princess Bella. Come and see my kittens!", bye:"The kittens love you! Thank you, friend! Bye-bye!",
+    eps:[
+      E('My Kittens','나의 아기 고양이',[
+        Q(null,null,"What does a kitten say?","🐱","meow","woof"),
+        Q(null,null,"How many kittens? Let's count!","n3:🐱","three","two"),
+        Q(null,null,"The kittens are thirsty. What do they drink?","🐾","milk","pizza"),
+        Q(null,null,"Let's pick a flower! What color is it?","🌼","yellow","purple")]),
+      E('Lost Kitten','길 잃은 고양이',[
+        Q("Oh no! One kitten is missing!","앗! 고양이 한 마리가 없어졌어요!","Where is he? Look up!","🌳","tree","boat"),
+        Q("Let's call him. Here, kitty!","불러 봐요. 야옹아!","What does he say?","🐱","meow","moo"),
+        Q("He comes down!","내려왔어요!","Let's give him a... ?","🐱","hug","run"),
+        Q("Now everyone is here.","이제 모두 모였어요.","How many kittens?","n3:🐱","three","one")]),
+      E('Ball Game','공놀이',[
+        Q("The kittens find something round.","고양이들이 동그란 걸 찾았어요.","What is it?","🐾","ball","spoon"),
+        Q("Look at the ball.","공을 봐요.","What color is it?","🔴","red","green"),
+        Q("They roll and play!","데굴데굴 놀아요!","What do they do?","🐱","jump","sleep"),
+        Q("Now they are tired.","이제 졸려요.","Good... ?","😴","night","morning")]),
+      E('Kitten Bath','고양이 목욕',[
+        Q("The kittens are dirty!","고양이들이 지저분해요!","What do they need?","🐾","bath","candy"),
+        Q("Do kittens like water?","고양이는 물을 좋아할까요?","Yes or no?","💦","no","yes"),
+        Q("Let's brush their fur.","털을 빗겨 줘요.","What do we use?","🐱","hairbrush","fork"),
+        Q("All done! They are... ?","다 했어요!","Clean or dirty?","✨","clean","dirty")]),
+      E('Garden Picnic','정원 소풍',[
+        Q("We have a picnic!","소풍을 가요!","What do we carry?","🌳","basket","car"),
+        Q("Kittens are hungry.","고양이들이 배고파요.","What do kittens like?","🐱","fish","carrot"),
+        Q("Someone pretty flies by!","예쁜 친구가 날아왔어요!","Who is it?","🌸","butterfly","bear"),
+        Q("Princess Bella gives you a cookie.","벨라 공주가 쿠키를 줬어요.","What do we say?","🍪","thankyou","bye")]),
     ]},
 ];
-STORIES.unshift(...CLASSICS);
+const STORIES = [...CLASSICS, ...PLAY];
+
 const PRAISE = ["Great job!","Wonderful!","You did it!","Super!","Yay! Well done!","Amazing!"];
 
 /* ---------------- Princess drawing (original, parametric) ---------------- */
@@ -502,25 +735,47 @@ function princessSVG(p){
 }
 
 /* ---------------- Silly villains (original) ---------------- */
-function monsterSVG(kind){
-  const col = {sleep:'#9A86D6', eat:'#86C46F', teeth:'#EE9A62'}[kind] || '#9A86D6';
+function monsterSVG(id){
+  const v = VILLAINS[id] || VILLAINS.sleep; const col = v.col;
+  const eyes = `<circle cx="46" cy="54" r="8" fill="#fff"/><circle cx="74" cy="54" r="8" fill="#fff"/><circle cx="47" cy="56" r="4" fill="#2B2340"/><circle cx="75" cy="56" r="4" fill="#2B2340"/>`;
   const face = {
     sleep:`<path d="M38 56 Q46 62 54 56 M66 56 Q74 62 82 56" stroke="#2B2340" stroke-width="4" fill="none" stroke-linecap="round"/>
       <path d="M36 64 Q46 70 56 64 M64 64 Q74 70 84 64" stroke="#5B4A8A" stroke-width="3" fill="none" stroke-linecap="round" opacity=".7"/>
       <ellipse cx="60" cy="82" rx="9" ry="11" fill="#2B2340"/>
       <text x="88" y="34" font-size="20" font-weight="800" fill="#fff" font-family="Baloo 2, sans-serif">Z</text><text x="100" y="20" font-size="14" font-weight="800" fill="#fff" font-family="Baloo 2, sans-serif">z</text>`,
-    eat:`<circle cx="46" cy="56" r="8" fill="#fff"/><circle cx="74" cy="56" r="8" fill="#fff"/><circle cx="47" cy="58" r="4" fill="#2B2340"/><circle cx="75" cy="58" r="4" fill="#2B2340"/>
-      <path d="M50 84 Q60 76 70 84" stroke="#2B2340" stroke-width="4" fill="none" stroke-linecap="round"/>
+    eat:`${eyes}<path d="M50 84 Q60 76 70 84" stroke="#2B2340" stroke-width="4" fill="none" stroke-linecap="round"/>
       <path d="M48 98 q4 -4 8 0 q4 4 8 0 q4 -4 8 0" stroke="#3E6B2E" stroke-width="3" fill="none" stroke-linecap="round"/>`,
-    teeth:`<circle cx="46" cy="54" r="8" fill="#fff"/><circle cx="74" cy="54" r="8" fill="#fff"/><circle cx="46" cy="56" r="4" fill="#2B2340"/><circle cx="74" cy="56" r="4" fill="#2B2340"/>
-      <path d="M36 72 Q60 98 84 72 Z" fill="#7A2E3A"/>
+    teeth:`${eyes}<path d="M36 72 Q60 98 84 72 Z" fill="#7A2E3A"/>
       <rect x="44" y="72" width="9" height="9" fill="#fff"/><rect x="55" y="72" width="9" height="9" fill="#3A2A20"/><rect x="66" y="72" width="9" height="9" fill="#F2E27A"/>`,
-  }[kind] || '';
-  return `<svg class="mon" viewBox="0 0 120 120" role="img" aria-label="villain">
+    stink:`${eyes}<path d="M48 80 Q60 88 72 80" stroke="#2B2340" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <path d="M14 30 q6 -8 0 -16 M108 34 q6 -8 0 -16 M104 70 q6 -8 0 -16" stroke="#7FA83A" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <circle cx="40" cy="96" r="5" fill="#7A6A2E"/><circle cx="78" cy="92" r="4" fill="#7A6A2E"/>`,
+    mud:`${eyes}<path d="M48 80 Q60 88 72 80" stroke="#2B2340" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <ellipse cx="18" cy="84" rx="10" ry="12" fill="${col}"/><ellipse cx="102" cy="84" rx="10" ry="12" fill="${col}"/>
+      <circle cx="16" cy="82" r="5" fill="#6B4A2E"/><circle cx="104" cy="86" r="5" fill="#6B4A2E"/><circle cx="22" cy="90" r="3" fill="#6B4A2E"/>`,
+    sweet:`${eyes}<path d="M48 86 Q60 78 72 86" stroke="#2B2340" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <line x1="100" y1="96" x2="100" y2="66" stroke="#fff" stroke-width="4"/><circle cx="100" cy="58" r="12" fill="#FFD23F" stroke="#E2575F" stroke-width="4"/>
+      <circle cx="60" cy="100" r="9" fill="none" stroke="#2B2340" stroke-width="3" stroke-dasharray="4 3"/>`,
+    messy:`${eyes}<path d="M48 82 Q60 90 72 82" stroke="#2B2340" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <rect x="6" y="96" width="16" height="16" rx="3" fill="#FFD23F"/><circle cx="108" cy="104" r="8" fill="#E2575F"/><rect x="88" y="16" width="14" height="6" rx="3" fill="#4D8DF0" transform="rotate(30 95 19)"/>`,
+  }[v.face] || '';
+  return `<svg class="mon" viewBox="0 0 120 120" role="img" aria-label="${v.label} monster">
     <path d="M30 36 L24 12 L44 28 Z M90 36 L96 12 L76 28 Z" fill="${col}"/>
     <path d="M20 112 Q8 64 28 38 Q60 10 92 38 Q112 64 100 112 Q92 104 82 112 Q72 104 60 112 Q50 104 40 112 Q30 104 20 112 Z" fill="${col}"/>
     ${face}
   </svg>`;
+}
+
+/* ---------------- Which story today ---------------- */
+const DAY = Math.floor((Date.now() - new Date().getTimezoneOffset()*60000) / 86400000);
+function hashStr(t){ let h = 7; for (const ch of t) h = (h*31 + ch.charCodeAt(0)) | 0; return Math.abs(h); }
+function mulberry32(a){ return function(){ a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const SKIP = {};
+function epFor(s){
+  const k = SKIP[s.id] || 0;
+  if (s.gen) return Object.assign({idx:'d' + DAY + '-' + k}, s.gen(mulberry32(DAY*7919 + k*104729 + 1)));
+  const i = (DAY + hashStr(s.id) + k) % s.eps.length;
+  return Object.assign({idx:i}, s.eps[i]);
 }
 
 /* ---------------- Helpers ---------------- */
@@ -534,8 +789,8 @@ const ICON = {
   mic:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3" fill="#fff"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>',
   stop:'<svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="3" fill="#fff"/></svg>',
 };
-function loadDone(){ try { return JSON.parse(localStorage.getItem('ptt-stars')||'{}'); } catch { return {}; } }
-function saveDone(o){ try { localStorage.setItem('ptt-stars', JSON.stringify(o)); } catch {} }
+function loadDone(){ try { return JSON.parse(localStorage.getItem('ptt-done2')||'{}'); } catch { return {}; } }
+function saveDone(o){ try { localStorage.setItem('ptt-done2', JSON.stringify(o)); } catch {} }
 
 /* ---------------- Voice out ---------------- */
 let tts = null, synthVoice = null, runId = 0;
@@ -685,7 +940,8 @@ function renderHome(){
         ${princessSVG(s.p)}
         <span class="label"><span class="en">${esc(s.en)}</span>
         <span class="ko">${esc(s.ko)}</span></span>
-        <span class="got">${'★'.repeat(done[s.id]||0)}</span>
+        <span class="today">오늘: ${esc(epFor(s).ko)}</span>
+        <span class="got">${s.gen ? (done[s.id+'#wins'] ? '🏆 ' + done[s.id+'#wins'] + '번 이겼어요' : '매일 새로운 괴물') : '★'.repeat(s.eps.filter((_,k) => done[s.id+'#'+k]).length) + '<span class="of">' + '★'.repeat(s.eps.length - s.eps.filter((_,k) => done[s.id+'#'+k]).length) + '</span>'}</span>
       </button>`).join('')}</div>`).join('')}
     <div class="tips">
       <b>엄마 아빠께</b>
@@ -711,12 +967,12 @@ function renderEngineNote(){
 
 function startStory(i){
   runId++;
-  const s = STORIES[i]; G.story = s; G.qi = 0; G.stars = 0; G.branch = 'sleep';
+  const s = STORIES[i]; G.story = s; G.ep = epFor(s); G.qi = 0; G.stars = 0; G.branch = null;
   app.innerHTML = `<div class="screen">
     <div class="topbar gutter">
       <button class="round" id="homeBtn" aria-label="처음으로">${ICON.home}</button>
-      <div class="name">${esc(s.p.name)}</div>
-      <div class="dots" id="dots">${s.qs.map(() => '<span>★</span>').join('')}</div>
+      <div class="name">${esc(G.ep.en)}</div>
+      <div class="dots" id="dots">${G.ep.qs.map(() => '<span>★</span>').join('')}</div>
     </div>
     <div class="stage gutter" id="stage" style="background:${s.bg}">
       <button class="bubble" id="bubble"><span class="ear">${ICON.ear}</span><span class="btxt"><span id="bubbleText"></span><small id="koText" hidden></small></span></button>
@@ -761,7 +1017,7 @@ function choiceHTML(c){
 }
 
 async function askQuestion(first){
-  const s = G.story; const raw = s.qs[G.qi]; const q = raw.by ? raw.by[G.branch] : raw; G.q = q; G.tries = 0; G.busy = false; G.pick = -1;
+  const s = G.story; const raw = G.ep.qs[G.qi]; const q = raw.by ? raw.by[G.branch] : raw; G.q = q; G.tries = 0; G.busy = false; G.pick = -1;
   G.order = shuffle(q.c.map((_,i) => i));
   $('#bubbleText').textContent = q.q; $('#koText').hidden = true;
   const prop = $('#prop');
@@ -773,9 +1029,10 @@ async function askQuestion(first){
   setStatus(''); updatePass();
   if (first) {
     const my = ++runId;
-    $('#bubbleText').textContent = s.hi;
+    const hi = G.ep.hi || s.hi;
+    $('#bubbleText').textContent = hi;
     setMic('wait');
-    await say(s.hi);
+    await say(hi);
     if (my !== runId) return;
   }
   if (q.n){
@@ -901,7 +1158,7 @@ async function success(byParent){
   await wait(500);
   if (my !== runId) return;
   G.qi++; G.lastTap = -1;
-  if (G.qi < G.story.qs.length) askQuestion(false);
+  if (G.qi < G.ep.qs.length) askQuestion(false);
   else finishStory();
 }
 
@@ -918,20 +1175,22 @@ function burst(el){
 
 async function finishStory(){
   const s = G.story; const my = ++runId;
-  const done = loadDone(); done[s.id] = Math.max(done[s.id]||0, G.stars); saveDone(done);
+  const done = loadDone();
+  if (s.gen) done[s.id+'#wins'] = (done[s.id+'#wins']||0) + 1; else done[s.id+'#'+G.ep.idx] = 1;
+  saveDone(done);
   const ov = document.createElement('div'); ov.className = 'overlay';
   ov.innerHTML = `<div class="done">
     <div class="princess-wrap">${princessSVG(s.p)}</div>
     <h2>You did it!</h2>
     <div class="big-stars">${'★'.repeat(G.stars)}</div>
-    <div class="ko">${esc(s.ko)} 이야기를 끝냈어요!</div>
-    <div class="btns"><button class="btn" id="again">Again</button><button class="btn alt" id="toHome">Home</button></div>
+    <div class="ko">“${esc(G.ep.ko)}” 이야기를 끝냈어요!</div>
+    <div class="btns"><button class="btn" id="again">Next story</button><button class="btn alt" id="toHome">Home</button></div>
   </div>`;
   app.appendChild(ov);
   const idx = STORIES.indexOf(s);
-  $('#again').onclick = () => startStory(idx);
+  $('#again').onclick = () => { SKIP[s.id] = (SKIP[s.id]||0) + 1; startStory(idx); };
   $('#toHome').onclick = renderHome;
-  await say(s.bye);
+  await say(G.ep.bye || s.bye);
 }
 
 renderHome();
