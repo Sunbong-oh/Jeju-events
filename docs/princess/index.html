@@ -9,7 +9,7 @@
 <title>Princess Talk Time</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Jua&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Cinzel:wght@700;900&family=Jua&display=swap">
 <style>
 :root{
   /* Layout: one-screen storybook stage. Princess and speech bubble on top, big picture cards and a mic button below. Single bright look by choice. */
@@ -145,6 +145,62 @@ button:focus-visible{outline:4px solid var(--gold);outline-offset:3px}
   *,*::before,*::after{animation-duration:0s!important;animation-iteration-count:1!important;transition:none!important}
   .particle{display:none}
 }
+
+/* ===== Royal storybook theme: deep indigo, ivory and gold ===== */
+:root{--ink:#2A2350;--ink-soft:#655C8C;--paper:#FFFBF2;--lilac:#F3ECFA;--line:#E8D9B0;--rose:#D9345F;--rose-deep:#A81E44;--gold:#F0B429;--gold-deep:#B9820F;--navy:#1F1B4D;--mint:#1FA37E;
+  --font-title:'Cinzel','Baloo 2',Georgia,serif}
+body{background:var(--navy)}
+.home{background:radial-gradient(circle at 50% -10%,#4A3F9A 0,transparent 55%),linear-gradient(180deg,#1F1B4D,#2D2466 60%,#3A2A6B)}
+.hero{position:relative;border-radius:28px;overflow:hidden;border:4px solid var(--gold);box-shadow:0 0 0 2px var(--gold-deep),0 14px 30px rgba(0,0,0,.4);aspect-ratio:21/9;min-height:190px;max-height:360px;width:100%;background:linear-gradient(180deg,#5B6FD6,#B28AE0)}
+.hero img{width:100%;height:100%;object-fit:cover;object-position:50% 35%;display:block}
+.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(20,14,50,.82))}
+.hero-text{position:absolute;left:0;right:0;bottom:0;z-index:1;padding:12px 16px 14px;display:grid;gap:4px}
+.home h1{font-family:var(--font-title);font-weight:900;letter-spacing:.02em;font-size:clamp(28px,6.2vw,60px);line-height:1.05;background:linear-gradient(180deg,#FFF6C8,#F0B429 55%,#D0921A);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:none;filter:drop-shadow(0 2px 1px rgba(0,0,0,.5))}
+.home .sub{color:#F6EBD0;font-size:clamp(16px,2.6vw,22px)}
+.sec{color:#FFE9A8;font-family:var(--font-title);font-size:24px}
+.sec small{color:#D9CFF2}
+.sec::after{content:"";flex:1;height:2px;align-self:center;background:linear-gradient(90deg,var(--gold),transparent)}
+.story{background:var(--paper);border:3px solid var(--gold);border-radius:26px;box-shadow:0 0 0 2px var(--gold-deep),0 8px 0 rgba(0,0,0,.28);padding:8px 8px 12px}
+.story:active{box-shadow:0 0 0 2px var(--gold-deep),0 3px 0 rgba(0,0,0,.28)}
+.story .arch{display:block;position:relative;width:100%;aspect-ratio:1/1.08;border-radius:999px 999px 16px 16px;overflow:hidden;border:3px solid var(--gold);box-shadow:inset 0 0 0 2px rgba(255,255,255,.6)}
+.story .arch .scene{position:absolute;inset:0;width:100%;height:100%;max-width:none}
+.story .arch .princess{position:absolute;left:50%;bottom:-3%;transform:translateX(-50%);height:86%;width:auto;max-width:none;filter:drop-shadow(0 4px 6px rgba(31,27,77,.3))}
+.story .label{background:none;padding:6px 4px 0}
+.story .en{font-family:var(--font-title);font-weight:700;font-size:18px;color:var(--ink)}
+.story .today{background:#F6EBD0;border:1px solid var(--line)}
+.story .got{color:var(--gold-deep);text-shadow:none}
+.story .got .of{color:#E6DCC4}
+.tips{background:var(--paper);border:2px solid var(--gold)}
+.tips .engine{background:#F6EBD0}
+.topbar{background:linear-gradient(180deg,#2B2466,var(--navy));color:#FFE9A8;border-bottom:3px solid var(--gold)}
+.topbar .name{font-family:var(--font-title);font-weight:700;font-size:20px}
+.round{background:var(--paper);border-color:var(--gold)}
+.dots span{color:rgba(255,255,255,.22)}
+.dots span.on{color:var(--gold);text-shadow:0 0 8px rgba(255,210,63,.8)}
+.stage::after{display:none}
+.stage .scene{position:absolute;inset:0;width:100%;height:100%;z-index:0}
+.bubble{background:var(--paper);border:3px solid var(--gold);box-shadow:0 0 0 1.5px var(--gold-deep),0 7px 0 rgba(31,27,77,.28)}
+.bubble::after{border-top-color:var(--gold)}
+.bubble .ear{background:#F6EBD0}
+.princess-wrap .princess{filter:drop-shadow(0 8px 10px rgba(31,27,77,.28))}
+.prop{filter:drop-shadow(0 6px 8px rgba(31,27,77,.25))}
+.friend{filter:drop-shadow(0 4px 5px rgba(31,27,77,.3))}
+.choices{background:var(--paper);border-top:3px solid var(--gold)}
+.dock{background:var(--paper)}
+.choice{border:3px solid var(--line);box-shadow:0 6px 0 var(--line);background:linear-gradient(180deg,#fff,#FFF8EA)}
+.choice.reading{border-color:var(--gold);box-shadow:0 10px 0 #E8C66A,0 0 0 4px rgba(240,180,41,.25)}
+.choice.correct{box-shadow:0 6px 0 #A9DCC8}
+.mic{background:radial-gradient(circle at 35% 28%,#FF8FAD,var(--rose) 55%,var(--rose-deep));box-shadow:0 0 0 4px var(--gold),0 0 0 6px var(--gold-deep),0 9px 0 rgba(31,27,77,.3)}
+.mic.listening{background:radial-gradient(circle at 35% 28%,#FFB0C4,#F04372 55%,#B01A44)}
+.mic:disabled{background:#D8CFE6;box-shadow:0 0 0 4px #E8D9B0,0 9px 0 rgba(31,27,77,.15)}
+.mic.ready::before,.mic.listening::before{inset:-14px;border-color:var(--gold)}
+.pass{background:#fff;border:2px dashed var(--gold-deep)}
+.particle{text-shadow:0 0 8px rgba(255,236,170,.9)}
+.overlay{background:rgba(24,18,60,.7)}
+.done{background:var(--paper);border:4px solid var(--gold);box-shadow:0 0 0 2px var(--gold-deep),0 20px 40px rgba(0,0,0,.4)}
+.done h2{font-family:var(--font-title);font-weight:900;font-size:38px;color:var(--gold-deep)}
+.btn{background:linear-gradient(180deg,#EC5A80,var(--rose-deep));box-shadow:0 5px 0 #7A1230}
+.btn.alt{background:#F6EBD0;box-shadow:0 5px 0 var(--line)}
 </style>
 
 <div id="app"></div>
@@ -475,7 +531,7 @@ function buildBattle(rng){
   const place = pick(BATTLE.places), st = pick(BATTLE.strong), mg = pick(BATTLE.magic);
   const by = f => Object.fromEntries(ids.map(id => [id, f(VILLAINS[id])]));
   return E(place[2], place[3], [
-    {n:place[0], ko:place[1], q:"Who should we beat today?", open:true, prop:'⚔️', a:0,
+    {n:place[0], ko:place[1], q:"The dark witch sent three monsters! Who should we beat today?", open:true, prop:'⚔️', a:0,
      c:ids.map(id => ({w:VILLAINS[id].label, m:id, branch:id, k:VILLAINS[id].k}))},
     {by:by(v => Q(v.n, v.ko, v.q, 'mon', v.s[0], v.s[1]))},
     Q(null, null, st[0], '💪', st[1], st[2]),
@@ -682,86 +738,187 @@ const STORIES = [...CLASSICS, ...PLAY];
 const PRAISE = ["Great job!","Wonderful!","You did it!","Super!","Yay! Well done!","Amazing!"];
 
 /* ---------------- Princess drawing (original, parametric) ---------------- */
+const PDEFS = `<defs>
+  <linearGradient id="pgVol" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity=".4"/><stop offset=".45" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#1B1240" stop-opacity=".24"/></linearGradient>
+  <linearGradient id="pgGold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFF4B8"/><stop offset=".5" stop-color="#F5C542"/><stop offset="1" stop-color="#C98A12"/></linearGradient>
+  <linearGradient id="pgIce" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F2FDFF"/><stop offset="1" stop-color="#7CCBF2"/></linearGradient>
+  <linearGradient id="pgHair" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".32"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".16"/></linearGradient>
+  <radialGradient id="pgSkin" cx=".38" cy=".32" r=".8"><stop offset="0" stop-color="#fff" stop-opacity=".4"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+</defs>`;
 function princessSVG(p){
+  const SK = 'M84 160 Q40 200 34 252 Q100 268 166 252 Q160 200 116 160 Z';
+  const TL = 'M80 150 Q70 196 90 226 Q95 238 80 258 Q96 254 100 244 Q104 254 120 258 Q105 238 110 226 Q130 196 120 150 Z';
+  const spark = (x,y,r) => `<path d="M${x} ${y-r} L${x+r*.3} ${y-r*.3} L${x+r} ${y} L${x+r*.3} ${y+r*.3} L${x} ${y+r} L${x-r*.3} ${y+r*.3} L${x-r} ${y} L${x-r*.3} ${y-r*.3} Z" fill="#fff" opacity=".9"/>`;
   const body = p.tail
-    ? `<path d="M80 150 Q70 196 90 226 Q95 238 80 258 Q96 254 100 244 Q104 254 120 258 Q105 238 110 226 Q130 196 120 150 Z" fill="${p.dress}"/>
-       <path d="M86 186 Q100 192 114 186 M88 204 Q100 210 112 204" stroke="rgba(255,255,255,.55)" stroke-width="3" fill="none" stroke-linecap="round"/>
-       <circle cx="90" cy="150" r="9" fill="${p.accent}"/><circle cx="110" cy="150" r="9" fill="${p.accent}"/>`
-    : `<path d="M82 150 L118 150 L152 250 Q100 264 48 250 Z" fill="${p.dress}" stroke="rgba(59,42,92,.15)" stroke-width="2"/>
-       <path d="M60 238 Q100 250 140 238" stroke="${p.accent}" stroke-width="6" fill="none" stroke-linecap="round"/>
-       <path d="M82 140 Q100 135 118 140 L119 168 Q100 174 81 168 Z" fill="${p.accent}"/>
-       <circle cx="100" cy="156" r="5" fill="${p.crown}"/>`;
-  const back = (p.cape ? `<path d="M74 140 Q30 200 26 262 L174 262 Q170 200 126 140 Z" fill="${p.cape}" opacity=".9"/>
-       <path d="M60 200 l4 -6 l4 6 l-4 6z M140 214 l4 -6 l4 6 l-4 6z M96 240 l4 -6 l4 6 l-4 6z" fill="#fff" opacity=".8"/>` : '')
-    + (p.veil ? `<path d="M56 60 Q20 160 30 262 L170 262 Q180 160 144 60 Z" fill="#FFFFFF" opacity=".75" stroke="#F3D6E8" stroke-width="2"/>` : '');
+    ? `<path d="${TL}" fill="${p.dress}"/><path d="${TL}" fill="url(#pgVol)"/>
+       <path d="M84 176 q5 6 10 0 q5 6 10 0 q5 6 10 0 M86 194 q5 6 9 0 q5 6 9 0 q5 6 9 0 M90 212 q5 5 10 0 q5 5 10 0" stroke="rgba(255,255,255,.6)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+       <path d="M82 152 Q100 160 118 152" stroke="url(#pgGold)" stroke-width="4" fill="none" stroke-linecap="round"/>
+       <circle cx="90" cy="148" r="9" fill="${p.accent}"/><circle cx="110" cy="148" r="9" fill="${p.accent}"/>
+       <path d="M84 148 h12 M104 148 h12 M90 142 v12 M110 142 v12" stroke="rgba(0,0,0,.14)" stroke-width="1.5"/>`
+    : `<path d="${SK}" fill="${p.dress}" stroke="rgba(42,35,80,.16)" stroke-width="2"/>
+       <path d="M94 162 Q84 212 80 259 Q100 263 120 259 Q116 212 106 162 Z" fill="${p.accent}" opacity=".92"/>
+       <path d="${SK}" fill="url(#pgVol)"/>
+       <path d="M34 252 Q100 268 166 252" stroke="url(#pgGold)" stroke-width="5" fill="none" stroke-linecap="round"/>
+       <path d="M44 236 Q60 246 78 238 M122 238 Q140 246 156 236" stroke="${p.accent}" stroke-width="3" fill="none" stroke-linecap="round" opacity=".9"/>
+       ${spark(58,214,4)}${spark(142,206,3.5)}${spark(70,240,3)}${spark(132,236,3)}
+       <circle cx="79" cy="146" r="11" fill="${p.dress}"/><circle cx="121" cy="146" r="11" fill="${p.dress}"/>
+       <circle cx="79" cy="146" r="11" fill="url(#pgVol)"/><circle cx="121" cy="146" r="11" fill="url(#pgVol)"/>
+       <path d="M82 138 Q100 132 118 138 L116 164 Q100 170 84 164 Z" fill="${p.dress}"/>
+       <path d="M82 138 Q100 132 118 138 L116 164 Q100 170 84 164 Z" fill="url(#pgVol)"/>
+       <path d="M83 139 Q100 149 117 139" stroke="url(#pgGold)" stroke-width="3" fill="none" stroke-linecap="round"/>
+       <path d="M84 162 Q100 169 116 162" stroke="url(#pgGold)" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+       <circle cx="100" cy="166" r="4.5" fill="#E0355A" stroke="#B77A0A" stroke-width="1.5"/><circle cx="98.6" cy="164.6" r="1.3" fill="#fff"/>`;
+  const back = (p.cape ? `<path d="M74 140 Q26 200 20 262 L180 262 Q174 200 126 140 Z" fill="${p.cape}" opacity=".92"/>
+       <path d="M74 140 Q26 200 20 262 L180 262 Q174 200 126 140 Z" fill="url(#pgVol)"/>
+       ${spark(44,222,5)}${spark(158,214,4.5)}${spark(36,250,3.5)}${spark(166,246,3.5)}` : '')
+    + (p.veil ? `<path d="M56 60 Q16 160 24 262 L176 262 Q184 160 144 60 Z" fill="#FFFFFF" opacity=".78" stroke="#F3D6E8" stroke-width="2"/>` : '');
+  const gem = (x,y,r,c) => `<circle cx="${x}" cy="${y}" r="${r}" fill="${c}" stroke="#B77A0A" stroke-width="1"/><circle cx="${x-r*.3}" cy="${y-r*.3}" r="${r*.3}" fill="#fff"/>`;
   const crown = p.noCrown
     ? `<path d="M62 56 Q100 30 138 56" stroke="${p.dress}" stroke-width="6" fill="none" stroke-linecap="round"/>
        <circle cx="72" cy="48" r="7" fill="${p.crown}"/><circle cx="72" cy="48" r="3" fill="#FFD95A"/>`
     : p.queen
-    ? `<path d="M70 48 L74 10 L86 30 L93 2 L100 24 L107 2 L114 30 L126 10 L130 48 Q100 40 70 48 Z" fill="${p.crown}" stroke="#5FA8D8" stroke-width="2" stroke-linejoin="round"/>
-       <path d="M100 14 l5 9 l-5 9 l-5 -9z" fill="#fff"/><circle cx="82" cy="38" r="3" fill="#fff"/><circle cx="118" cy="38" r="3" fill="#fff"/>`
-    : `<path d="M74 46 L80 20 L91 36 L100 12 L109 36 L120 20 L126 46 Q100 40 74 46 Z" fill="${p.crown}" stroke="#E3A600" stroke-width="2" stroke-linejoin="round"/>
-       <circle cx="100" cy="34" r="4.5" fill="${p.dress}"/><circle cx="82" cy="38" r="2.5" fill="#fff"/><circle cx="118" cy="38" r="2.5" fill="#fff"/>`;
+    ? `<path d="M70 48 L74 10 L86 30 L93 2 L100 24 L107 2 L114 30 L126 10 L130 48 Q100 40 70 48 Z" fill="url(#pgIce)" stroke="#5FA8D8" stroke-width="2" stroke-linejoin="round"/>
+       <path d="M100 14 l5 9 l-5 9 l-5 -9z" fill="#fff"/>${spark(82,38,3.5)}${spark(118,38,3.5)}`
+    : `<path d="M74 46 L78 18 L90 34 L100 8 L110 34 L122 18 L126 46 Q100 39 74 46 Z" fill="url(#pgGold)" stroke="#B77A0A" stroke-width="2" stroke-linejoin="round"/>
+       <circle cx="78" cy="17" r="3" fill="#FFF4B8" stroke="#B77A0A"/><circle cx="100" cy="7" r="3.5" fill="#FFF4B8" stroke="#B77A0A"/><circle cx="122" cy="17" r="3" fill="#FFF4B8" stroke="#B77A0A"/>
+       ${gem(100,32,5,'#E0355A')}${gem(84,38,3,'#4D8DF0')}${gem(116,38,3,'#4D8DF0')}`;
   const longHair = p.longHair ? `<path d="M146 110 Q190 160 160 205 Q136 240 186 266" stroke="${p.hairDark}" stroke-width="24" fill="none" stroke-linecap="round"/>
        <path d="M146 110 Q190 160 160 205 Q136 240 186 266" stroke="${p.hair}" stroke-width="16" fill="none" stroke-linecap="round" stroke-dasharray="14 6"/>` : '';
-  return `<svg class="princess" viewBox="0 0 200 270" role="img" aria-label="${p.name}">
+  const BANG = 'M48 92 Q48 32 100 32 Q152 32 152 92 Q140 62 114 56 Q106 72 86 68 Q64 72 48 92 Z';
+  const eye = x => `<ellipse cx="${x}" cy="96" rx="10" ry="12" fill="#2B2340"/><ellipse cx="${x}" cy="99" rx="7.5" ry="8.5" fill="${p.eye}"/>
+      <ellipse cx="${x}" cy="102" rx="5" ry="4" fill="#fff" opacity=".28"/><circle cx="${x-3.5}" cy="92" r="4" fill="#fff"/><circle cx="${x+3}" cy="102" r="1.8" fill="#fff"/>
+      <path d="M${x-11} 91 Q${x} 81 ${x+11} 91" stroke="#2B2340" stroke-width="3" fill="none" stroke-linecap="round"/>`;
+  return `<svg class="princess" viewBox="0 0 200 270" role="img" aria-label="${p.name}">${PDEFS}
+    <ellipse cx="100" cy="263" rx="62" ry="6" fill="#1B1240" opacity=".16"/>
     ${back}${longHair}
-    <path d="M42 96 Q30 196 58 222 L142 222 Q170 196 158 96 Z" fill="${p.hairDark}"/>
+    <path d="M40 96 Q22 172 44 228 Q60 238 72 224 L128 224 Q140 238 156 228 Q178 172 160 96 Z" fill="${p.hairDark}"/>
     ${body}
-    <ellipse cx="70" cy="170" rx="8" ry="22" fill="${p.skin}" transform="rotate(18 70 170)"/>
-    <ellipse cx="133" cy="146" rx="8" ry="22" fill="${p.skin}" transform="rotate(-40 133 146)"/>
-    <circle cx="146" cy="130" r="8" fill="${p.skin}"/>
+    <ellipse cx="70" cy="172" rx="8" ry="22" fill="${p.skin}" transform="rotate(18 70 172)"/>
+    <ellipse cx="134" cy="146" rx="8" ry="22" fill="${p.skin}" transform="rotate(-40 134 146)"/>
+    <circle cx="147" cy="130" r="8" fill="${p.skin}"/>
     <rect x="93" y="126" width="14" height="18" rx="6" fill="${p.skin}"/>
-    <circle cx="100" cy="88" r="50" fill="${p.skin}"/>
-    <path d="M52 90 Q42 150 60 200 L72 200 Q60 150 66 100 Z" fill="${p.hair}"/>
-    <path d="M148 90 Q158 150 140 200 L128 200 Q140 150 134 100 Z" fill="${p.hair}"/>
-    <path d="M48 92 Q48 32 100 32 Q152 32 152 92 Q140 62 114 56 Q106 72 86 68 Q64 72 48 92 Z" fill="${p.hair}"/>
-    <g>
-      <ellipse cx="80" cy="96" rx="10" ry="12" fill="#2B2340"/>
-      <ellipse cx="80" cy="99" rx="7" ry="8" fill="${p.eye}"/>
-      <circle cx="76.5" cy="92" r="4" fill="#fff"/><circle cx="83" cy="102" r="1.8" fill="#fff"/>
-      <ellipse cx="120" cy="96" rx="10" ry="12" fill="#2B2340"/>
-      <ellipse cx="120" cy="99" rx="7" ry="8" fill="${p.eye}"/>
-      <circle cx="116.5" cy="92" r="4" fill="#fff"/><circle cx="123" cy="102" r="1.8" fill="#fff"/>
+    ${p.tail ? '' : `<path d="M91 135 Q100 143 109 135" stroke="url(#pgGold)" stroke-width="2" fill="none"/><circle cx="100" cy="140.5" r="2.6" fill="#E0355A" stroke="#B77A0A" stroke-width=".8"/>`}
+    <circle cx="100" cy="88" r="50" fill="${p.skin}"/><circle cx="100" cy="88" r="50" fill="url(#pgSkin)"/>
+    <path d="M52 90 Q40 150 58 204 Q66 210 72 200 Q60 150 66 100 Z" fill="${p.hair}"/>
+    <path d="M148 90 Q160 150 142 204 Q134 210 128 200 Q140 150 134 100 Z" fill="${p.hair}"/>
+    <path d="${BANG}" fill="${p.hair}"/><path d="${BANG}" fill="url(#pgHair)"/>
+    <path d="M66 54 Q98 40 132 52" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round" opacity=".38"/>
+    <g>${eye(80)}${eye(120)}
       <path d="M68 88 L64 84 M72 85 L70 80" stroke="#2B2340" stroke-width="2.5" stroke-linecap="round"/>
       <path d="M132 88 L136 84 M128 85 L130 80" stroke="#2B2340" stroke-width="2.5" stroke-linecap="round"/>
     </g>
-    <ellipse cx="66" cy="112" rx="8" ry="5" fill="#FF8FB0" opacity=".55"/>
-    <ellipse cx="134" cy="112" rx="8" ry="5" fill="#FF8FB0" opacity=".55"/>
-    <path class="m-closed" d="M91 115 Q100 123 109 115" stroke="#B5476B" stroke-width="3.2" fill="none" stroke-linecap="round"/>
+    <ellipse cx="66" cy="112" rx="9" ry="5.5" fill="#FF8FB0" opacity=".5"/>
+    <ellipse cx="134" cy="112" rx="9" ry="5.5" fill="#FF8FB0" opacity=".5"/>
+    <path class="m-closed" d="M91 115 Q100 123 109 115" stroke="#C4456E" stroke-width="3.2" fill="none" stroke-linecap="round"/>
     <ellipse class="m-open" cx="100" cy="118" rx="6.5" ry="6" fill="#B5476B"/>
     ${crown}
   </svg>`;
 }
 
+/* ---------------- Painted backdrops ---------------- */
+const SCENE = {snowwhite:'forest', sleeping:'palace', cinderella:'ball', mermaid:'sea', rapunzel:'meadow', snowqueen:'snow', battle:'dusk', wedding:'palace', snow:'snow', sea:'sea', unicorn:'meadow', dino:'forest', kitten:'meadow'};
+function castleG(x, y, k, wall='#F6EEDF', roof='#4F74C9', flag='#E0355A'){
+  const tw = (cx, h, w) => `<rect x="${cx-w/2}" y="${-h}" width="${w}" height="${h}" fill="${wall}"/><rect x="${cx}" y="${-h}" width="${w/2}" height="${h}" fill="#000" opacity=".07"/>
+    <polygon points="${cx-w/2-5},${-h} ${cx},${-h-w*1.7} ${cx+w/2+5},${-h}" fill="${roof}"/><polygon points="${cx},${-h} ${cx},${-h-w*1.7} ${cx+w/2+5},${-h}" fill="#000" opacity=".12"/>
+    <line x1="${cx}" y1="${-h-w*1.7}" x2="${cx}" y2="${-h-w*1.7-18}" stroke="#8A6A3A" stroke-width="2"/><polygon points="${cx},${-h-w*1.7-18} ${cx+16},${-h-w*1.7-13} ${cx},${-h-w*1.7-8}" fill="${flag}"/>
+    <path d="M${cx-4} ${-h+22} v-8 a4 4 0 0 1 8 0 v8 z" fill="#5E76C4" opacity=".8"/>`;
+  return `<g transform="translate(${x} ${y}) scale(${k})">
+    ${tw(-70,96,30)}${tw(70,96,30)}${tw(-34,128,24)}${tw(34,128,24)}
+    <rect x="-62" y="-66" width="124" height="66" fill="${wall}"/><rect x="0" y="-66" width="62" height="66" fill="#000" opacity=".06"/>
+    <path d="M-62 -66 h12 v-8 h12 v8 h12 v-8 h12 v8 h28 v-8 h12 v8 h12 v-8 h12 v8 h12" fill="none" stroke="${wall}" stroke-width="6"/>
+    ${tw(0,170,38)}
+    <path d="M-16 0 v-26 a16 16 0 0 1 32 0 v26 z" fill="#8A5F3A"/><path d="M0 0 v-42" stroke="#6B4628" stroke-width="2"/>
+  </g>`;
+}
+const cloudG = (x, y, k=1, o=.92) => `<g transform="translate(${x} ${y}) scale(${k})" fill="#fff" opacity="${o}"><ellipse cx="0" cy="0" rx="46" ry="20"/><ellipse cx="-30" cy="8" rx="30" ry="15"/><ellipse cx="34" cy="8" rx="34" ry="16"/><ellipse cx="8" cy="-14" rx="26" ry="18"/></g>`;
+function sceneSVG(kind){
+  const open = (id, stops) => `<svg class="scene" viewBox="0 0 800 600" preserveAspectRatio="xMidYMax slice" aria-hidden="true"><defs><linearGradient id="sky-${id}" x1="0" y1="0" x2="0" y2="1">${stops.map(([o,c]) => `<stop offset="${o}" stop-color="${c}"/>`).join('')}</linearGradient>
+    <radialGradient id="sun-${id}"><stop offset="0" stop-color="#FFF6C8" stop-opacity=".95"/><stop offset="1" stop-color="#FFF6C8" stop-opacity="0"/></radialGradient></defs><rect width="800" height="600" fill="url(#sky-${id})"/>`;
+  const flowers = cols => Array.from({length:22}, (_,i) => `<circle cx="${(i*83+37)%800}" cy="${540 + (i*29)%52}" r="${4 + i%3}" fill="${cols[i%cols.length]}"/><circle cx="${(i*83+37)%800}" cy="${540 + (i*29)%52}" r="1.6" fill="#FFE27A"/>`).join('');
+  if (kind === 'snow') return open('snow', [[0,'#8FC2F5'],[.6,'#D8ECFF'],[1,'#F6FBFF']]) + `
+    <circle cx="140" cy="110" r="150" fill="url(#sun-snow)"/>${cloudG(560,90,1.2)}${cloudG(250,150,.8,.8)}
+    <path d="M0 420 Q160 330 330 400 T640 380 T800 400 V600 H0Z" fill="#DCEBFA"/>
+    ${castleG(600,400,1.15,'#F1F7FF','#6FA6E0','#4D8DF0')}
+    ${[60,150,240,720].map((x,i) => `<g transform="translate(${x} ${470 - i%2*18})"><polygon points="0,-90 34,0 -34,0" fill="#4E86A0"/><polygon points="0,-90 14,-52 -14,-52" fill="#fff"/><polygon points="-24,-26 24,-26 34,0 -34,0" fill="#fff" opacity=".55"/></g>`).join('')}
+    <path d="M0 480 Q220 420 430 476 T800 460 V600 H0Z" fill="#FFFFFF"/><path d="M0 540 Q300 500 800 545 V600 H0Z" fill="#EAF4FF"/></svg>`;
+  if (kind === 'sea') return open('sea', [[0,'#7FE0F2'],[.45,'#2E97CC'],[1,'#134F86']]) + `
+    ${[120,300,470,640].map((x,i) => `<polygon points="${x},0 ${x+70},0 ${x+10+i*20},600 ${x-90+i*20},600" fill="#fff" opacity=".09"/>`).join('')}
+    <g opacity=".3">${castleG(610,470,1.0,'#0F4F86','#0B3F70','#0B3F70')}</g>
+    <path d="M0 500 Q200 450 400 500 T800 480 V600 H0Z" fill="#F2DFA8"/><path d="M0 550 Q300 520 800 556 V600 H0Z" fill="#E6CC8A"/>
+    ${[70,150,690,760].map((x,i) => `<path d="M${x} 520 q-22 -50 0 -90 q22 -40 0 -90" stroke="${i%2?'#2FA36B':'#3FBF8A'}" stroke-width="14" fill="none" stroke-linecap="round"/>`).join('')}
+    ${[[230,520,'#FF8FA8'],[560,512,'#FFB45A'],[420,540,'#F27FB8']].map(([x,y,c]) => `<g fill="${c}"><circle cx="${x}" cy="${y}" r="26"/><circle cx="${x-24}" cy="${y+10}" r="18"/><circle cx="${x+26}" cy="${y+8}" r="20"/><rect x="${x-6}" y="${y-56}" width="12" height="40" rx="6"/><rect x="${x+16}" y="${y-40}" width="10" height="30" rx="5"/></g>`).join('')}</svg>`;
+  if (kind === 'palace' || kind === 'ball'){
+    const night = kind === 'ball';
+    return open(kind, night ? [[0,'#3B3470'],[1,'#5B4A8E']] : [[0,'#FBEFD9'],[1,'#F0DBB8']]) + `
+    <defs><clipPath id="win-${kind}"><path d="M430 470 V230 a130 130 0 0 1 260 0 V470 Z"/></clipPath>
+    <linearGradient id="wsky-${kind}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${night ? '#1B1F5C' : '#8EC9F5'}"/><stop offset="1" stop-color="${night ? '#5A4FA8' : '#E6F4FF'}"/></linearGradient></defs>
+    <g clip-path="url(#win-${kind})"><rect x="430" y="90" width="260" height="380" fill="url(#wsky-${kind})"/>
+      ${night ? Array.from({length:14}, (_,i) => `<circle cx="${440 + (i*47)%240}" cy="${120 + (i*61)%190}" r="${1.5 + i%3}" fill="#FFF6C8"/>`).join('') + '<circle cx="640" cy="170" r="26" fill="#FFF3B8"/>' : cloudG(520,180,.8) + cloudG(650,250,.6,.8)}
+      ${castleG(560,440,.9, night ? '#C9C6E8' : '#F6EEDF', night ? '#3D4FA0' : '#4F74C9')}
+      <path d="M430 440 Q560 410 690 440 V470 H430Z" fill="${night ? '#3F5A6E' : '#8FCF86'}"/></g>
+    <path d="M430 470 V230 a130 130 0 0 1 260 0 V470" fill="none" stroke="#F5C542" stroke-width="10"/><path d="M430 470 V230 a130 130 0 0 1 260 0 V470" fill="none" stroke="#B9820F" stroke-width="2"/>
+    ${[330,750].map(x => `<rect x="${x-26}" y="60" width="52" height="420" fill="${night ? '#D9D2F0' : '#FFF9EC'}"/><rect x="${x}" y="60" width="26" height="420" fill="#000" opacity=".07"/><rect x="${x-36}" y="44" width="72" height="24" rx="4" fill="#F5C542"/><rect x="${x-36}" y="468" width="72" height="22" rx="4" fill="#F5C542"/>`).join('')}
+    <path d="M0 0 H300 Q260 150 150 210 Q70 250 0 330 Z" fill="#B3263C"/><path d="M0 0 H150 Q130 130 40 220 Q16 250 0 280 Z" fill="#8F1B30"/>
+    <path d="M150 210 q10 30 -4 62" stroke="#F5C542" stroke-width="6" fill="none" stroke-linecap="round"/><circle cx="146" cy="278" r="10" fill="#F5C542"/>
+    <circle cx="250" cy="330" r="60" fill="url(#sun-${kind})"/><rect x="246" y="330" width="8" height="34" fill="#F5C542"/><path d="M250 318 q-7 8 0 16 q7 -8 0 -16" fill="#FFB02E"/>
+    <rect y="480" width="800" height="120" fill="${night ? '#6A5CA0' : '#EBD6B0'}"/>
+    ${Array.from({length:9}, (_,i) => `<polygon points="${i*100-60},600 ${i*100+40},600 ${i*90+20},480 ${i*90-50},480" fill="#fff" opacity="${i%2 ? .22 : 0}"/>`).join('')}
+    <rect y="476" width="800" height="8" fill="#F5C542"/></svg>`;
+  }
+  if (kind === 'forest') return open('forest', [[0,'#A9E0A0'],[.6,'#DDF3C8'],[1,'#F4F9DC']]) + `
+    <circle cx="400" cy="60" r="220" fill="url(#sun-forest)"/>
+    ${[200,330,480,600].map((x,i) => `<polygon points="${x},0 ${x+50},0 ${x+120-i*30},600 ${x-20-i*30},600" fill="#FFF6C8" opacity=".16"/>`).join('')}
+    ${[[90,1.2],[250,.8],[560,.85],[720,1.25]].map(([x,k]) => `<g transform="translate(${x} 500) scale(${k})"><rect x="-16" y="-230" width="32" height="240" rx="8" fill="#8A5F3A"/><rect x="0" y="-230" width="16" height="240" fill="#000" opacity=".12"/>
+      <circle cx="0" cy="-260" r="80" fill="#4FA35A"/><circle cx="-56" cy="-220" r="56" fill="#5DB567"/><circle cx="58" cy="-226" r="60" fill="#439150"/><circle cx="-10" cy="-310" r="50" fill="#6CC474"/></g>`).join('')}
+    <path d="M0 470 Q200 430 420 470 T800 455 V600 H0Z" fill="#7FC97A"/><path d="M340 600 Q380 520 400 470 Q430 520 480 600Z" fill="#E9D7A8"/>
+    <path d="M0 530 Q260 500 800 536 V600 H0Z" fill="#63B565" opacity=".7"/>${flowers(['#FF8FB0','#FFFFFF','#FFD23F'])}</svg>`;
+  if (kind === 'dusk') return open('dusk', [[0,'#4B50C4'],[.5,'#A985E0'],[1,'#FFD3C4']]) + `
+    <circle cx="200" cy="180" r="170" fill="url(#sun-dusk)"/>${cloudG(150,110,1,.75)}
+    <g fill="#3A2466" opacity=".85"><ellipse cx="660" cy="110" rx="150" ry="52"/><ellipse cx="560" cy="130" rx="90" ry="40"/><ellipse cx="750" cy="150" rx="90" ry="44"/></g>
+    <path d="M610 150 q-40 50 0 90 q40 40 -10 90" stroke="#D59BFF" stroke-width="8" fill="none" stroke-linecap="round" opacity=".8"/>
+    <path d="M0 430 Q200 360 400 420 T800 400 V600 H0Z" fill="#7C8FD0"/>
+    ${castleG(210,410,1.15,'#F6EEDF','#4F74C9','#F5C542')}
+    <path d="M0 480 Q240 430 460 480 T800 462 V600 H0Z" fill="#6DB872"/>
+    <g fill="#9A93B8"><rect x="640" y="440" width="46" height="60" rx="6"/><rect x="694" y="462" width="60" height="40" rx="6"/><rect x="606" y="474" width="34" height="28" rx="5"/></g>
+    <path d="M0 540 Q300 506 800 544 V600 H0Z" fill="#58A865" opacity=".8"/>${flowers(['#FFFFFF','#FF8FB0','#C9A6FF'])}</svg>`;
+  return open('meadow', [[0,'#7FC1F5'],[.55,'#D6EEFF'],[1,'#FFF2D6']]) + `
+    <circle cx="130" cy="110" r="170" fill="url(#sun-meadow)"/>${cloudG(330,100,1.1)}${cloudG(640,70,.8,.85)}${cloudG(90,220,.6,.7)}
+    <path d="M0 420 Q180 340 380 410 T800 380 V600 H0Z" fill="#A9D9A0"/>
+    ${castleG(590,410,1.2)}
+    <path d="M0 480 Q220 420 440 478 T800 458 V600 H0Z" fill="#7FC97A"/>
+    <path d="M0 536 Q300 500 800 540 V600 H0Z" fill="#63B565"/>${flowers(['#FF8FB0','#FFFFFF','#FFD23F','#C9A6FF'])}</svg>`;
+}
+
 /* ---------------- Silly villains (original) ---------------- */
 function monsterSVG(id){
   const v = VILLAINS[id] || VILLAINS.sleep; const col = v.col;
-  const eyes = `<circle cx="46" cy="54" r="8" fill="#fff"/><circle cx="74" cy="54" r="8" fill="#fff"/><circle cx="47" cy="56" r="4" fill="#2B2340"/><circle cx="75" cy="56" r="4" fill="#2B2340"/>`;
+  const eyes = `<path d="M36 52 Q46 42 56 54 Q46 62 36 52 Z M84 52 Q74 42 64 54 Q74 62 84 52 Z" fill="#FFD23F" filter="url(#glow)"/><ellipse cx="47" cy="53" rx="2" ry="4" fill="#33264F"/><ellipse cx="73" cy="53" rx="2" ry="4" fill="#33264F"/>`;
   const face = {
-    sleep:`<path d="M38 56 Q46 62 54 56 M66 56 Q74 62 82 56" stroke="#2B2340" stroke-width="4" fill="none" stroke-linecap="round"/>
-      <path d="M36 64 Q46 70 56 64 M64 64 Q74 70 84 64" stroke="#5B4A8A" stroke-width="3" fill="none" stroke-linecap="round" opacity=".7"/>
-      <ellipse cx="60" cy="82" rx="9" ry="11" fill="#2B2340"/>
+    sleep:`<path d="M38 56 Q46 62 54 56 M66 56 Q74 62 82 56" stroke="#FFE9A8" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <path d="M36 64 Q46 70 56 64 M64 64 Q74 70 84 64" stroke="#FFD23F" stroke-width="3" fill="none" stroke-linecap="round" opacity=".7"/>
+      <ellipse cx="60" cy="82" rx="9" ry="11" fill="#120C22"/>
       <text x="88" y="34" font-size="20" font-weight="800" fill="#fff" font-family="Baloo 2, sans-serif">Z</text><text x="100" y="20" font-size="14" font-weight="800" fill="#fff" font-family="Baloo 2, sans-serif">z</text>`,
-    eat:`${eyes}<path d="M50 84 Q60 76 70 84" stroke="#2B2340" stroke-width="4" fill="none" stroke-linecap="round"/>
+    eat:`${eyes}<path d="M50 84 Q60 76 70 84" stroke="#FFE9A8" stroke-width="4" fill="none" stroke-linecap="round"/>
       <path d="M48 98 q4 -4 8 0 q4 4 8 0 q4 -4 8 0" stroke="#3E6B2E" stroke-width="3" fill="none" stroke-linecap="round"/>`,
     teeth:`${eyes}<path d="M36 72 Q60 98 84 72 Z" fill="#7A2E3A"/>
       <rect x="44" y="72" width="9" height="9" fill="#fff"/><rect x="55" y="72" width="9" height="9" fill="#3A2A20"/><rect x="66" y="72" width="9" height="9" fill="#F2E27A"/>`,
-    stink:`${eyes}<path d="M48 80 Q60 88 72 80" stroke="#2B2340" stroke-width="4" fill="none" stroke-linecap="round"/>
+    stink:`${eyes}<path d="M48 80 Q60 88 72 80" stroke="#FFE9A8" stroke-width="4" fill="none" stroke-linecap="round"/>
       <path d="M14 30 q6 -8 0 -16 M108 34 q6 -8 0 -16 M104 70 q6 -8 0 -16" stroke="#7FA83A" stroke-width="4" fill="none" stroke-linecap="round"/>
       <circle cx="40" cy="96" r="5" fill="#7A6A2E"/><circle cx="78" cy="92" r="4" fill="#7A6A2E"/>`,
-    mud:`${eyes}<path d="M48 80 Q60 88 72 80" stroke="#2B2340" stroke-width="4" fill="none" stroke-linecap="round"/>
+    mud:`${eyes}<path d="M48 80 Q60 88 72 80" stroke="#FFE9A8" stroke-width="4" fill="none" stroke-linecap="round"/>
       <ellipse cx="18" cy="84" rx="10" ry="12" fill="${col}"/><ellipse cx="102" cy="84" rx="10" ry="12" fill="${col}"/>
       <circle cx="16" cy="82" r="5" fill="#6B4A2E"/><circle cx="104" cy="86" r="5" fill="#6B4A2E"/><circle cx="22" cy="90" r="3" fill="#6B4A2E"/>`,
-    sweet:`${eyes}<path d="M48 86 Q60 78 72 86" stroke="#2B2340" stroke-width="4" fill="none" stroke-linecap="round"/>
+    sweet:`${eyes}<path d="M48 86 Q60 78 72 86" stroke="#FFE9A8" stroke-width="4" fill="none" stroke-linecap="round"/>
       <line x1="100" y1="96" x2="100" y2="66" stroke="#fff" stroke-width="4"/><circle cx="100" cy="58" r="12" fill="#FFD23F" stroke="#E2575F" stroke-width="4"/>
-      <circle cx="60" cy="100" r="9" fill="none" stroke="#2B2340" stroke-width="3" stroke-dasharray="4 3"/>`,
-    messy:`${eyes}<path d="M48 82 Q60 90 72 82" stroke="#2B2340" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <circle cx="60" cy="100" r="9" fill="none" stroke="#FFE9A8" stroke-width="3" stroke-dasharray="4 3"/>`,
+    messy:`${eyes}<path d="M48 82 Q60 90 72 82" stroke="#FFE9A8" stroke-width="4" fill="none" stroke-linecap="round"/>
       <rect x="6" y="96" width="16" height="16" rx="3" fill="#FFD23F"/><circle cx="108" cy="104" r="8" fill="#E2575F"/><rect x="88" y="16" width="14" height="6" rx="3" fill="#4D8DF0" transform="rotate(30 95 19)"/>`,
   }[v.face] || '';
   return `<svg class="mon" viewBox="0 0 120 120" role="img" aria-label="${v.label} monster">
-    <path d="M30 36 L24 12 L44 28 Z M90 36 L96 12 L76 28 Z" fill="${col}"/>
-    <path d="M20 112 Q8 64 28 38 Q60 10 92 38 Q112 64 100 112 Q92 104 82 112 Q72 104 60 112 Q50 104 40 112 Q30 104 20 112 Z" fill="${col}"/>
+    <defs><filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="2.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <radialGradient id="imp" cx=".4" cy=".3" r=".9"><stop offset="0" stop-color="#5A4488"/><stop offset="1" stop-color="#2A1D44"/></radialGradient></defs>
+    <path d="M30 36 L22 8 L46 28 Z M90 36 L98 8 L74 28 Z" fill="${col}"/>
+    <path d="M20 112 Q8 64 28 38 Q60 10 92 38 Q112 64 100 112 Q92 104 82 112 Q72 104 60 112 Q50 104 40 112 Q30 104 20 112 Z" fill="url(#imp)" stroke="${col}" stroke-width="3.5" stroke-linejoin="round"/>
     ${face}
   </svg>`;
 }
@@ -931,13 +1088,13 @@ function renderHome(){
   runId++; stopSpeech(); stopListening(); G.story = null; G.q = null;
   const done = loadDone();
   app.innerHTML = `<div class="screen home gutter"><div class="home-inner">
-    <h1>Princess Talk Time</h1>
-    <p class="sub">공주님이 물어보면, 영어로 대답해요!</p>
+    <div class="hero"><img id="heroImg" src="hero.jpg" alt=""><div class="hero-text"><h1>Princess Talk Time</h1>
+    <p class="sub">공주님이 물어보면, 영어로 대답해요!</p></div></div>
     ${[['classic','명작 동화','Classic Stories'],['play','놀이 이야기','Play Stories']].map(([g,ko,en]) => `
     <h2 class="sec"><span>${en}</span><small>${ko}</small></h2>
     <div class="stories">${STORIES.map((s,i) => (s.group||'play') !== g ? '' : `
-      <button class="story" data-i="${i}" style="background:${s.bg}" aria-label="${esc(s.en)}">
-        ${princessSVG(s.p)}
+      <button class="story" data-i="${i}" aria-label="${esc(s.en)}">
+        <span class="arch" style="background:${s.bg}">${sceneSVG(SCENE[s.id])}${princessSVG(s.p)}</span>
         <span class="label"><span class="en">${esc(s.en)}</span>
         <span class="ko">${esc(s.ko)}</span></span>
         <span class="today">오늘: ${esc(epFor(s).ko)}</span>
@@ -955,6 +1112,7 @@ function renderHome(){
     </div>
   </div></div>`;
   app.querySelectorAll('.story').forEach(b => b.onclick = () => startStory(+b.dataset.i));
+  const hero = $('#heroImg'); if (hero) hero.onerror = () => hero.remove();
   renderEngineNote();
 }
 function renderEngineNote(){
@@ -974,7 +1132,7 @@ function startStory(i){
       <div class="name">${esc(G.ep.en)}</div>
       <div class="dots" id="dots">${G.ep.qs.map(() => '<span>★</span>').join('')}</div>
     </div>
-    <div class="stage gutter" id="stage" style="background:${s.bg}">
+    <div class="stage gutter" id="stage" style="background:${s.bg}">${sceneSVG(SCENE[s.id])}
       <button class="bubble" id="bubble"><span class="ear">${ICON.ear}</span><span class="btxt"><span id="bubbleText"></span><small id="koText" hidden></small></span></button>
       <div class="princess-wrap">${princessSVG(s.p)}<div class="friend">${s.friend}</div></div>
       <div class="prop" id="prop"></div>
