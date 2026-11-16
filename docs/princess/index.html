@@ -629,7 +629,7 @@ const PLAY = [
         Q("Today is my birthday!","오늘은 코랄 공주의 생일이에요!","Who swims with me?","🌊","fish","dog"),
         Q(null,null,"What do we eat?","🎉","cake","shoe"),
         Q(null,null,"How many shells? Let's count!","n3:🐚","three","one"),
-        Q(null,null,"What color is my tail?","🧜‍♀️","purple","green")]),
+        Q(null,null,"What color is my dress?","👗","purple","green")]),
       E('Sea Friends','바다 친구들',[
         Q("Someone has eight long legs.","다리가 여덟 개인 친구가 있어요.","Who is it?","🌊","octopus","dog"),
         Q("Someone is very, very big.","아주 아주 큰 친구가 있어요.","Who is it?","🌊","whale","mouse"),
@@ -772,6 +772,8 @@ const LOOKS = {
   dino:{hs:'buns2', bg:'straight', ey:'almond', ds:'aline', sl:'puff', hd:'tiara', gem:'#2FBF94', pose:'down'},
   kitten:{hs:'ponytail', bg:'center', ey:'big', mo:'grin', freckles:true, ds:'ball', sl:'puff', hd:'catears', pose:'wave'},
 };
+/* Painted portraits: the queen and the little princess from the family picture, recoloured per character. */
+['snowwhite','sleeping','cinderella','mermaid','rapunzel','snowqueen','snow','sea','unicorn','dino','kitten'].forEach(id => { LOOKS[id].img = 'p_' + id + '.jpg'; });
 STORIES.forEach(st => { st.p = Object.assign({}, st.p, LOOKS[st.id] || {}); });
 
 function princessSVG(p){
