@@ -790,24 +790,24 @@ const PDEFS = `<defs>
 </defs>`;
 /* Each character's own look: hairstyle, fringe, eyes, mouth, dress cut, sleeves, headpiece, pose. */
 const LOOKS = {
-  snowwhite:{hs:'long', bg:'center', ey:'big', ds:'ball', sl:'puff', hd:'tiara', gem:'#E0355A', pose:'wave', lips:'#D62F4A'},
-  sleeping:{hs:'bun', bg:'swoop', ey:'almond', ds:'tier', sl:'long', hd:'flowers', fl:['#FF8FB0','#FFFFFF'], pose:'down', hair:'#B5552E', hairDark:'#8E3D1C', dress:'#3FA8A0', accent:'#D8F3F0'},
-  cinderella:{hs:'sidebraid', bg:'swoop', ey:'round', ds:'ball', sl:'none', hd:'tiara', gem:'#4D8DF0', pose:'wave'},
-  mermaid:{hs:'wavy', bg:'center', ey:'big', hd:'shell'},
-  rapunzel:{hs:'long', bg:'straight', ey:'round', freckles:true, ds:'aline', sl:'puff', hd:'flowers', fl:['#C9A6FF','#FF8FB0'], pose:'down'},
-  snowqueen:{hs:'braids', bg:'straight', ey:'round', freckles:true, mo:'grin', ds:'aline', apron:true, sl:'long', hd:'band', pose:'wave'},
+  snowwhite:{hs:'bob', bg:'center', ey:'big', ds:'ball', sl:'puff', hd:'tiara', gem:'#E0355A', pose:'wave', hold:'apple', lips:'#D62F4A', dress:'#E21B2D', accent:'#FFFFFF', skin:'#FFF4EE'},
+  sleeping:{hs:'bun', bg:'swoop', ey:'almond', ds:'tier', sl:'long', hd:'flowers', fl:['#E21B2D','#FF8FB0'], pose:'wave', hold:'rose', sleepy:true, hair:'#B5552E', hairDark:'#8E3D1C', dress:'#B23FE0', accent:'#F3D6FF'},
+  cinderella:{hs:'sidebraid', bg:'swoop', ey:'round', ds:'ball', sl:'none', hd:'tiara', gem:'#4D8DF0', pose:'wave', hold:'slipper', dress:'#FFC21A', accent:'#FFF3B8'},
+  mermaid:{hs:'wavy', bg:'center', ey:'big', hd:'shell', dress:'#FF4F8B', accent:'#FFD23F', bigfin:true},
+  rapunzel:{hs:'long', bg:'straight', ey:'round', freckles:true, ds:'aline', sl:'puff', hd:'flowers', fl:['#C9A6FF','#FF8FB0'], pose:'down', rapunzel:true, hair:'#FFD21F', hairDark:'#E0A800', dress:'#34B24A', accent:'#DFF7DF'},
+  snowqueen:{hs:'braids', bg:'straight', ey:'round', freckles:true, mo:'grin', ds:'aline', apron:true, sl:'long', hd:'band', pose:'wave', dress:'#2F7BE8', crown:'#E21B2D'},
   battle:{img:'c_queen.webp'}, wedding:{img:'c_queen.webp'},
-  snow:{hs:'bob', bg:'straight', ey:'big', ds:'fur', sl:'long', hd:'crown', pose:'wand'},
-  sea:{hs:'buns2', bg:'swoop', ey:'almond', mo:'grin', hd:'shell', skin:'#F3C9A8'},
-  unicorn:{hs:'curly', bg:'curly', ey:'big', mo:'grin', ds:'tier', sl:'puff', hd:'flowers', fl:['#FFD23F','#FFFFFF'], pose:'wave', skin:'#B9794E', hair:'#3A2418', hairDark:'#26160E', blush:'#E0606E'},
-  dino:{hs:'buns2', bg:'straight', ey:'almond', ds:'aline', sl:'puff', hd:'tiara', gem:'#2FBF94', pose:'down'},
-  kitten:{hs:'ponytail', bg:'center', ey:'big', mo:'grin', freckles:true, ds:'ball', sl:'puff', hd:'catears', pose:'wave'},
+  snow:{dress:'#35B4F0', hs:'bob', bg:'straight', ey:'big', ds:'fur', sl:'long', hd:'crown', pose:'wand'},
+  sea:{hs:'buns2', bg:'swoop', ey:'almond', mo:'grin', hd:'shell', skin:'#F3C9A8', dress:'#8F5CF0', bigfin:true},
+  unicorn:{dress:'#FF4FA3', hs:'curly', bg:'curly', ey:'big', mo:'grin', ds:'tier', sl:'puff', hd:'flowers', fl:['#FFD23F','#FFFFFF'], pose:'wave', skin:'#B9794E', hair:'#3A2418', hairDark:'#26160E', blush:'#E0606E'},
+  dino:{dress:'#FF8A1F', accent:'#FFE3C2', hs:'buns2', bg:'straight', ey:'almond', ds:'aline', sl:'puff', hd:'tiara', gem:'#2FBF94', pose:'down'},
+  kitten:{dress:'#A066F0', hs:'ponytail', bg:'center', ey:'big', mo:'grin', freckles:true, ds:'ball', sl:'puff', hd:'catears', pose:'wave'},
 };
 /* Painted portraits: the queen and the little princess from the family picture, recoloured per character. */
-['snowwhite','sleeping','cinderella','mermaid','rapunzel','snowqueen','snow','sea','unicorn','dino','kitten'].forEach(id => { LOOKS[id].img = 'c_' + id + '.webp'; });
 STORIES.forEach(st => { st.p = Object.assign({}, st.p, LOOKS[st.id] || {}); });
 
-function princessSVG(p){
+function princessSVG(p, opt = {}){
+  const asleep = opt.asleep && p.sleepy;
   if (p.img) return `<img class="princess cutout" src="${p.img}" alt="${p.name}">`;
   const H = p.hair, HD = p.hairDark, G = 'url(#pgGold)';
   const spark = (x,y,r) => `<path d="M${x} ${y-r} L${x+r*.3} ${y-r*.3} L${x+r} ${y} L${x+r*.3} ${y+r*.3} L${x} ${y+r} L${x-r*.3} ${y+r*.3} L${x-r} ${y} L${x-r*.3} ${y-r*.3} Z" fill="#fff" opacity=".9"/>`;
@@ -823,7 +823,9 @@ function princessSVG(p){
     ? [[44,80],[38,108],[46,136],[64,152],[156,80],[162,108],[154,136],[136,152],[54,54],[146,54],[76,36],[124,36],[100,30]].map(([x,y]) => `<circle cx="${x}" cy="${y}" r="23" fill="${HD}"/>`).join('')
     : `<path d="${backD}" fill="${HD}"/>`;
   if (hs === 'ponytail') back += `<path d="M140 50 Q200 66 190 140 Q186 192 160 218 Q174 160 160 118 Q154 84 132 70 Z" fill="${HD}"/><path d="M150 62 Q188 80 180 140 Q178 170 168 190 Q172 150 162 116 Q158 90 144 76 Z" fill="${H}"/><circle cx="143" cy="58" r="8" fill="${p.accent}" stroke="${p.dress}" stroke-width="2"/>`;
-  if (p.longHair) back += `<path d="M146 110 Q190 160 160 205 Q136 240 186 266" stroke="${HD}" stroke-width="24" fill="none" stroke-linecap="round"/><path d="M146 110 Q190 160 160 205 Q136 240 186 266" stroke="${H}" stroke-width="16" fill="none" stroke-linecap="round" stroke-dasharray="14 6"/>`;
+  if (p.longHair){ const d = p.rapunzel ? 'M146 110 Q192 160 162 205 Q138 246 196 254 Q236 260 248 236 Q262 212 284 240' : 'M146 110 Q190 160 160 205 Q136 240 186 266';
+    back += `<path d="${d}" stroke="${HD}" stroke-width="${p.rapunzel ? 30 : 24}" fill="none" stroke-linecap="round"/><path d="${d}" stroke="${H}" stroke-width="${p.rapunzel ? 21 : 16}" fill="none" stroke-linecap="round" stroke-dasharray="14 6"/>`
+      + (p.rapunzel ? `<circle cx="284" cy="240" r="9" fill="#C9A6FF" stroke="#8E5CD9" stroke-width="2"/>` : ''); }
   const cape = (p.cape ? `<path d="M74 140 Q26 200 20 262 L180 262 Q174 200 126 140 Z" fill="${p.cape}" opacity=".92"/>${vol('M74 140 Q26 200 20 262 L180 262 Q174 200 126 140 Z')}${spark(44,222,5)}${spark(158,214,4.5)}` : '')
     + (p.veil ? `<path d="M56 60 Q16 160 24 262 L176 262 Q184 160 144 60 Z" fill="#FFFFFF" opacity=".78" stroke="#F3D6E8" stroke-width="2"/>` : '');
 
@@ -835,7 +837,7 @@ function princessSVG(p){
   const TL = 'M80 150 Q70 196 90 226 Q95 238 80 258 Q96 254 100 244 Q104 254 120 258 Q105 238 110 226 Q130 196 120 150 Z';
   const BOD = 'M82 138 Q100 132 118 138 L116 164 Q100 170 84 164 Z';
   const body = p.tail
-    ? `<path d="${TL}" fill="${p.dress}"/>${vol(TL)}
+    ? `${p.bigfin ? `<path d="M100 238 Q62 240 44 268 Q84 266 100 252 Q116 266 156 268 Q138 240 100 238 Z" fill="${p.dress}" stroke="rgba(255,255,255,.6)" stroke-width="2"/><path d="M60 262 L92 246 M140 262 L108 246 M76 266 L98 250 M124 266 L102 250" stroke="rgba(255,255,255,.55)" stroke-width="2"/>` : ''}<path d="${TL}" fill="${p.dress}"/>${vol(TL)}
        <path d="M84 176 q5 6 10 0 q5 6 10 0 q5 6 10 0 M86 194 q5 6 9 0 q5 6 9 0 q5 6 9 0 M90 212 q5 5 10 0 q5 5 10 0" stroke="rgba(255,255,255,.6)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
        <path d="M82 152 Q100 160 118 152" stroke="${G}" stroke-width="4" fill="none" stroke-linecap="round"/>
        <circle cx="90" cy="148" r="9" fill="${p.accent}"/><circle cx="110" cy="148" r="9" fill="${p.accent}"/>
@@ -860,6 +862,9 @@ function princessSVG(p){
   const arms = `<ellipse cx="70" cy="172" rx="8" ry="22" fill="${armC}" transform="rotate(18 70 172)"/>${cuff(64,191)}`
     + (pose === 'down' ? `<ellipse cx="130" cy="172" rx="8" ry="22" fill="${armC}" transform="rotate(-18 130 172)"/>${cuff(136,191)}`
        : `<ellipse cx="134" cy="146" rx="8" ry="22" fill="${armC}" transform="rotate(-40 134 146)"/><circle cx="147" cy="130" r="8" fill="${p.skin}"/>`)
+    + (p.hold === 'apple' ? `<path d="M152 100 q-4 -8 2 -12" stroke="#6B4628" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M155 92 q10 -8 14 2 q-8 6 -14 -2z" fill="#3FA84A"/><path d="M152 100 Q134 92 134 112 Q136 132 152 130 Q168 132 170 112 Q170 92 152 100 Z" fill="#E21B2D" stroke="#A80F1E" stroke-width="2"/><ellipse cx="143" cy="108" rx="4" ry="7" fill="#fff" opacity=".55" transform="rotate(-20 143 108)"/>`
+       : p.hold === 'slipper' ? `<g transform="translate(128 86) scale(1.15)"><path d="M2 26 Q8 6 24 12 Q34 16 40 4 L46 4 Q48 22 38 30 L38 40 L33 40 L33 32 Q16 38 2 32 Z" fill="#CDEEFF" fill-opacity=".8" stroke="#fff" stroke-width="2.5" stroke-linejoin="round"/><path d="M2 26 Q8 6 24 12 Q34 16 40 4 L46 4 Q48 22 38 30 L38 40 L33 40 L33 32 Q16 38 2 32 Z" fill="none" stroke="#5FB4E8" stroke-width="1"/><path d="M8 24 Q14 14 22 16" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round"/></g>${spark(126,92,6)}${spark(182,84,5)}${spark(160,74,4)}`
+       : p.hold === 'rose' ? `<path d="M148 132 Q154 116 152 104" stroke="#2F8A3C" stroke-width="3.5" fill="none" stroke-linecap="round"/><path d="M152 118 q10 -2 12 6 q-10 2 -12 -6z" fill="#3FA84A"/><circle cx="152" cy="98" r="12" fill="#E21B2D" stroke="#A80F1E" stroke-width="1.5"/><path d="M152 98 q-6 -4 -2 -9 q7 0 8 6 q0 8 -9 8 q-8 -2 -6 -10" stroke="#A80F1E" stroke-width="1.8" fill="none" stroke-linecap="round"/>` : '')
     + (pose === 'wand' ? `<line x1="146" y1="134" x2="170" y2="92" stroke="#B77A0A" stroke-width="4" stroke-linecap="round"/><path d="M170 76 l4 10 l11 1 l-8 7 l3 11 l-10 -6 l-10 6 l3 -11 l-8 -7 l11 -1z" fill="${G}" stroke="#B77A0A" stroke-width="1.5" stroke-linejoin="round"/>` : '');
 
   /* --- hair in front --- */
@@ -911,7 +916,7 @@ function princessSVG(p){
        + `<path d="M88 42 L92 26 L100 36 L108 26 L112 42 Q100 38 88 42 Z" fill="${G}" stroke="#B77A0A" stroke-width="1.5" stroke-linejoin="round"/>${gem(100,36,2.6,'#E0355A')}`,
   }[hd]();
 
-  return `<svg class="princess" viewBox="0 0 200 270" role="img" aria-label="${p.name}">${PDEFS}
+  return `<svg class="princess" viewBox="0 0 ${p.rapunzel ? 292 : 200} 270" role="img" aria-label="${p.name}">${PDEFS}
     <ellipse cx="100" cy="263" rx="62" ry="6" fill="#1B1240" opacity=".16"/>
     ${cape}${back}${body}${arms}
     <rect x="93" y="126" width="14" height="18" rx="6" fill="${p.skin}"/>
@@ -919,7 +924,9 @@ function princessSVG(p){
       : `<path d="M91 135 Q100 143 109 135" stroke="${G}" stroke-width="2" fill="none"/><circle cx="100" cy="140.5" r="2.6" fill="${p.gem || '#E0355A'}" stroke="#B77A0A" stroke-width=".8"/>`}
     <circle cx="100" cy="88" r="50" fill="${p.skin}"/><circle cx="100" cy="88" r="50" fill="url(#pgSkin)"/>
     ${front}${bangs}${topHair}
-    <g>${eye(80,-1)}${eye(120,1)}</g>
+    ${asleep ? `<path d="M69 97 Q80 107 91 97 M109 97 Q120 107 131 97" stroke="#2B2340" stroke-width="3.5" fill="none" stroke-linecap="round"/><path d="M70 100 l-4 4 M90 100 l4 4 M110 100 l-4 4 M130 100 l4 4" stroke="#2B2340" stroke-width="2.5" stroke-linecap="round"/>
+      <text x="150" y="60" font-size="26" font-weight="800" fill="#fff" stroke="#6A5CA0" stroke-width="1.5" font-family="Baloo 2, sans-serif">Z</text><text x="170" y="40" font-size="18" font-weight="800" fill="#fff" stroke="#6A5CA0" stroke-width="1.2" font-family="Baloo 2, sans-serif">z</text>`
+      : `<g>${eye(80,-1)}${eye(120,1)}</g>`}
     <ellipse cx="66" cy="113" rx="9" ry="5.5" fill="${p.blush || '#FF8FB0'}" opacity=".5"/><ellipse cx="134" cy="113" rx="9" ry="5.5" fill="${p.blush || '#FF8FB0'}" opacity=".5"/>
     ${freck}${mouth}
     <ellipse class="m-open" cx="100" cy="118" rx="6.5" ry="6" fill="#B5476B"/>
@@ -933,7 +940,7 @@ const EPSCENE = {'The Magic Mirror':'palace','The Little House':'forest','Three 
   "The Fairies' Gifts":'palace','The Old Tower':'palace','Everyone Sleeps':'ball','The Rose Hedge':'meadow','Good Morning, Castle':'palace',
   'Hard Work':'palace','Fairy Magic':'ball','The Royal Ball':'ball','Midnight!':'ball','The Shoe Fits':'palace',
   'Up to the Top':'meadow','The Storm':'dusk','The Sea Witch':'sea','Dancing on Land':'palace',
-  "The Witch's Garden":'meadow','The Tall Tower':'meadow','Let Down Your Hair':'forest','Her Song':'meadow','Together Again':'forest',
+  "The Witch's Garden":'meadow','The Tall Tower':'tower','Let Down Your Hair':'tower','Her Song':'tower','Together Again':'forest',
   'Kai and Gerda':'meadow','The Broken Mirror':'snow',"Gerda's Journey":'forest','New Friends':'forest','The Ice Palace':'snow',
   'The Dark Forest':'forest','The Ice Mountain':'snow','The Castle Garden':'meadow','The Snowy Village':'snow','The Stormy Night':'dusk','The Frozen Sea':'snow','The Castle Kitchen':'palace',
   'Wedding Party':'ball','Trip to the Sea':'meadow','Warm Inside':'palace','Rainy Day':'dusk','Tea Party':'palace','Treasure Hunt':'sea'};
@@ -966,7 +973,7 @@ function react(kind, ch){
   if (ch !== undefined) emote(ch, kind === 'listen');
 }
 
-const SCENE = {snowwhite:'forest', sleeping:'palace', cinderella:'ball', mermaid:'sea', rapunzel:'meadow', snowqueen:'snow', battle:'dusk', wedding:'palace', snow:'snow', sea:'sea', unicorn:'meadow', dino:'forest', kitten:'meadow'};
+const SCENE = {snowwhite:'forest', sleeping:'palace', cinderella:'ball', mermaid:'sea', rapunzel:'tower', snowqueen:'snow', battle:'dusk', wedding:'palace', snow:'snow', sea:'sea', unicorn:'meadow', dino:'forest', kitten:'meadow'};
 function castleG(x, y, k, wall='#F6EEDF', roof='#4F74C9', flag='#E0355A'){
   const tw = (cx, h, w) => `<rect x="${cx-w/2}" y="${-h}" width="${w}" height="${h}" fill="${wall}"/><rect x="${cx}" y="${-h}" width="${w/2}" height="${h}" fill="#000" opacity=".07"/>
     <polygon points="${cx-w/2-5},${-h} ${cx},${-h-w*1.7} ${cx+w/2+5},${-h}" fill="${roof}"/><polygon points="${cx},${-h} ${cx},${-h-w*1.7} ${cx+w/2+5},${-h}" fill="#000" opacity=".12"/>
@@ -1034,7 +1041,11 @@ function sceneSVG(kind){
   return open('meadow', [[0,'#7FC1F5'],[.55,'#D6EEFF'],[1,'#FFF2D6']]) + `
     <circle cx="130" cy="110" r="170" fill="url(#sun-meadow)"/>${cloudG(330,100,1.1)}${cloudG(640,70,.8,.85)}${cloudG(90,220,.6,.7)}
     <path d="M0 420 Q180 340 380 410 T800 380 V600 H0Z" fill="#A9D9A0"/>
-    ${castleG(590,410,1.2)}
+    ${kind === 'tower' ? `<g transform="translate(610 430)"><rect x="-44" y="-330" width="88" height="330" fill="#E9DFCF"/><rect x="0" y="-330" width="44" height="330" fill="#000" opacity=".08"/>
+      <rect x="-58" y="-350" width="116" height="30" rx="4" fill="#D9CDB8"/><polygon points="-66,-350 0,-470 66,-350" fill="#8E5CD9"/><polygon points="0,-350 0,-470 66,-350" fill="#000" opacity=".12"/>
+      <path d="M-20 -250 v-36 a20 20 0 0 1 40 0 v36 z" fill="#4A3A6A"/><path d="M-20 -250 h40" stroke="#B9A98F" stroke-width="6"/>
+      <path d="M0 -262 Q-30 -180 -8 -110 Q10 -50 -26 0" stroke="#E0A800" stroke-width="16" fill="none" stroke-linecap="round"/><path d="M0 -262 Q-30 -180 -8 -110 Q10 -50 -26 0" stroke="#FFD21F" stroke-width="10" fill="none" stroke-linecap="round" stroke-dasharray="12 5"/>
+      ${[[-30,-200],[18,-160],[-22,-90],[24,-40],[20,-300]].map(([x,y]) => `<rect x="${x}" y="${y}" width="18" height="10" rx="2" fill="#000" opacity=".08"/>`).join('')}</g>` : castleG(590,410,1.2)}
     <path d="M0 480 Q220 420 440 478 T800 458 V600 H0Z" fill="#7FC97A"/>
     <path d="M0 536 Q300 500 800 540 V600 H0Z" fill="#63B565"/>${flowers(['#FF8FB0','#FFFFFF','#FFD23F','#C9A6FF'])}</svg>`;
 }
@@ -1244,7 +1255,7 @@ function renderHome(){
     <h2 class="sec"><span>${en}</span><small>${ko}</small></h2>
     <div class="stories">${STORIES.map((s,i) => (s.group||'play') !== g ? '' : `
       <button class="story" data-i="${i}" aria-label="${esc(s.en)}">
-        <span class="arch" style="background:${s.bg}">${sceneSVG(SCENE[s.id])}${princessSVG(s.p)}</span>
+        <span class="arch" style="background:${s.bg}">${sceneSVG(SCENE[s.id])}${princessSVG(s.p, {asleep:true})}</span>
         <span class="label"><span class="en">${esc(s.en)}</span>
         <span class="ko">${esc(s.ko)}</span></span>
         <span class="today">오늘: ${esc(epFor(s).ko)}</span>
