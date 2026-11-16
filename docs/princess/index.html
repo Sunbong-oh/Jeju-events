@@ -797,6 +797,8 @@ const LOOKS = {
   rapunzel:{hs:'long', bg:'straight', ey:'round', freckles:true, ds:'aline', sl:'puff', hd:'flowers', fl:['#C9A6FF','#FF8FB0'], pose:'down', rapunzel:true, hair:'#FFD21F', hairDark:'#E0A800', dress:'#34B24A', accent:'#DFF7DF'},
   snowqueen:{hs:'braids', bg:'straight', ey:'round', freckles:true, mo:'grin', ds:'aline', apron:true, sl:'long', hd:'band', pose:'wave', dress:'#2F7BE8', crown:'#E21B2D'},
   battle:{img:'c_queen.webp'}, wedding:{img:'c_queen.webp'},
+  /* painted pictures supplied by the family replace the drawn princess */
+  __img:{snowwhite:'c_snowwhite.webp'},
   snow:{dress:'#35B4F0', hs:'bob', bg:'straight', ey:'big', ds:'fur', sl:'long', hd:'crown', pose:'wand'},
   sea:{hs:'buns2', bg:'swoop', ey:'almond', mo:'grin', hd:'shell', skin:'#F3C9A8', dress:'#8F5CF0', bigfin:true},
   unicorn:{dress:'#FF4FA3', hs:'curly', bg:'curly', ey:'big', mo:'grin', ds:'tier', sl:'puff', hd:'flowers', fl:['#FFD23F','#FFFFFF'], pose:'wave', skin:'#B9794E', hair:'#3A2418', hairDark:'#26160E', blush:'#E0606E'},
@@ -804,6 +806,7 @@ const LOOKS = {
   kitten:{dress:'#A066F0', hs:'ponytail', bg:'center', ey:'big', mo:'grin', freckles:true, ds:'ball', sl:'puff', hd:'catears', pose:'wave'},
 };
 /* Painted portraits: the queen and the little princess from the family picture, recoloured per character. */
+Object.entries(LOOKS.__img).forEach(([id, f]) => { LOOKS[id].img = f; });
 STORIES.forEach(st => { st.p = Object.assign({}, st.p, LOOKS[st.id] || {}); });
 
 function princessSVG(p, opt = {}){
