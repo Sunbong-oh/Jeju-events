@@ -866,7 +866,13 @@ function princessSVG(p, opt = {}){
     + (pose === 'down' ? `<ellipse cx="130" cy="172" rx="8" ry="22" fill="${armC}" transform="rotate(-18 130 172)"/>${cuff(136,191)}`
        : `<ellipse cx="134" cy="146" rx="8" ry="22" fill="${armC}" transform="rotate(-40 134 146)"/><circle cx="147" cy="130" r="8" fill="${p.skin}"/>`)
     + (p.hold === 'apple' ? `<path d="M152 100 q-4 -8 2 -12" stroke="#6B4628" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M155 92 q10 -8 14 2 q-8 6 -14 -2z" fill="#3FA84A"/><path d="M152 100 Q134 92 134 112 Q136 132 152 130 Q168 132 170 112 Q170 92 152 100 Z" fill="#E21B2D" stroke="#A80F1E" stroke-width="2"/><ellipse cx="143" cy="108" rx="4" ry="7" fill="#fff" opacity=".55" transform="rotate(-20 143 108)"/>`
-       : p.hold === 'slipper' ? `<g transform="translate(128 86) scale(1.15)"><path d="M2 26 Q8 6 24 12 Q34 16 40 4 L46 4 Q48 22 38 30 L38 40 L33 40 L33 32 Q16 38 2 32 Z" fill="#CDEEFF" fill-opacity=".8" stroke="#fff" stroke-width="2.5" stroke-linejoin="round"/><path d="M2 26 Q8 6 24 12 Q34 16 40 4 L46 4 Q48 22 38 30 L38 40 L33 40 L33 32 Q16 38 2 32 Z" fill="none" stroke="#5FB4E8" stroke-width="1"/><path d="M8 24 Q14 14 22 16" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round"/></g>${spark(126,92,6)}${spark(182,84,5)}${spark(160,74,4)}`
+       : p.hold === 'slipper' ? `<defs><linearGradient id="glass" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".45" stop-color="#BFE9FF"/><stop offset="1" stop-color="#62B8F0"/></linearGradient>
+         <radialGradient id="slglow"><stop offset="0" stop-color="#DFF6FF" stop-opacity=".95"/><stop offset="1" stop-color="#DFF6FF" stop-opacity="0"/></radialGradient></defs>
+         <circle cx="196" cy="104" r="52" fill="url(#slglow)"/>
+         <g transform="translate(154 66) scale(1.9)"><path d="M2 26 Q8 6 24 12 Q34 16 40 4 L46 4 Q48 22 38 30 L38 42 L32 42 L32 33 Q16 39 2 33 Z" fill="url(#glass)" stroke="#3E9BE0" stroke-width="2" stroke-linejoin="round"/>
+         <path d="M7 24 Q13 13 22 15" stroke="#fff" stroke-width="2.6" fill="none" stroke-linecap="round"/><path d="M36 14 L42 10" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+         <path d="M20 28 l3 -4 l3 4 l-3 4z" fill="#fff" opacity=".9"/><circle cx="12" cy="29" r="1.4" fill="#fff"/><circle cx="29" cy="30" r="1.4" fill="#fff"/></g>
+         ${spark(150,70,8)}${spark(236,60,9)}${spark(240,130,7)}${spark(170,150,6)}${spark(210,40,6)}`
        : p.hold === 'rose' ? `<path d="M148 132 Q154 116 152 104" stroke="#2F8A3C" stroke-width="3.5" fill="none" stroke-linecap="round"/><path d="M152 118 q10 -2 12 6 q-10 2 -12 -6z" fill="#3FA84A"/><circle cx="152" cy="98" r="12" fill="#E21B2D" stroke="#A80F1E" stroke-width="1.5"/><path d="M152 98 q-6 -4 -2 -9 q7 0 8 6 q0 8 -9 8 q-8 -2 -6 -10" stroke="#A80F1E" stroke-width="1.8" fill="none" stroke-linecap="round"/>` : '')
     + (pose === 'wand' ? `<line x1="146" y1="134" x2="170" y2="92" stroke="#B77A0A" stroke-width="4" stroke-linecap="round"/><path d="M170 76 l4 10 l11 1 l-8 7 l3 11 l-10 -6 l-10 6 l3 -11 l-8 -7 l11 -1z" fill="${G}" stroke="#B77A0A" stroke-width="1.5" stroke-linejoin="round"/>` : '');
 
@@ -919,7 +925,7 @@ function princessSVG(p, opt = {}){
        + `<path d="M88 42 L92 26 L100 36 L108 26 L112 42 Q100 38 88 42 Z" fill="${G}" stroke="#B77A0A" stroke-width="1.5" stroke-linejoin="round"/>${gem(100,36,2.6,'#E0355A')}`,
   }[hd]();
 
-  return `<svg class="princess" viewBox="0 0 ${p.rapunzel ? 292 : 200} 270" role="img" aria-label="${p.name}">${PDEFS}
+  return `<svg class="princess" viewBox="0 0 ${p.rapunzel ? 292 : p.hold === 'slipper' ? 252 : 200} 270" role="img" aria-label="${p.name}">${PDEFS}
     <ellipse cx="100" cy="263" rx="62" ry="6" fill="#1B1240" opacity=".16"/>
     ${cape}${back}${body}${arms}
     <rect x="93" y="126" width="14" height="18" rx="6" fill="${p.skin}"/>
