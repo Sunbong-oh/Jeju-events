@@ -213,6 +213,37 @@ body{background:var(--navy)}
 .done .princess.portrait{height:200px;width:auto;margin-bottom:0}
 .friend img{display:block;width:clamp(60px,12vh,104px);aspect-ratio:1;border-radius:50%;object-fit:cover;object-position:50% 20%;border:3px solid var(--gold);box-shadow:0 0 0 2px var(--gold-deep)}
 .prop-img{display:block;height:1.7em;max-height:100%;aspect-ratio:3/4;object-fit:cover;border-radius:22px;border:4px solid var(--gold);box-shadow:0 0 0 2px var(--gold-deep)}
+
+/* ===== cut-out characters standing in the scene, and moments of the story ===== */
+.princess.cutout{display:block;height:100%;max-height:400px;width:auto;max-width:100%;object-fit:contain;object-position:50% 100%;filter:drop-shadow(0 6px 10px rgba(31,27,77,.35))}
+.princess-wrap .princess.cutout{height:100%;margin:0 0 -16px}
+.story .arch .princess.cutout{height:78%;bottom:0;max-width:none}
+.done .princess.cutout{height:190px}
+.friend{right:-4%}
+.friend img{width:auto;height:clamp(64px,15vh,140px);aspect-ratio:auto;border:none;border-radius:0;box-shadow:none;object-fit:contain;filter:drop-shadow(0 4px 6px rgba(31,27,77,.35))}
+.prop-img{height:2em;max-height:100%;width:auto;aspect-ratio:auto;border:none;border-radius:0;box-shadow:none;object-fit:contain}
+.emote{position:absolute;left:58%;top:0;z-index:3;font-size:clamp(30px,6vh,54px);line-height:1;background:var(--paper);border:3px solid var(--gold);border-radius:50%;width:1.7em;height:1.7em;display:grid;place-items:center;box-shadow:0 4px 0 rgba(31,27,77,.25)}
+.emote.pop{animation:pop .45s cubic-bezier(.3,1.6,.5,1)}
+.princess-wrap.joy .princess{animation:joy .55s ease-in-out 3}
+.princess-wrap.hmm .princess{animation:hmm .5s ease-in-out 2}
+.princess-wrap.listen .princess{animation:none;transform:rotate(5deg) translateY(-4px);transition:transform .3s}
+@keyframes joy{0%,100%{transform:translateY(0) rotate(0)}40%{transform:translateY(-26px) rotate(-4deg)}70%{transform:translateY(-6px) rotate(3deg)}}
+@keyframes hmm{0%,100%{transform:rotate(0)}30%{transform:rotate(-5deg)}70%{transform:rotate(5deg)}}
+.stage::before{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;opacity:0;transition:opacity .7s}
+.stage .scene{z-index:-1}
+.stage{isolation:isolate}
+.stage[data-mood="sleep"]::before{opacity:1;background:radial-gradient(circle at 80% 12%,rgba(255,243,184,.55) 0 5%,transparent 6%),linear-gradient(180deg,rgba(20,24,84,.72),rgba(58,42,107,.5))}
+.stage[data-mood="storm"]::before{opacity:1;background:repeating-linear-gradient(105deg,transparent 0 16px,rgba(255,255,255,.4) 16px 18px),linear-gradient(180deg,rgba(30,35,80,.7),rgba(30,35,80,.4));background-size:60px 120px,100% 100%;animation:rainfall .5s linear infinite}
+.stage[data-mood="sad"]::before{opacity:1;background:linear-gradient(180deg,rgba(60,80,140,.5),rgba(60,80,140,.25))}
+.stage[data-mood="cold"]::before{opacity:1;background:radial-gradient(ellipse at 50% 55%,transparent 45%,rgba(225,243,255,.9))}
+.stage[data-mood="party"]::before{opacity:1;background:radial-gradient(circle at 15% 20%,rgba(255,210,63,.55) 0 7px,transparent 8px),radial-gradient(circle at 70% 12%,rgba(255,143,176,.6) 0 6px,transparent 7px),radial-gradient(circle at 40% 30%,rgba(143,180,255,.6) 0 5px,transparent 6px),radial-gradient(circle at 88% 34%,rgba(160,230,160,.6) 0 6px,transparent 7px);background-size:170px 150px;animation:confetti 3s linear infinite}
+.stage[data-mood="magic"]::before{opacity:1;background:radial-gradient(circle at 30% 40%,rgba(255,246,200,.55),transparent 45%),radial-gradient(circle at 75% 30%,rgba(213,155,255,.4),transparent 40%)}
+.stage[data-mood="sleep"] .princess,.stage[data-mood="storm"] .princess{filter:brightness(.78) saturate(.85) drop-shadow(0 6px 10px rgba(10,10,40,.5))}
+.stage[data-mood="sad"] .princess{filter:saturate(.7) drop-shadow(0 6px 10px rgba(31,27,77,.35))}
+.stage[data-mood="magic"] .princess,.stage[data-mood="party"] .princess{filter:drop-shadow(0 0 14px rgba(255,236,170,.95))}
+.stage[data-mood="cold"] .princess{filter:drop-shadow(0 0 12px rgba(200,235,255,.95))}
+@keyframes rainfall{to{background-position:-60px 120px,0 0}}
+@keyframes confetti{to{background-position:0 150px}}
 </style>
 
 <div id="app"></div>
@@ -543,22 +574,22 @@ function buildBattle(rng){
   const place = pick(BATTLE.places), st = pick(BATTLE.strong), mg = pick(BATTLE.magic);
   const by = f => Object.fromEntries(ids.map(id => [id, f(VILLAINS[id])]));
   return E(place[2], place[3], [
-    {n:place[0], ko:place[1], q:"The dark witch sent three monsters! Who should we beat today?", open:true, prop:'img:witch.jpg', a:0,
+    {n:place[0], ko:place[1], q:"The dark witch sent three monsters! Who should we beat today?", open:true, prop:'img:c_witch.webp', a:0,
      c:ids.map(id => ({w:VILLAINS[id].label, m:id, branch:id, k:VILLAINS[id].k}))},
     {by:by(v => Q(v.n, v.ko, v.q, 'mon', v.s[0], v.s[1]))},
     Q(null, null, st[0], '💪', st[1], st[2]),
     Q(null, null, mg[0], 'mon', mg[1], mg[2], {freeze:true}),
-    {by:by(v => Q("We won!", "우리가 이겼어요!", v.hq, 'img:girl.jpg', v.h[0], v.h[1]))},
+    {by:by(v => Q("We won!", "우리가 이겼어요!", v.hq, 'img:c_girl.webp', v.h[0], v.h[1]))},
   ], {hi:pick(BATTLE.hi), bye:pick(BATTLE.bye)});
 }
 
 /* ---------------- Play stories ---------------- */
 const QUEEN = {name:'The Ice Queen', skin:'#FCE6DA', hair:'#EDEBFA', hairDark:'#C9C3EA', dress:'#4C6FD9', accent:'#BFE6FF', eye:'#2F7FD0', crown:'#9FE3FF', queen:true, cape:'#8AB8F5'};
 const PLAY = [
-  { id:'battle', group:'play', en:'Ice Queen Power', ko:'얼음 여왕: 오늘은 누굴 해치울까?', friend:'img:king.jpg', fx:{ch:'❄',mode:'fall'},
+  { id:'battle', group:'play', en:'Ice Queen Power', ko:'얼음 여왕: 오늘은 누굴 해치울까?', friend:'img:c_king.webp', fx:{ch:'❄',mode:'fall'},
     bg:'linear-gradient(180deg,#5B6FD6 0%,#8FB6F2 55%,#DDEEFF 100%)', p:QUEEN, gen:buildBattle,
     hi:"I am the Ice Queen!", bye:"Bye-bye!" },
-  { id:'wedding', group:'play', en:'Royal Wedding', ko:'얼음 여왕과 왕의 이야기', friend:'img:king.jpg', fx:{ch:'♥',mode:'fall'},
+  { id:'wedding', group:'play', en:'Royal Wedding', ko:'얼음 여왕과 왕의 이야기', friend:'img:c_king.webp', fx:{ch:'♥',mode:'fall'},
     bg:'linear-gradient(180deg,#FFD3E6 0%,#FBEAFF 55%,#FFFFFF 100%)',
     p:{...QUEEN, dress:'#FFFFFF', accent:'#FFD3E6', cape:null, veil:true},
     hi:"Hello! I am the Ice Queen, and this is my King!", bye:"What a happy day! Thank you, friend! Bye-bye!",
@@ -765,7 +796,7 @@ const LOOKS = {
   mermaid:{hs:'wavy', bg:'center', ey:'big', hd:'shell'},
   rapunzel:{hs:'long', bg:'straight', ey:'round', freckles:true, ds:'aline', sl:'puff', hd:'flowers', fl:['#C9A6FF','#FF8FB0'], pose:'down'},
   snowqueen:{hs:'braids', bg:'straight', ey:'round', freckles:true, mo:'grin', ds:'aline', apron:true, sl:'long', hd:'band', pose:'wave'},
-  battle:{img:'queen.jpg'}, wedding:{img:'queen.jpg'},
+  battle:{img:'c_queen.webp'}, wedding:{img:'c_queen.webp'},
   snow:{hs:'bob', bg:'straight', ey:'big', ds:'fur', sl:'long', hd:'crown', pose:'wand'},
   sea:{hs:'buns2', bg:'swoop', ey:'almond', mo:'grin', hd:'shell', skin:'#F3C9A8'},
   unicorn:{hs:'curly', bg:'curly', ey:'big', mo:'grin', ds:'tier', sl:'puff', hd:'flowers', fl:['#FFD23F','#FFFFFF'], pose:'wave', skin:'#B9794E', hair:'#3A2418', hairDark:'#26160E', blush:'#E0606E'},
@@ -773,11 +804,11 @@ const LOOKS = {
   kitten:{hs:'ponytail', bg:'center', ey:'big', mo:'grin', freckles:true, ds:'ball', sl:'puff', hd:'catears', pose:'wave'},
 };
 /* Painted portraits: the queen and the little princess from the family picture, recoloured per character. */
-['snowwhite','sleeping','cinderella','mermaid','rapunzel','snowqueen','snow','sea','unicorn','dino','kitten'].forEach(id => { LOOKS[id].img = 'p_' + id + '.jpg'; });
+['snowwhite','sleeping','cinderella','mermaid','rapunzel','snowqueen','snow','sea','unicorn','dino','kitten'].forEach(id => { LOOKS[id].img = 'c_' + id + '.webp'; });
 STORIES.forEach(st => { st.p = Object.assign({}, st.p, LOOKS[st.id] || {}); });
 
 function princessSVG(p){
-  if (p.img) return `<span class="princess portrait"><img src="${p.img}" alt="${p.name}"></span>`;
+  if (p.img) return `<img class="princess cutout" src="${p.img}" alt="${p.name}">`;
   const H = p.hair, HD = p.hairDark, G = 'url(#pgGold)';
   const spark = (x,y,r) => `<path d="M${x} ${y-r} L${x+r*.3} ${y-r*.3} L${x+r} ${y} L${x+r*.3} ${y+r*.3} L${x} ${y+r} L${x-r*.3} ${y+r*.3} L${x-r} ${y} L${x-r*.3} ${y-r*.3} Z" fill="#fff" opacity=".9"/>`;
   const gem = (x,y,r,c) => `<circle cx="${x}" cy="${y}" r="${r}" fill="${c}" stroke="#B77A0A" stroke-width="1"/><circle cx="${x-r*.3}" cy="${y-r*.3}" r="${r*.3}" fill="#fff"/>`;
@@ -897,6 +928,44 @@ function princessSVG(p){
 }
 
 /* ---------------- Painted backdrops ---------------- */
+/* Where each episode happens (falls back to the story's usual place). */
+const EPSCENE = {'The Magic Mirror':'palace','The Little House':'forest','Three Tricks':'forest','Wake Up, Snow White':'forest','Forest Picnic':'forest',
+  "The Fairies' Gifts":'palace','The Old Tower':'palace','Everyone Sleeps':'ball','The Rose Hedge':'meadow','Good Morning, Castle':'palace',
+  'Hard Work':'palace','Fairy Magic':'ball','The Royal Ball':'ball','Midnight!':'ball','The Shoe Fits':'palace',
+  'Up to the Top':'meadow','The Storm':'dusk','The Sea Witch':'sea','Dancing on Land':'palace',
+  "The Witch's Garden":'meadow','The Tall Tower':'meadow','Let Down Your Hair':'forest','Her Song':'meadow','Together Again':'forest',
+  'Kai and Gerda':'meadow','The Broken Mirror':'snow',"Gerda's Journey":'forest','New Friends':'forest','The Ice Palace':'snow',
+  'The Dark Forest':'forest','The Ice Mountain':'snow','The Castle Garden':'meadow','The Snowy Village':'snow','The Stormy Night':'dusk','The Frozen Sea':'snow','The Castle Kitchen':'palace',
+  'Wedding Party':'ball','Trip to the Sea':'meadow','Warm Inside':'palace','Rainy Day':'dusk','Tea Party':'palace','Treasure Hunt':'sea'};
+/* What is going on in this moment of the story, read from the words. */
+const MOODS = [
+  ['storm', /storm|rain|wind blows|whoosh|pitter/, '⛈️'],
+  ['sleep', /sleep|asleep|tired|bed\b|good night|shh/, '💤'],
+  ['sad',   /\bsad\b|cry|crying|oh no|missing|lost|angry|shout|grumpy|scary|takes her voice|takes kai/, '💧'],
+  ['cold',  /cold|brr|frozen|freeze|ice magic|snowball/, '❄️'],
+  ['party', /party|dance|birthday|wedding|music|sing|song|hooray|we won|concert|balloon/, '🎵'],
+  ['magic', /magic|fairy|treasure|shines|sparkl|rainbow|unicorn/, '✨'],
+];
+function moodOf(q){ const t = ((q.n || '') + ' ' + q.q).toLowerCase(); return MOODS.find(m => m[1].test(t)) || null; }
+function setMood(q){
+  const st = $('#stage'); if (!st) return;
+  const m = q ? moodOf(q) : null;
+  st.dataset.mood = m ? m[0] : '';
+  emote(m ? m[2] : '', true);
+}
+function emote(ch, stay){
+  const e = $('#emote'); if (!e) return;
+  clearTimeout(emote.t);
+  e.textContent = ch; e.hidden = !ch; e.classList.remove('pop'); void e.offsetWidth; if (ch) e.classList.add('pop');
+  if (ch && !stay) emote.t = setTimeout(() => { const m = G.q && moodOf(G.q); e.textContent = m ? m[2] : ''; e.hidden = !m; }, 1800);
+}
+function react(kind, ch){
+  const w = $('.stage .princess-wrap'); if (!w) return;
+  w.classList.remove('joy','hmm','listen'); void w.offsetWidth;
+  if (kind) w.classList.add(kind);
+  if (ch !== undefined) emote(ch, kind === 'listen');
+}
+
 const SCENE = {snowwhite:'forest', sleeping:'palace', cinderella:'ball', mermaid:'sea', rapunzel:'meadow', snowqueen:'snow', battle:'dusk', wedding:'palace', snow:'snow', sea:'sea', unicorn:'meadow', dino:'forest', kitten:'meadow'};
 function castleG(x, y, k, wall='#F6EEDF', roof='#4F74C9', flag='#E0355A'){
   const tw = (cx, h, w) => `<rect x="${cx-w/2}" y="${-h}" width="${w}" height="${h}" fill="${wall}"/><rect x="${cx}" y="${-h}" width="${w/2}" height="${h}" fill="#000" opacity=".07"/>
@@ -1213,9 +1282,9 @@ function startStory(i){
       <div class="name">${esc(G.ep.en)}</div>
       <div class="dots" id="dots">${G.ep.qs.map(() => '<span>★</span>').join('')}</div>
     </div>
-    <div class="stage gutter" id="stage" style="background:${s.bg}">${sceneSVG(SCENE[s.id])}
+    <div class="stage gutter" id="stage" style="background:${s.bg}">${sceneSVG(EPSCENE[G.ep.en] || SCENE[s.id])}
       <button class="bubble" id="bubble"><span class="ear">${ICON.ear}</span><span class="btxt"><span id="bubbleText"></span><small id="koText" hidden></small></span></button>
-      <div class="princess-wrap">${princessSVG(s.p)}<div class="friend">${s.friend.startsWith('img:') ? `<img src="${s.friend.slice(4)}" alt="">` : s.friend}</div></div>
+      <div class="princess-wrap">${princessSVG(s.p)}<div class="emote" id="emote" hidden></div><div class="friend">${s.friend.startsWith('img:') ? `<img src="${s.friend.slice(4)}" alt="">` : s.friend}</div></div>
       <div class="prop" id="prop"></div>
     </div>
     <div class="choices gutter" id="choices"></div>
@@ -1266,7 +1335,7 @@ async function askQuestion(first){
   else { prop.className = 'prop'; prop.innerHTML = `<span>${q.prop}</span>`; }
   $('#choices').innerHTML = G.order.map(i => `<button class="choice" data-i="${i}" aria-label="${esc(q.c[i].w)}">${choiceHTML(q.c[i])}</button>`).join('');
   $('#choices').querySelectorAll('.choice').forEach(b => b.onclick = () => tapChoice(+b.dataset.i, b));
-  setStatus(''); updatePass();
+  setStatus(''); updatePass(); react(''); setMood(q);
   if (first) {
     const my = ++runId;
     const hi = G.ep.hi || s.hi;
@@ -1339,11 +1408,11 @@ function onMic(){
     setStatus('아이가 말한 뒤 “잘 말했어요 ✓”를 눌러 주세요.');
     updatePass(); return;
   }
-  G.listening = true; setMic('listening'); setStatus('듣고 있어요…');
+  G.listening = true; setMic('listening'); setStatus('듣고 있어요…'); react('listen', '👂');
   const myQ = G.q;
   const p = listen(t => setStatus('들린 말: ' + t));
   stopListening = () => { try { dict && dict.active() && dict.stop(); } catch {} };
-  p.then(r => { G.listening = false; if (G.q === myQ) handleHeard(r); });
+  p.then(r => { G.listening = false; react('', ''); if (G.q === myQ) handleHeard(r); });
 }
 
 async function handleHeard({texts, err}){
@@ -1354,7 +1423,7 @@ async function handleHeard({texts, err}){
     updatePass(); return;
   }
   if (heardCorrect(texts)) return success(false);
-  G.tries++; updatePass();
+  G.tries++; updatePass(); react('hmm', '🤔');
   if (G.q.open){
     const heard0 = texts.filter(Boolean)[0];
     setStatus(heard0 ? '들린 말: ' + heard0 : '잘 안 들렸어요.');
@@ -1387,7 +1456,7 @@ async function success(byParent){
   if (G.q.freeze){ const pr = $('#prop'); pr.classList.add('frozen'); pr.insertAdjacentHTML('beforeend', '<span class="ice" style="left:10%;top:10%">❄️</span><span class="ice" style="right:10%;bottom:15%">❄️</span>'); }
   const card = $(`.choice[data-i="${ri}"]`);
   if (card){ card.classList.remove('hint'); card.classList.add('correct'); burst(card); }
-  G.stars++;
+  G.stars++; react('joy', '💖'); const stg = $('#stage'); if (stg && G.q.freeze) stg.dataset.mood = 'cold';
   const dot = $('#dots').children[G.qi]; dot && dot.classList.add('on');
   setMic('busy'); $('#pass').hidden = true;
   setStatus(byParent ? '' : '정답이에요!');
